@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 
+#ruby=ruby-1.9.3-p374
+#ruby-gemset=quirkafleeg
+
 gem 'unicorn', '~> 4.3.1'
 gem 'rake', '0.9.2.2'
 gem 'sinatra', '1.3.2'
@@ -26,7 +29,7 @@ else
 end
 
 gem 'govspeak', '1.0.1'
-gem 'plek', '1.3.1'
+gem 'plek', '1.4.0'
 gem 'router-client', '3.1.0', :require => false
 gem 'yajl-ruby'
 gem 'aws-ses'

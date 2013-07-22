@@ -11,10 +11,11 @@ gem 'rabl', '0.6.14'
 gem 'statsd-ruby', '1.0.0'
 gem 'omniauth-gds', '0.0.3' #rubygems doesn't seem to pull this in transitively
 
+gem "govuk_content_models"
 if ENV['CONTENT_MODELS_DEV']
-  gem 'govuk_content_models', path: '../govuk_content_models'
+  gem "odi_content_models", path: '../odi_content_models'
 else
-  gem 'govuk_content_models', github: 'theodi/govuk_content_models'
+  gem "odi_content_models", github: 'theodi/odi_content_models'
 end
 
 # Pinning mongo to prevent bundler downgrading it in order to upgrade bson

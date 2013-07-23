@@ -17,6 +17,7 @@ end
 node(:content_with_tag) do |tag|
   {
     id: with_tag_url(tag),
-    web_url: with_tag_web_url(tag)
+    web_url: with_tag_web_url(tag),
+    slug: tag.tag_id
   }
 end

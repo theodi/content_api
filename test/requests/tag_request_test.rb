@@ -95,7 +95,8 @@ class TagRequestTest < GovUkContentApiTest
           },
           "content_with_tag" => {
             "id" => "http://example.org/with_tag.json?section=crime-and-prison",
-            "web_url" => "#{public_web_url}/browse/crime-and-prison"
+            "web_url" => "#{public_web_url}/browse/crime-and-prison",
+            "slug" => "crime-and-prison"
           },
           "parent" => nil,
           "title" => @parent.title

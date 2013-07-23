@@ -1,5 +1,6 @@
 node(:id) { |artefact| artefact_url(artefact) }
 node(:web_url) { |artefact| artefact_web_url(artefact) }
+node(:slug) { |artefact| artefact.slug }
 node(:title) do |artefact|
   if artefact.edition and artefact.edition.respond_to?(:title)
     artefact.edition.title

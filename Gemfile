@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 
-#ruby=ruby-1.9.3-p374
+#ruby=ruby-1.9.3
 #ruby-gemset=quirkafleeg
 
 gem 'unicorn', '~> 4.3.1'
@@ -11,7 +11,7 @@ gem 'rabl', '0.6.14'
 gem 'statsd-ruby', '1.0.0'
 gem 'omniauth-gds', '0.0.3' #rubygems doesn't seem to pull this in transitively
 
-gem "govuk_content_models"
+gem "govuk_content_models", github: 'theodi/govuk_content_models', branch: 'feature-lambda-format-validator'
 if ENV['CONTENT_MODELS_DEV']
   gem "odi_content_models", path: '../odi_content_models'
 else

@@ -1,5 +1,7 @@
 require "govuk_content_models"
 require "govuk_content_models/require_all"
+require "odi_content_models"
+require "odi_content_models/require_all"
 
 module ContentApiArtefactExtensions
   extend ActiveSupport::Concern

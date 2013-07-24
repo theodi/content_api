@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 
 #ruby=ruby-1.9.3
-#ruby-gemset=quirkafleeg
+#ruby-gemset=quirkafleeg-content_api
 
 gem 'unicorn', '~> 4.3.1'
 gem 'rake', '0.9.2.2'

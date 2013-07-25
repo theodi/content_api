@@ -4,12 +4,15 @@ source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 #ruby=ruby-1.9.3
 #ruby-gemset=quirkafleeg-content_api
 
-gem 'unicorn', '~> 4.3.1'
+gem 'thin'
+gem 'foreman'
 gem 'rake', '0.9.2.2'
 gem 'sinatra', '1.3.2'
 gem 'rabl', '0.6.14'
 gem 'statsd-ruby', '1.0.0'
 gem 'omniauth-gds', '0.0.3' #rubygems doesn't seem to pull this in transitively
+
+gem 'dotenv'
 
 gem "govuk_content_models", github: 'theodi/govuk_content_models', branch: 'feature-lambda-format-validator'
 if ENV['CONTENT_MODELS_DEV']
@@ -53,6 +56,4 @@ end
 
 group :development do
   gem "shotgun"
-  # Use thin because WEBrick has a URL length limit of 1024, and shotgun doesn't support unicorn
-  gem "thin", "1.5.1"
 end

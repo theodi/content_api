@@ -11,6 +11,8 @@ gem 'rabl', '0.6.14'
 gem 'statsd-ruby', '1.0.0'
 gem 'omniauth-gds', '0.0.3' #rubygems doesn't seem to pull this in transitively
 
+gem 'dotenv'
+
 gem "govuk_content_models", github: 'theodi/govuk_content_models', branch: 'feature-lambda-format-validator'
 if ENV['CONTENT_MODELS_DEV']
   gem "odi_content_models", path: '../odi_content_models'

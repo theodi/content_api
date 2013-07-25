@@ -69,6 +69,7 @@ GEM
     daemons (1.1.9)
     database_cleaner (0.7.2)
     differ (0.1.2)
+    dotenv (0.8.0)
     erubis (2.7.0)
     eventmachine (1.0.3)
     factory_girl (3.6.1)
@@ -237,6 +238,7 @@ DEPENDENCIES
   aws-ses
   ci_reporter (= 1.7.0)
   database_cleaner (= 0.7.2)
+  dotenv
   factory_girl (= 3.6.1)
   gds-api-adapters (= 7.2.0)
   gds-sso (= 3.0.1)

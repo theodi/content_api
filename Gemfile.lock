@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/theodi/govuk_content_models.git
-  revision: 77bbd75991f54dc304c0bd289c271785fc586fd9
+  revision: d2c8536da24a9ef003e1eb40f5bac2074dfa478b
   branch: feature-lambda-format-validator
   specs:
     govuk_content_models (5.10.0)

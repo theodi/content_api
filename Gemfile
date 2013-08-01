@@ -32,7 +32,12 @@ else
   gem 'gds-api-adapters', '7.2.0'
 end
 
-gem 'govspeak', '1.0.1'
+if ENV['ODIDOWN_DEV']
+  gem 'odidown', path: '../odidown'
+else
+  gem 'odidown', github: 'theodi/odidown'
+end
+
 gem 'plek', '1.4.0'
 gem 'router-client', '3.1.0', :require => false
 gem 'yajl-ruby'

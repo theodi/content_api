@@ -20,6 +20,13 @@ GIT
     odi_content_models (0.0.1)
       govuk_content_models
 
+GIT
+  remote: git://github.com/theodi/odidown.git
+  revision: 8f70d15db759f09d0104244819467149ab90df3d
+  specs:
+    odidown (0.0.1)
+      govspeak (~> 1.2.3)
+
 GEM
   remote: https://rubygems.org/
   remote: https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/
@@ -89,7 +96,7 @@ GEM
       rack-accept (~> 0.4.4)
       rails (>= 3.0.0)
       warden (~> 1.2)
-    govspeak (1.0.1)
+    govspeak (1.2.3)
       htmlentities (~> 4)
       kramdown (~> 0.13.3)
       sanitize (= 2.0.3)
@@ -126,7 +133,7 @@ GEM
       tzinfo (~> 0.3.22)
     multi_json (1.3.7)
     multipart-post (1.1.5)
-    nokogiri (1.5.5)
+    nokogiri (1.5.10)
     null_logger (0.0.1)
     oauth2 (0.8.0)
       faraday (~> 0.8)
@@ -240,7 +247,6 @@ DEPENDENCIES
   foreman
   gds-api-adapters (= 7.2.0)
   gds-sso (= 3.0.1)
-  govspeak (= 1.0.1)
   govuk_content_models!
   kaminari (= 0.14.1)
   link_header (= 0.0.5)
@@ -248,6 +254,7 @@ DEPENDENCIES
   mocha (= 0.12.4)
   mongo (>= 1.6.2)
   odi_content_models!
+  odidown!
   omniauth-gds (= 0.0.3)
   plek (= 1.4.0)
   rabl (= 0.6.14)

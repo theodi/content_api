@@ -22,7 +22,7 @@ GIT
 
 GIT
   remote: git://github.com/theodi/odidown.git
-  revision: 8f70d15db759f09d0104244819467149ab90df3d
+  revision: 9f14a2ffcd50962d862abf58085c2d085d35ab85
   specs:
     odidown (0.0.1)
       govspeak (~> 1.2.3)

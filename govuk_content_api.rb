@@ -101,11 +101,11 @@ class GovUkContentApi < Sinatra::Application
         @results = client.search(params[:q])["results"]
       end
 
-      result_set = FakePaginatedResultSet.new(@results)
-      present_result = lambda do |result|
-        SearchResultPresenter.new(result, url_helper)
-      end
-      presenter = ResultSetPresenter.new(result_set, present_result)
+      presenter = ResultSetPresenter.new(
+        FakePaginatedResultSet.new(@results),
+        url_helper,
+        SearchResultPresenter
+      )
 
       presenter.present.to_json
     rescue GdsApi::HTTPErrorResponse, GdsApi::TimedOutException
@@ -162,12 +162,10 @@ class GovUkContentApi < Sinatra::Application
       @result_set = FakePaginatedResultSet.new(tags_scope)
     end
 
-    present_result = lambda do |result|
-      TagPresenter.new(result, url_helper)
-    end
     presenter = ResultSetPresenter.new(
       @result_set,
-      present_result,
+      url_helper,
+      TagPresenter,
       # This is replicating the existing behaviour from the RABL implementation
       # TODO: make this actually describe the results
       description: "All tags"
@@ -238,12 +236,10 @@ class GovUkContentApi < Sinatra::Application
 
     @result_set = FakePaginatedResultSet.new(tags)
 
-    present_result = lambda do |result|
-      TagPresenter.new(result, url_helper)
-    end
     presenter = ResultSetPresenter.new(
       @result_set,
-      present_result,
+      url_helper,
+      TagPresenter,
       # This description replicates the existing behaviour from RABL
       # TODO: make the description describe the results in all cases
       description: "All '#{@tag_type_name}' tags"
@@ -460,12 +456,10 @@ class GovUkContentApi < Sinatra::Application
       @result_set = FakePaginatedResultSet.new(artefacts)
     end
 
-    present_result = lambda do |result|
-      BasicArtefactPresenter.new(result, url_helper)
-    end
     presenter = ResultSetPresenter.new(
       @result_set,
-      present_result
+      url_helper,
+      BasicArtefactPresenter
     )
     presenter.present.to_json
   end

@@ -22,9 +22,6 @@ require 'config/kaminari'
 require 'config/rabl'
 require 'country'
 
-require 'dotenv'
-Dotenv.load
-
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
 

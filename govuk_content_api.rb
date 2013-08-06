@@ -576,7 +576,7 @@ class GovUkContentApi < Sinatra::Application
       if asset_id = artefact.edition.send("#{key}_id")
         begin
           asset = asset_manager_api.asset(asset_id)
-          artefact.assets[key] = asset if asset and asset["state"] == "clean"
+          artefact.assets[key] = asset if asset# and asset["state"] == "clean"
         rescue GdsApi::BaseError => e
           logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
         end

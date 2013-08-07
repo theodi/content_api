@@ -170,7 +170,7 @@ class FormatsRequestTest < GovUkContentApiTest
                                      :panopticon_id => @artefact.id, :state => "published",
                                      :caption_file_id => "512c9019686c82191d000001")
 
-        stub_request(:get, "http://asset-manager.dev.gov.uk/assets/512c9019686c82191d000001").to_return(:body => "Error", :status => 500)
+        stub_request(:get, "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001").to_return(:body => "Error", :status => 500)
 
         get '/batman.json'
         assert last_response.ok?

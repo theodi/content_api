@@ -261,14 +261,14 @@ class TravelAdviceTest < GovUkContentApiTest
                                      :document_id => "512c9019686c82191d000002")
 
         asset_manager_has_an_asset("512c9019686c82191d000001", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000001",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
           "name" => "darth-on-a-cat.jpg",
           "content_type" => "image/jpeg",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat.jpg",
           "state" => "clean",
         })
         asset_manager_has_an_asset("512c9019686c82191d000002", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000002",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000002",
           "name" => "cookie-monster.pdf",
           "content_type" => "application/pdf",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf",
@@ -299,7 +299,7 @@ class TravelAdviceTest < GovUkContentApiTest
 
         asset_manager_does_not_have_an_asset("512c9019686c82191d000001")
         asset_manager_has_an_asset("512c9019686c82191d000002", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000002",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000002",
           "name" => "cookie-monster.pdf",
           "content_type" => "application/pdf",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf",
@@ -326,14 +326,14 @@ class TravelAdviceTest < GovUkContentApiTest
                                      :document_id => "512c9019686c82191d000002")
 
         asset_manager_has_an_asset("512c9019686c82191d000001", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000001",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
           "name" => "darth-on-a-cat.jpg",
           "content_type" => "image/jpeg",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat.jpg",
           "state" => "unscanned",
         })
         asset_manager_has_an_asset("512c9019686c82191d000002", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000002",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000002",
           "name" => "cookie-monster.pdf",
           "content_type" => "application/pdf",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf",
@@ -360,7 +360,7 @@ class TravelAdviceTest < GovUkContentApiTest
                                      :image_id => "512c9019686c82191d000003")
 
         asset_manager_has_an_asset("512c9019686c82191d000003", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000003",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000003",
           "name" => "darth-on-a-cat.jpg",
           "content_type" => "image/jpeg",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000003/darth-on-a-cat.jpg",

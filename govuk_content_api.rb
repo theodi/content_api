@@ -505,6 +505,7 @@ class GovUkContentApi < Sinatra::Application
     attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
     attach_assets(@artefact, :caption_file) if @artefact.edition.is_a?(VideoEdition)
     attach_assets(@artefact, :image) if @artefact.edition.is_a?(NewsEdition)
+    attach_assets(@artefact, :video) if @artefact.edition.is_a?(NewsEdition)
   end
 
   def attach_place_data(artefact)

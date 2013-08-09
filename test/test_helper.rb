@@ -1,3 +1,6 @@
+require 'dotenv'
+Dotenv.load
+
 if ENV["USE_SIMPLECOV"]
   require "simplecov"
   require "simplecov-rcov"

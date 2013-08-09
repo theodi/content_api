@@ -146,7 +146,7 @@ class FormatsRequestTest < GovUkContentApiTest
                                      :caption_file_id => "512c9019686c82191d000001")
 
         asset_manager_has_an_asset("512c9019686c82191d000001", {
-          "id" => "https://asset-manager.production.alphagov.co.uk/assets/512c9019686c82191d000001",
+          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
           "name" => "captions-file.xml",
           "content_type" => "application/xml",
           "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/captions-file.xml",
@@ -170,7 +170,7 @@ class FormatsRequestTest < GovUkContentApiTest
                                      :panopticon_id => @artefact.id, :state => "published",
                                      :caption_file_id => "512c9019686c82191d000001")
 
-        stub_request(:get, "http://asset-manager.dev.gov.uk/assets/512c9019686c82191d000001").to_return(:body => "Error", :status => 500)
+        stub_request(:get, "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001").to_return(:body => "Error", :status => 500)
 
         get '/batman.json'
         assert last_response.ok?

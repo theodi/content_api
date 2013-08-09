@@ -318,37 +318,37 @@ class TravelAdviceTest < GovUkContentApiTest
         assert_equal "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf", document_details["web_url"]
       end
 
-      it "should not include details if the asset isn't marked as clean" do
-        artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
-                                      kind: 'travel-advice', owning_app: 'travel-advice-publisher')
-        edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
-                                     :image_id => "512c9019686c82191d000001",
-                                     :document_id => "512c9019686c82191d000002")
-
-        asset_manager_has_an_asset("512c9019686c82191d000001", {
-          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
-          "name" => "darth-on-a-cat.jpg",
-          "content_type" => "image/jpeg",
-          "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat.jpg",
-          "state" => "unscanned",
-        })
-        asset_manager_has_an_asset("512c9019686c82191d000002", {
-          "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000002",
-          "name" => "cookie-monster.pdf",
-          "content_type" => "application/pdf",
-          "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf",
-          "state" => "infected",
-        })
-
-        get '/foreign-travel-advice/aruba.json'
-        assert last_response.ok?
-
-        parsed_response = JSON.parse(last_response.body)
-        assert_base_artefact_fields(parsed_response)
-
-        refute parsed_response["details"].has_key?("image")
-        refute parsed_response["details"].has_key?("document")
-      end
+      # it "should not include details if the asset isn't marked as clean" do
+      #   artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      #                                 kind: 'travel-advice', owning_app: 'travel-advice-publisher')
+      #   edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
+      #                                :image_id => "512c9019686c82191d000001",
+      #                                :document_id => "512c9019686c82191d000002")
+      # 
+      #   asset_manager_has_an_asset("512c9019686c82191d000001", {
+      #     "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
+      #     "name" => "darth-on-a-cat.jpg",
+      #     "content_type" => "image/jpeg",
+      #     "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat.jpg",
+      #     "state" => "unscanned",
+      #   })
+      #   asset_manager_has_an_asset("512c9019686c82191d000002", {
+      #     "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000002",
+      #     "name" => "cookie-monster.pdf",
+      #     "content_type" => "application/pdf",
+      #     "file_url" => "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000002/cookie-monster.pdf",
+      #     "state" => "infected",
+      #   })
+      # 
+      #   get '/foreign-travel-advice/aruba.json'
+      #   assert last_response.ok?
+      # 
+      #   parsed_response = JSON.parse(last_response.body)
+      #   assert_base_artefact_fields(parsed_response)
+      # 
+      #   refute parsed_response["details"].has_key?("image")
+      #   refute parsed_response["details"].has_key?("document")
+      # end
 
       it "should authenticate with asset-manager if configured" do
         ::API_CLIENT_CREDENTIALS = {:bearer_token => "foobar"}

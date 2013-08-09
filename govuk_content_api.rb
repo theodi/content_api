@@ -22,9 +22,6 @@ require 'config/kaminari'
 require 'config/rabl'
 require 'country'
 
-require 'dotenv'
-Dotenv.load
-
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
 
@@ -507,6 +504,8 @@ class GovUkContentApi < Sinatra::Application
     attach_place_data(@artefact) if @artefact.edition.format == "Place" && params[:latitude] && params[:longitude]
     attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
     attach_assets(@artefact, :caption_file) if @artefact.edition.is_a?(VideoEdition)
+    attach_assets(@artefact, :image) if @artefact.edition.is_a?(NewsEdition)
+    attach_assets(@artefact, :video) if @artefact.edition.is_a?(NewsEdition)
   end
 
   def attach_place_data(artefact)
@@ -578,7 +577,7 @@ class GovUkContentApi < Sinatra::Application
       if asset_id = artefact.edition.send("#{key}_id")
         begin
           asset = asset_manager_api.asset(asset_id)
-          artefact.assets[key] = asset if asset and asset["state"] == "clean"
+          artefact.assets[key] = asset if asset# and asset["state"] == "clean"
         rescue GdsApi::BaseError => e
           logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
         end
@@ -587,7 +586,9 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def asset_manager_api
-    options = Object::const_defined?(:API_CLIENT_CREDENTIALS) ? API_CLIENT_CREDENTIALS : {}
+    options = Object::const_defined?(:API_CLIENT_CREDENTIALS) ? API_CLIENT_CREDENTIALS : {
+      bearer_token: ENV['CONTENTAPI_ASSET_MANAGER_BEARER_TOKEN']
+    }
     super(options)
   end
 

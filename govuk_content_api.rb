@@ -3,7 +3,6 @@ require 'sinatra/cross_origin'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
-require 'url_helpers'
 require 'content_format_helpers'
 require 'timestamp_helpers'
 require 'gds_api/helpers'
@@ -34,7 +33,7 @@ require 'section_extensions'
 require 'config/kaminari'
 
 class GovUkContentApi < Sinatra::Application
-  helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
+  helpers GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
   
   configure do
     enable :cross_origin
@@ -161,7 +160,7 @@ class GovUkContentApi < Sinatra::Application
 
       @result_set = PaginatedResultSet.new(paginated_tags)
       @result_set.populate_page_links { |page_number|
-        tags_url(allowed_params, page_number)
+        url_helper.tags_url(allowed_params, page_number)
       }
 
       headers "Link" => LinkHeader.new(@result_set.links).to_s
@@ -209,14 +208,14 @@ class GovUkContentApi < Sinatra::Application
       # Redirect from a singular tag type to its plural
       # e.g. /tags/section.json => /tags/sections.json
       tag_type = known_tag_types.from_singular(params[:tag_type_or_id])
-      redirect(tag_type_url(tag_type)) if tag_type
+      redirect(url_helper.tag_type_url(tag_type)) if tag_type
 
       # Tags used to be accessed through /tags/tag_id.json, so we check here
       # whether one exists to avoid breaking the Web. We only check for section
       # tags, as at the time of change sections were the only tag type in use
       # in production
       section = Tag.by_tag_id(params[:tag_type_or_id], "section")
-      redirect(tag_url(section)) if section
+      redirect(url_helper.tag_url(section)) if section
 
       custom_404
     end
@@ -299,7 +298,7 @@ class GovUkContentApi < Sinatra::Application
         redirect with_tag_url(possible_tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
-        redirect with_type_url(params[:tag], modifier_params)
+        redirect url_helper.with_type_url(params[:tag], modifier_params)
       else
         custom_404
       end
@@ -465,7 +464,9 @@ class GovUkContentApi < Sinatra::Application
       end
 
       @result_set = PaginatedResultSet.new(paginated_artefacts)
-      @result_set.populate_page_links { |page_number| artefacts_url(page_number) }
+      @result_set.populate_page_links { |page_number|
+        url_helper.artefacts_url(page_number)
+      }
       headers "Link" => LinkHeader.new(@result_set.links).to_s
     else
       @result_set = FakePaginatedResultSet.new(artefacts)

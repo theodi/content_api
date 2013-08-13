@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'sinatra/cross_origin'
-require 'rabl'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
@@ -33,7 +32,6 @@ require 'artefact'
 require 'section_extensions'
 
 require 'config/kaminari'
-require 'config/rabl'
 
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
@@ -178,7 +176,7 @@ class GovUkContentApi < Sinatra::Application
       @result_set,
       url_helper,
       TagPresenter,
-      # This is replicating the existing behaviour from the RABL implementation
+      # This is replicating the existing behaviour from the old implementation
       # TODO: make this actually describe the results
       description: "All tags"
     )
@@ -250,7 +248,7 @@ class GovUkContentApi < Sinatra::Application
       @result_set,
       url_helper,
       TagPresenter,
-      # This description replicates the existing behaviour from RABL
+      # This description replicates the existing behaviour from the old version
       # TODO: make the description describe the results in all cases
       description: "All '#{@tag_type_name}' tags"
     )

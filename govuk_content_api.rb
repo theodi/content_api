@@ -350,7 +350,14 @@ class GovUkContentApi < Sinatra::Application
     results = map_artefacts_and_add_editions(artefacts)
     @result_set = FakePaginatedResultSet.new(results)
 
-    render :rabl, :with_tag, format: "json"
+    presenter = ResultSetPresenter.new(
+      @result_set,
+      url_helper,
+      TaggedArtefactPresenter,
+      description: @description
+    )
+
+    presenter.present.to_json
   end
   
   # Get the newest artefact by tag or type

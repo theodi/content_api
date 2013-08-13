@@ -23,6 +23,10 @@ require "presenters/search_result_presenter"
 require "presenters/tag_presenter"
 require "presenters/tag_type_presenter"
 require "presenters/basic_artefact_presenter"
+require "presenters/minimal_artefact_presenter"
+require "presenters/artefact_presenter"
+require "presenters/travel_advice_index_presenter"
+require "govspeak_formatter"
 
 # Note: the artefact patch needs to be included before the Kaminari patch,
 # otherwise it doesn't work. I haven't quite got to the bottom of why that is.
@@ -67,6 +71,14 @@ class GovUkContentApi < Sinatra::Application
     end
 
     URLHelper.new(*parameters)
+  end
+
+  def govspeak_formatter
+    if params[:content_format] == "govspeak"
+      GovspeakFormatter.new(:govspeak, fact_cave_api)
+    else
+      GovspeakFormatter.new(:html, fact_cave_api)
+    end
   end
 
   def known_tag_types
@@ -458,7 +470,7 @@ class GovUkContentApi < Sinatra::Application
     presenter = ResultSetPresenter.new(
       @result_set,
       url_helper,
-      BasicArtefactPresenter
+      MinimalArtefactPresenter
     )
     presenter.present.to_json
   end
@@ -490,11 +502,28 @@ class GovUkContentApi < Sinatra::Application
     @nodes = @artefact.node_editions
     @organizations = @artefact.organization_editions
 
+    if @artefact.slug == 'foreign-travel-advice'
+      load_travel_advice_countries
+      presenter = SingleResultPresenter.new(
+        TravelAdviceIndexPresenter.new(
+          @artefact,
+          @countries,
+          url_helper,
+          govspeak_formatter
+        )
+      )
+      return presenter.present.to_json
+    end
+
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
     end
 
-    render :rabl, :artefact, format: "json"
+    presenter = SingleResultPresenter.new(
+      ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter)
+    )
+
+    presenter.present.to_json
   end
 
   def map_editions_with_artefacts(editions)
@@ -661,6 +690,17 @@ class GovUkContentApi < Sinatra::Application
       rescue GdsApi::BaseError => e
         logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
       end
+    end
+  end
+
+  def attach_local_information(artefact, snac)
+    provider = artefact.edition.service.preferred_provider(snac)
+    artefact.local_authority = provider
+    if provider
+      artefact.local_interaction = provider.preferred_interaction_for(
+        artefact.edition.lgsl_code,
+        artefact.edition.lgil_override
+      )
     end
   end
 

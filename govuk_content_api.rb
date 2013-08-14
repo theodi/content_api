@@ -3,7 +3,6 @@ require 'sinatra/cross_origin'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
-require 'content_format_helpers'
 require 'gds_api/helpers'
 require 'gds_api/rummager'
 require_relative "config"
@@ -32,7 +31,7 @@ require 'section_extensions'
 require 'config/kaminari'
 
 class GovUkContentApi < Sinatra::Application
-  helpers GdsApi::Helpers, ContentFormatHelpers
+  helpers GdsApi::Helpers
   
   configure do
     enable :cross_origin

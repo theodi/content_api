@@ -6,6 +6,11 @@ require "presenters/artefact_node_presenter"
 require "presenters/artefact_organization_presenter"
 
 
+# Full presenter for artefacts.
+#
+# This presenter handles all relevant fields for the various different types of
+# artefact, so it's pretty expensive and so we only use this for a single
+# artefact's view (the `*.json` handler in `govuk_content_api.rb`).
 class ArtefactPresenter
 
   BASE_FIELDS = %w(

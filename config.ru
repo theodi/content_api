@@ -31,7 +31,7 @@ enable :dump_errors, :raise_errors
 
 if ! in_development || ENV["API_CACHE"]
   cache_config_file_path = File.expand_path(
-    "rack-cache.yml",
+    "rack-cache.#{ENV['RACK_ENV']}.yml",
     File.dirname(__FILE__)
   )
   if File.exists? cache_config_file_path

@@ -366,6 +366,8 @@ class GovUkContentApi < Sinatra::Application
 
     custom_404 unless @artefact
     handle_unpublished_artefact(@artefact) unless params[:edition]
+    
+    @author = get_artefact_author(@artefact)
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
@@ -380,6 +382,16 @@ class GovUkContentApi < Sinatra::Application
 
   protected
 
+  def get_artefact_author(artefact)
+    slug = artefact.author
+    if slug
+      artefact = Artefact.find_by_slug(slug)
+      Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+    else
+      nil
+    end
+  end
+  
   def map_editions_with_artefacts(editions)
     statsd.time("#{@statsd_scope}.map_editions_to_artefacts") do
       artefact_ids = editions.collect(&:panopticon_id)
@@ -634,4 +646,5 @@ class GovUkContentApi < Sinatra::Application
 
     custom_error(401, "Edition parameter requires authentication")
   end
+  
 end

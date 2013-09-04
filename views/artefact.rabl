@@ -20,6 +20,19 @@ child @artefact.live_related_artefacts => :related do
   extends "_basic_artefact"
 end
 
+node :author do
+  if @author
+    {
+      name: @author.title,
+      slug: @author.slug,
+      gravatar_email: @author.gravatar_email,
+      web_url: artefact_web_url(@author.artefact)
+    }
+  else
+    nil
+  end
+end
+
 node(:related_external_links) do
   @artefact.external_links.map do |link|
     {

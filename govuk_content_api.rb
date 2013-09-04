@@ -384,8 +384,12 @@ class GovUkContentApi < Sinatra::Application
 
   def get_artefact_author(artefact)
     slug = artefact.author
-    artefact = Artefact.find_by_slug(slug)
-    Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+    if slug
+      artefact = Artefact.find_by_slug(slug)
+      Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+    else
+      nil
+    end
   end
   
   def map_editions_with_artefacts(editions)

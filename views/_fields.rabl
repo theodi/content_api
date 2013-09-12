@@ -73,8 +73,16 @@ end
 node(nil, :if => lambda { |artefact| artefact.assets }) do |artefact|
   artefact.assets.each_with_object({}) do |(key, details), assets|
     assets[key] = {
-      "web_url" => details["file_url"],
+      "web_url"      => details["file_url"],
       "content_type" => details["content_type"],
+      "title"        => details["title"],
+      "source"       => details["source"],
+      "description"  => details["description"],
+      "creator"      => details["creator"],
+      "attribution"  => details["attribution"],
+      "subject"      => details["subject"],
+      "license"      => details["license"],
+      "spatial"      => details["spatial"],
     }
   end
 end

@@ -160,7 +160,15 @@ class FormatsRequestTest < GovUkContentApiTest
         parsed_response = JSON.parse(last_response.body)
         caption_file_info = {
           "web_url"=>"https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/captions-file.xml",
-          "content_type"=>"application/xml"
+          "content_type"=>"application/xml",
+          "title"=>nil, 
+          "source"=>nil, 
+          "description"=>nil, 
+          "creator"=>nil, 
+          "attribution"=>nil, 
+          "subject"=>nil, 
+          "license"=>nil, 
+          "spatial"=>nil
         }
         assert_equal caption_file_info, parsed_response["details"]["caption_file"]
       end

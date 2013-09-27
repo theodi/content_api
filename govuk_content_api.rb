@@ -515,8 +515,8 @@ class GovUkContentApi < Sinatra::Application
 
     attach_place_data(@artefact) if @artefact.edition.format == "Place" && params[:latitude] && params[:longitude]
     attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
-    [NewsEdition, PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
-    attach_assets(@artefact, :video) if @artefact.edition.is_a?(NewsEdition)
+    [PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
+    #attach_assets(@artefact, :video) if @artefact.edition.is_a?(NewsEdition)
     attach_assets(@artefact, :caption_file) if @artefact.edition.is_a?(VideoEdition)
   end
 

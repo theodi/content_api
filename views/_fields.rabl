@@ -14,7 +14,8 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
     :description, :url, :telephone, :twitter, :linkedin, :github, 
     :email, :length, :outline, :outcomes, :audience, :prerequisites, 
     :requirements, :materials, :subtitle, :content, :end_date, :media_enquiries_name,
-    :media_enquiries_email, :media_enquiries_telephone].each do |field|
+    :media_enquiries_email, :media_enquiries_telephone, 
+    :location, :salary, :closing_date].each do |field|
   node(field, :if => lambda { |artefact| artefact.edition.respond_to?(field) }) do |artefact|
     if artefact.edition.class::GOVSPEAK_FIELDS.include?(field)
       process_content(artefact.edition.send(field))

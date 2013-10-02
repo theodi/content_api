@@ -378,6 +378,36 @@ class FormatsRequestTest < GovUkContentApiTest
     end
     
   end
+  
+  describe "creative work editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'mona-lisa', kind: 'creative_work', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end   
+    
+    it "should work with basic creative_work_edition" do
+      description = 'The Mona Lisa - what did you expect?'
+      date_published = 1.month.ago.to_date
+
+      creative_work_edition = FactoryGirl.create(:creative_work_edition, title: 'Mona Lisa', 
+                                                  panopticon_id: @artefact.id, slug: @artefact.slug,
+                                                  description: description, date_published: date_published,
+                                                  state: 'published')
+
+      get '/mona-lisa.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description date_published)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>The Mona Lisa - what did you expect?</p>\n", fields["description"]
+      assert_equal date_published.to_s, fields["date_published"].to_s       
+    end
+  end
 
   describe "video editions" do
     before :each do

@@ -517,6 +517,8 @@ class GovUkContentApi < Sinatra::Application
     attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
     [PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(OrganizationEdition)
+    attach_assets(@artefact, :file) if @artefact.edition.is_a?(CreativeWorkEdition)
+    attach_assets(@artefact, :thumbnail) if @artefact.edition.is_a?(CreativeWorkEdition)
     attach_assets(@artefact, :caption_file) if @artefact.edition.is_a?(VideoEdition)
   end
 

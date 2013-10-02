@@ -23,7 +23,7 @@ require 'factory_girl'
 require 'webmock/minitest'
 require 'timecop'
 require 'govuk_content_api'
-require 'govuk_content_models/test_helpers/factories'
+require 'odi_content_models/test_helpers/factories'
 require 'gds_api/test_helpers/json_client_helper'
 
 DatabaseCleaner.strategy = :truncation

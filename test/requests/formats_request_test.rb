@@ -329,6 +329,55 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_equal closing_date.to_s, fields["closing_date"].to_s
     end
   end
+  
+  describe "organization editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'widgets-inc', kind: 'organization', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic organization edtion" do
+      description  = 'A basic description'
+      joined_at    = Date.today
+      tagline      = "tagline"
+      involvement  = "involvment"
+      want_to_meet = "want to meet"
+      case_study   = "001-002-003"
+      url          = "http://bbc.co.uk"
+      telephone    = "1234"
+      email        = "hello@example.com"
+      twitter      = "example"
+      linkedin     = "http://linkedin.com/example"
+      
+      organization_edition = FactoryGirl.create(:organization_edition, title: 'Widgets Inc', panopticon_id: @artefact.id, slug: @artefact.slug,
+                                                 description: description, joined_at: joined_at,
+                                                 tagline: tagline, involvement: involvement, want_to_meet: want_to_meet, 
+                                                 case_study: case_study, url: url, telephone: telephone, email: email, 
+                                                 twitter: twitter, linkedin: linkedin, state: 'published')
+
+      get '/widgets-inc.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description joined_at tagline involvement want_to_meet case_study url telephone email twitter linkedin)
+
+      assert_has_expected_fields(fields, expected_fields)
+      assert_equal joined_at.to_s, fields["joined_at"].to_s
+      assert_equal tagline, fields["tagline"]
+      assert_equal involvement, fields["involvement"]
+      assert_equal "<p>A basic description</p>\n", fields["description"]
+      assert_equal want_to_meet, fields["want_to_meet"]
+      assert_equal case_study, fields["case_study"]
+      assert_equal url, fields["url"]
+      assert_equal telephone, fields["telephone"]
+      assert_equal email, fields["email"]
+      assert_equal linkedin, fields["linkedin"]
+    end
+    
+  end
 
   describe "video editions" do
     before :each do

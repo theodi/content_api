@@ -408,6 +408,37 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_equal date_published.to_s, fields["date_published"].to_s       
     end
   end
+  
+  describe "course editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic course_edition" do
+      description = "This is an awesome course"
+      length = "5 days"
+
+      course_edition = FactoryGirl.create(:course_edition, title: 'Mona Lisa', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          description: description, length: length,
+                                          state: 'published')
+      
+      get '/all-the-datas.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description length)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>This is an awesome course</p>\n", fields["description"]
+      assert_equal length, fields["length"]     
+    end
+    
+  end
 
   describe "video editions" do
     before :each do

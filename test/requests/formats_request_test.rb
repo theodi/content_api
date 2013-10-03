@@ -439,6 +439,45 @@ class FormatsRequestTest < GovUkContentApiTest
     end
     
   end
+    
+  describe "course instance editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas-2013-02-03', kind: 'course_instance', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic course_edition" do
+      course = "all-the-datas"
+      date = 1.month.from_now
+      location = "The ODI"
+      price = "1 shiny penny"
+      description = "Foo bar baz"
+      trainers = ['ian', 'mike', 'stu']
+
+      course_edition = FactoryGirl.create(:course_instance_edition, title: 'All the datas', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          course: course, date: date, location: location, 
+                                          price: price, description: description, trainers: trainers,
+                                          state: 'published')
+      
+      get '/all-the-datas-2013-02-03.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+      
+      expected_fields = %w(course date location price description trainers)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>Foo bar baz</p>\n", fields["description"]
+      assert_equal course, fields["course"]     
+      assert_equal date.to_s, Time.zone.parse(fields["date"]).to_s
+      assert_equal location, fields["location"] 
+      assert_equal price, fields["price"]
+      assert_equal trainers, fields["trainers"]   
+    end
+  end
 
   describe "video editions" do
     before :each do

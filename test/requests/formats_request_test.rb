@@ -478,6 +478,45 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_equal trainers, fields["trainers"]   
     end
   end
+  
+  describe "event editons" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'lunchtime-lecture', kind: 'event', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic event_edition" do
+      start_date = 1.day.from_now
+      end_date = 2.days.from_now
+      location = "The ODI"
+      description = "Event stuff goes here"
+      booking_url = "http://example.com"
+      hashtag = "foobar"
+      
+      event_edition = FactoryGirl.create(:event_edition, title: 'Lunchtime lecture', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          start_date: start_date, end_date: end_date, location: location, 
+                                          description: description, booking_url: booking_url, hashtag: hashtag,
+                                          state: 'published')
+
+      get '/lunchtime-lecture.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(start_date end_date location description booking_url hashtag)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>Event stuff goes here</p>\n", fields["description"]    
+      assert_equal start_date.to_s, Time.zone.parse(fields["start_date"]).to_s
+      assert_equal end_date.to_s, Time.zone.parse(fields["end_date"]).to_s
+      assert_equal booking_url, fields["booking_url"] 
+      assert_equal hashtag, fields["hashtag"]
+    end
+
+  end
 
   describe "video editions" do
     before :each do

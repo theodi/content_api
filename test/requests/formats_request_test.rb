@@ -517,6 +517,48 @@ class FormatsRequestTest < GovUkContentApiTest
     end
 
   end
+  
+  describe "node editons" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'birmingham', kind: 'node', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic node_edition" do
+      level = 1
+      region = "GB"
+      location = [51.43242,-1.534543543]
+      description = "This is a really long description"
+      telephone = "123456677788"
+      twitter = "example"
+      linkedin = "http://linkedin.com/example"
+      
+      node_edition = FactoryGirl.create(:node_edition, title: 'Birmingham', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          level: level, region: region, location: location, 
+                                          description: description, telephone: telephone, twitter: twitter,
+                                          linkedin: linkedin, state: 'published')
+
+      get '/birmingham.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(level region location description telephone twitter linkedin)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>This is a really long description</p>\n", fields["description"]    
+      assert_equal level, fields["level"]
+      assert_equal region, fields["region"] 
+      assert_equal location, fields["location"]
+      assert_equal telephone, fields["telephone"]
+      assert_equal twitter, fields["twitter"]
+      assert_equal linkedin, fields["linkedin"]
+    end
+
+  end
 
   describe "video editions" do
     before :each do

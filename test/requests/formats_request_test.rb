@@ -112,6 +112,453 @@ class FormatsRequestTest < GovUkContentApiTest
     assert_equal "#{public_web_url}/batman/overview", fields['parts'][0]['web_url']
     assert_equal "overview", fields['parts'][0]['slug']
   end
+  
+  describe "person editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'batman', kind: 'person', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic person edtion" do
+      honorific_prefix = 'Sir'
+      honorific_suffix = 'PhD'
+      affiliation = 'Stately Wayne Manor'
+      description = '## Foo bar'
+      role = 'BATMAN!'
+      url = 'http://www.batman.com'
+      telephone = '1213134242'
+      email = 'bat@man.com'
+      twitter = 'batman'
+      linkedin = 'http://www.linkedin.com/batman'
+      github = 'https://github.com/batman'
+      
+      video_edition = FactoryGirl.create(:person_edition, title: 'Bruce Wayne', panopticon_id: @artefact.id, slug: @artefact.slug,
+                                         honorific_prefix: honorific_prefix, honorific_suffix: honorific_suffix,
+                                         url: url, affiliation: affiliation, role: role, telephone: telephone,
+                                         email: email, twitter: twitter, linkedin: linkedin, github: github,
+                                         description: description, state: 'published')
+
+      get '/batman.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(honorific_prefix honorific_suffix affiliation description role url telephone email twitter linkedin github)
+
+      assert_has_expected_fields(fields, expected_fields)
+      assert_equal honorific_prefix, fields["honorific_prefix"]
+      assert_equal honorific_suffix, fields["honorific_suffix"]
+      assert_equal affiliation, fields["affiliation"]
+      assert_equal "<h2>Foo bar</h2>\n", fields["description"]
+      assert_equal role, fields["role"]
+      assert_equal url, fields["url"]
+      assert_equal telephone, fields["telephone"]
+      assert_equal email, fields["email"]
+      assert_equal linkedin, fields["linkedin"]
+      assert_equal github, fields["github"]
+    end
+    
+  end
+  
+  describe "timed item editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'timey-wimey', kind: 'timed_item', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+
+    it "should work with basic timed_item_edition" do
+      content = '## Some content'
+      end_date = 1.month.from_now.to_datetime
+      
+      timed_item_edition = FactoryGirl.create(:timed_item_edition, title: 'Timey Wimey', 
+                                              panopticon_id: @artefact.id, slug: @artefact.slug,
+                                              content: content, end_date: end_date, state: 'published')
+
+      get '/timey-wimey.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+      
+      expected_fields = %w(content end_date)
+      
+      assert_has_expected_fields(fields, expected_fields)
+      
+      assert_equal "<h2>Some content</h2>\n", fields["content"]
+      assert_equal end_date.to_s, fields["end_date"].to_s
+    end
+  end
+  
+  describe "article editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'some-news', kind: 'article', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic article edition" do
+      content = '## A title'
+      url = 'http://www.example.com'
+      media_enquiries_name = 'Dave'
+      media_enquiries_email = 'dave@example.com'
+      media_enquiries_telephone = '1212312321'
+      
+      article_edition = FactoryGirl.create(:article_edition, title: 'Here is the news', 
+                                            panopticon_id: @artefact.id, slug: @artefact.slug,
+                                            content: content, url: url, media_enquiries_name: media_enquiries_name,
+                                            media_enquiries_email: media_enquiries_email, media_enquiries_telephone: media_enquiries_telephone,
+                                            state: 'published')
+                                            
+      get '/some-news.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(content url media_enquiries_name media_enquiries_email media_enquiries_telephone)
+      
+      assert_has_expected_fields(fields, expected_fields)
+      
+      assert_equal "<h2>A title</h2>\n", fields["content"]
+      assert_equal media_enquiries_name, fields["media_enquiries_name"]
+      assert_equal media_enquiries_email, fields["media_enquiries_email"]
+      assert_equal media_enquiries_telephone, fields["media_enquiries_telephone"]
+    end
+  end
+  
+  describe "case study editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'case-study', kind: 'case_study', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic case study edition" do
+      content = '## A case title'
+      url = 'http://www.example.com/case'
+      media_enquiries_name = 'Casey Jones'
+      media_enquiries_email = 'casey@example.com'
+      media_enquiries_telephone = '342343534534'
+      
+      article_edition = FactoryGirl.create(:case_study_edition, title: 'Studying your cases', 
+                                            panopticon_id: @artefact.id, slug: @artefact.slug,
+                                            content: content, url: url, media_enquiries_name: media_enquiries_name,
+                                            media_enquiries_email: media_enquiries_email, media_enquiries_telephone: media_enquiries_telephone,
+                                            state: 'published')
+                                            
+      get '/case-study.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(content url media_enquiries_name media_enquiries_email media_enquiries_telephone)
+      
+      assert_has_expected_fields(fields, expected_fields)
+      
+      assert_equal "<h2>A case title</h2>\n", fields["content"]
+      assert_equal media_enquiries_name, fields["media_enquiries_name"]
+      assert_equal media_enquiries_email, fields["media_enquiries_email"]
+      assert_equal media_enquiries_telephone, fields["media_enquiries_telephone"]
+    end
+  end
+  
+  describe "FAQ editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'meaning-of-life', kind: 'faq', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic FAQ edition" do
+      content = "**42**"
+
+      article_edition = FactoryGirl.create(:faq_edition, title: 'What is the meaning of life?', 
+                                            panopticon_id: @artefact.id, slug: @artefact.slug,
+                                            content: content, state: 'published')
+
+      get '/meaning-of-life.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+      
+      expected_fields = %w(content)
+      
+      fields = parsed_response["details"]
+      
+      assert_has_expected_fields(fields, expected_fields)
+      
+      assert_equal "<p><strong>42</strong></p>\n", fields["content"]
+    end
+  end
+
+  describe "Job editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'jobby-job', kind: 'job', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic job edition" do
+      location = 'The Moon'
+      salary = '20p/decade'
+      description = 'Live on the moon'
+      closing_date = 1.month.from_now
+
+      article_edition = FactoryGirl.create(:job_edition, title: 'The job of a lifetime', 
+                                            panopticon_id: @artefact.id, slug: @artefact.slug,
+                                            location: location, salary: salary,
+                                            description: description, closing_date: closing_date,
+                                            state: 'published')
+
+      get '/jobby-job.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+      
+      expected_fields = %w(location salary description closing_date)
+      
+      fields = parsed_response["details"]
+      
+      assert_has_expected_fields(fields, expected_fields)
+      
+      assert_equal location, fields["location"]
+      assert_equal salary, fields["salary"]
+      assert_equal "<p>Live on the moon</p>\n", fields["description"]
+      assert_equal closing_date.to_s, fields["closing_date"].to_s
+    end
+  end
+  
+  describe "organization editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'widgets-inc', kind: 'organization', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic organization edtion" do
+      description  = 'A basic description'
+      joined_at    = Date.today
+      tagline      = "tagline"
+      involvement  = "involvment"
+      want_to_meet = "want to meet"
+      case_study   = "001-002-003"
+      url          = "http://bbc.co.uk"
+      telephone    = "1234"
+      email        = "hello@example.com"
+      twitter      = "example"
+      linkedin     = "http://linkedin.com/example"
+      
+      organization_edition = FactoryGirl.create(:organization_edition, title: 'Widgets Inc', panopticon_id: @artefact.id, slug: @artefact.slug,
+                                                 description: description, joined_at: joined_at,
+                                                 tagline: tagline, involvement: involvement, want_to_meet: want_to_meet, 
+                                                 case_study: case_study, url: url, telephone: telephone, email: email, 
+                                                 twitter: twitter, linkedin: linkedin, state: 'published')
+
+      get '/widgets-inc.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description joined_at tagline involvement want_to_meet case_study url telephone email twitter linkedin)
+
+      assert_has_expected_fields(fields, expected_fields)
+      assert_equal joined_at.to_s, fields["joined_at"].to_s
+      assert_equal tagline, fields["tagline"]
+      assert_equal involvement, fields["involvement"]
+      assert_equal "<p>A basic description</p>\n", fields["description"]
+      assert_equal want_to_meet, fields["want_to_meet"]
+      assert_equal case_study, fields["case_study"]
+      assert_equal url, fields["url"]
+      assert_equal telephone, fields["telephone"]
+      assert_equal email, fields["email"]
+      assert_equal linkedin, fields["linkedin"]
+    end
+    
+  end
+  
+  describe "creative work editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'mona-lisa', kind: 'creative_work', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end   
+    
+    it "should work with basic creative_work_edition" do
+      description = 'The Mona Lisa - what did you expect?'
+      date_published = 1.month.ago.to_date
+
+      creative_work_edition = FactoryGirl.create(:creative_work_edition, title: 'Mona Lisa', 
+                                                  panopticon_id: @artefact.id, slug: @artefact.slug,
+                                                  description: description, date_published: date_published,
+                                                  state: 'published')
+
+      get '/mona-lisa.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description date_published)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>The Mona Lisa - what did you expect?</p>\n", fields["description"]
+      assert_equal date_published.to_s, fields["date_published"].to_s       
+    end
+  end
+  
+  describe "course editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic course_edition" do
+      description = "This is an awesome course"
+      length = "5 days"
+
+      course_edition = FactoryGirl.create(:course_edition, title: 'Mona Lisa', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          description: description, length: length,
+                                          state: 'published')
+      
+      get '/all-the-datas.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(description length)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>This is an awesome course</p>\n", fields["description"]
+      assert_equal length, fields["length"]     
+    end
+    
+  end
+    
+  describe "course instance editions" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas-2013-02-03', kind: 'course_instance', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic course_edition" do
+      course = "all-the-datas"
+      date = 1.month.from_now
+      location = "The ODI"
+      price = "1 shiny penny"
+      description = "Foo bar baz"
+      trainers = ['ian', 'mike', 'stu']
+
+      course_edition = FactoryGirl.create(:course_instance_edition, title: 'All the datas', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          course: course, date: date, location: location, 
+                                          price: price, description: description, trainers: trainers,
+                                          state: 'published')
+      
+      get '/all-the-datas-2013-02-03.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+      
+      expected_fields = %w(course date location price description trainers)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>Foo bar baz</p>\n", fields["description"]
+      assert_equal course, fields["course"]     
+      assert_equal date.to_s, Time.zone.parse(fields["date"]).to_s
+      assert_equal location, fields["location"] 
+      assert_equal price, fields["price"]
+      assert_equal trainers, fields["trainers"]   
+    end
+  end
+  
+  describe "event editons" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'lunchtime-lecture', kind: 'event', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic event_edition" do
+      start_date = 1.day.from_now
+      end_date = 2.days.from_now
+      location = "The ODI"
+      description = "Event stuff goes here"
+      booking_url = "http://example.com"
+      hashtag = "foobar"
+      
+      event_edition = FactoryGirl.create(:event_edition, title: 'Lunchtime lecture', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          start_date: start_date, end_date: end_date, location: location, 
+                                          description: description, booking_url: booking_url, hashtag: hashtag,
+                                          state: 'published')
+
+      get '/lunchtime-lecture.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(start_date end_date location description booking_url hashtag)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>Event stuff goes here</p>\n", fields["description"]    
+      assert_equal start_date.to_s, Time.zone.parse(fields["start_date"]).to_s
+      assert_equal end_date.to_s, Time.zone.parse(fields["end_date"]).to_s
+      assert_equal booking_url, fields["booking_url"] 
+      assert_equal hashtag, fields["hashtag"]
+    end
+
+  end
+  
+  describe "node editons" do
+    before :each do
+      @artefact = FactoryGirl.create(:artefact, slug: 'birmingham', kind: 'node', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    end
+    
+    it "should work with basic node_edition" do
+      level = 1
+      region = "GB"
+      location = [51.43242,-1.534543543]
+      description = "This is a really long description"
+      telephone = "123456677788"
+      twitter = "example"
+      linkedin = "http://linkedin.com/example"
+      
+      node_edition = FactoryGirl.create(:node_edition, title: 'Birmingham', 
+                                          panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          level: level, region: region, location: location, 
+                                          description: description, telephone: telephone, twitter: twitter,
+                                          linkedin: linkedin, state: 'published')
+
+      get '/birmingham.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+      assert_base_artefact_fields(parsed_response)
+
+      fields = parsed_response["details"]
+
+      expected_fields = %w(level region location description telephone twitter linkedin)
+
+      assert_has_expected_fields(fields, expected_fields)  
+      assert_equal "<p>This is a really long description</p>\n", fields["description"]    
+      assert_equal level, fields["level"]
+      assert_equal region, fields["region"] 
+      assert_equal location, fields["location"]
+      assert_equal telephone, fields["telephone"]
+      assert_equal twitter, fields["twitter"]
+      assert_equal linkedin, fields["linkedin"]
+    end
+
+  end
 
   describe "video editions" do
     before :each do

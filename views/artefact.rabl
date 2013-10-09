@@ -25,7 +25,6 @@ node :author do
     {
       name: @author.title,
       slug: @author.slug,
-      gravatar_email: @author.gravatar_email,
       web_url: artefact_web_url(@author.artefact)
     }
   else

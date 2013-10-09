@@ -19,3 +19,7 @@ end
 node(:updated_at) { |artefact|
   presented_updated_date(artefact).iso8601
 }
+
+node(:created_at) { |artefact|
+  presented_created_date(artefact).iso8601
+}

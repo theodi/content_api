@@ -86,6 +86,7 @@ end
 class MiniTest::Spec
   before :each do
     DatabaseCleaner.start
+    Tag.create(title: "Team", tag_type: "person", tag_id: "writers")
   end
 
   after :each do

@@ -12,10 +12,10 @@ class TagListRequestTest < GovUkContentApiTest
       assert last_response.ok?
       assert_status_field "ok", last_response
       response = JSON.parse(last_response.body)
-      assert_equal 2, response['results'].count
+      assert_equal 3, response['results'].count
 
       # Check pagination info
-      assert_has_values response, "total" => 2, "current_page" => 1,
+      assert_has_values response, "total" => 3, "current_page" => 1,
                                   "start_index" => 1, "pages" => 1
     end
 
@@ -33,9 +33,9 @@ class TagListRequestTest < GovUkContentApiTest
       get "/tags.json"
       expected_id = "http://example.org/tags/sections/crime.json"
       expected_url = "#{public_web_url}/browse/crime"
-      assert_equal expected_id, JSON.parse(last_response.body)['results'][0]['id']
-      assert_equal nil, JSON.parse(last_response.body)['results'][0]['web_url']
-      assert_equal expected_url, JSON.parse(last_response.body)['results'][0]["content_with_tag"]["web_url"]
+      assert_equal expected_id, JSON.parse(last_response.body)['results'].last['id']
+      assert_equal nil, JSON.parse(last_response.body)['results'].last['web_url']
+      assert_equal expected_url, JSON.parse(last_response.body)['results'].last["content_with_tag"]["web_url"]
     end
 
     it "provides a public API URL when requested through that route" do
@@ -45,7 +45,7 @@ class TagListRequestTest < GovUkContentApiTest
       get '/tags.json', {}, {'HTTP_API_PREFIX' => 'api'}
 
       expected_id = "#{public_web_url}/api/tags/sections/crime.json"
-      assert_equal expected_id, JSON.parse(last_response.body)['results'][0]['id']
+      assert_equal expected_id, JSON.parse(last_response.body)['results'].last['id']
     end
 
     describe "with pagination" do

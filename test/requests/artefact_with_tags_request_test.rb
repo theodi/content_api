@@ -45,6 +45,15 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         last_response.location
       )
     end
+    
+    it "should redirect to a content type if one is found" do
+      get "/with_tag.json?tag=job"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?type=job",
+        last_response.location
+      )
+    end
 
     it "should redirect to the typed URL with multiple results" do
       farmers = FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
@@ -173,4 +182,38 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
     end
   end
+  
+  describe "handling requests for types" do
+    
+    it "should return all artefacts of that specific type" do
+      5.times do |n|
+        FactoryGirl.create(:non_publisher_artefact, kind: 'case_study', state: 'live')
+      end
+      
+      get "with_tag.json?type=case_study"
+      response = JSON.parse(last_response.body)
+      assert last_response.ok?
+      assert_equal 5, response["results"].count      
+    end
+    
+    it "should return successfully if a plural type is requested" do
+      5.times do |n|
+        FactoryGirl.create(:non_publisher_artefact, kind: 'job', state: 'live')
+      end
+      
+      get "with_tag.json?type=jobs"
+      response = JSON.parse(last_response.body)
+      assert last_response.ok?
+      assert_equal 5, response["results"].count
+    end
+    
+    it "should return 404 if no artefacts for that type" do
+      get "with_tag.json?type=article"
+      
+      assert last_response.not_found?
+      assert_status_field "not found", last_response
+    end
+    
+  end
+  
 end

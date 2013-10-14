@@ -57,6 +57,7 @@ group :test do
   gem 'ci_reporter', '1.7.0'
   gem 'webmock', '~> 1.8', require: false
   gem 'timecop', '0.5.9.2'
+  gem 'pry'
 end
 
 group :development do

@@ -34,6 +34,11 @@ module URLHelpers
 
     api_url("/with_tag.json?#{URI.encode_www_form(tag_query)}")
   end
+  
+  def with_type_url(type, params = {})
+    type_query = {:type => type}.merge(Hash[params.sort])
+    api_url("/with_tag.json?#{URI.encode_www_form(type_query)}")
+  end
 
   def with_tag_web_url(tag)
     public_web_url("/browse/#{tag.tag_id}")

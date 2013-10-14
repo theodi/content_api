@@ -258,40 +258,56 @@ class GovUkContentApi < Sinatra::Application
         custom_404
       end
 
-      # If we can unambiguously determine the tag, redirect to its correct URL
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
+      content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+      # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
         modifier_params = params.slice('sort')
         redirect with_tag_url(possible_tags, modifier_params)
+      # If the tag is a content type, redirect to the type's URL
+      elsif content_types.include? params[:tag].singularize
+        modifier_params = params.slice('sort')
+        redirect with_type_url(params[:tag], modifier_params)
       else
         custom_404
       end
     end
-
-    requested_tags = known_tag_types.each_with_object([]) do |tag_type, req|
-      unless params[tag_type.singular].blank?
-        req << Tag.by_tag_id(params[tag_type.singular], tag_type.singular)
+    
+    if params[:type].blank?    
+      requested_tags = known_tag_types.each_with_object([]) do |tag_type, req|
+        unless params[tag_type.singular].blank?
+          req << Tag.by_tag_id(params[tag_type.singular], tag_type.singular)
+        end
       end
+
+      # If any of the tags weren't found, that's enough to 404
+      custom_404 if requested_tags.any? &:nil?
+
+      # For now, we only support retrieving by a single tag
+      custom_404 unless requested_tags.size == 1
+
+      if params[:sort]
+        custom_404 unless ["curated", "alphabetical"].include?(params[:sort])
+      end
+
+      tag_id = requested_tags.first.tag_id
+      tag_type = requested_tags.first.tag_type
+      @description = "All content with the '#{tag_id}' #{tag_type}"
+
+      artefacts = sorted_artefacts_for_tag_id(
+        tag_id,
+        params[:sort]
+      )
+    else
+      # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
+      type = params[:type].singularize
+      @description = "All content with the #{type} type"
+      artefacts = Artefact.where(:kind => type)
+      
+      # If there are no artefacts for this content type, return 404
+      custom_404 if artefacts.count == 0
     end
-
-    # If any of the tags weren't found, that's enough to 404
-    custom_404 if requested_tags.any? &:nil?
-
-    # For now, we only support retrieving by a single tag
-    custom_404 unless requested_tags.size == 1
-
-    if params[:sort]
-      custom_404 unless ["curated", "alphabetical"].include?(params[:sort])
-    end
-
-    tag_id = requested_tags.first.tag_id
-    tag_type = requested_tags.first.tag_type
-    @description = "All content with the '#{tag_id}' #{tag_type}"
-
-    artefacts = sorted_artefacts_for_tag_id(
-      tag_id,
-      params[:sort]
-    )
+    
     results = map_artefacts_and_add_editions(artefacts)
     @result_set = FakePaginatedResultSet.new(results)
 

@@ -8,6 +8,7 @@ child(:results => "results") do
   node :details do |artefact|
     {
       "description" => artefact.description,
+      "excerpt" => artefact.excerpt
     }
   end
 end

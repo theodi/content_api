@@ -2,6 +2,7 @@ require "govuk_content_models"
 require "govuk_content_models/require_all"
 require "odi_content_models"
 require "odi_content_models/require_all"
+require "govspeak"
 
 module ContentApiArtefactExtensions
   extend ActiveSupport::Concern
@@ -15,6 +16,17 @@ module ContentApiArtefactExtensions
     artefacts = ordered_related_artefacts(related_artefacts.live).to_a
     artefacts += @extra_related_artefacts.to_a if @extra_related_artefacts
     artefacts.uniq(&:slug)
+  end
+  
+  def excerpt
+    begin
+      edition = Edition.where(:panopticon_id => id).first
+      html = Govspeak::Document.new(edition.whole_body, auto_ids: false).to_html
+      text = Nokogiri::HTML(html).inner_text
+      text.lines.first.chomp 
+    rescue
+      nil
+    end
   end
 
 end

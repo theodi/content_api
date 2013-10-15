@@ -94,11 +94,11 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should return an array of results" do
-        artefact = FactoryGirl.create(:artefact, owning_app: "smart-answers", keywords: ['farmers'], state: 'live',
-                                     description: "Artefact description")
-
+        artefact = FactoryGirl.create(:artefact, owning_app: "publisher", keywords: ['farmers'], state: 'live', description: "Artefact description", kind: "Article")
+        edition = ArticleEdition.create(panopticon_id: artefact.id, title: artefact.name, content: "A really long description\n\nWith line breaks.", state: "published", slug: artefact.slug)        
+        
         get "/with_tag.json?keyword=farmers"
-
+        
         assert last_response.ok?
         assert_status_field "ok", last_response
         parsed_response = JSON.parse(last_response.body)
@@ -107,6 +107,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         details = parsed_response["results"].first
         assert_equal artefact.name, details["title"]
         assert_equal artefact.description, details["details"]["description"]
+        assert_equal "A really long description", details["details"]["excerpt"]
       end
 
       it "should return the standard response even if zero results" do

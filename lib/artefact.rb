@@ -20,7 +20,6 @@ module ContentApiArtefactExtensions
   
   def excerpt
     begin
-      edition = Edition.where(:panopticon_id => id).first
       html = Govspeak::Document.new(edition.whole_body, auto_ids: false).to_html
       text = Nokogiri::HTML(html).inner_text
       text.lines.first.chomp 

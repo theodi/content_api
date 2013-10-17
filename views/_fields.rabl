@@ -80,6 +80,7 @@ node(nil, :if => lambda { |artefact| artefact.assets }) do |artefact|
   artefact.assets.each_with_object({}) do |(key, details), assets|
     assets[key] = {
       "web_url"      => details["file_url"],
+      "versions"     => details["file_versions"],
       "content_type" => details["content_type"],
       "title"        => details["title"],
       "source"       => details["source"],

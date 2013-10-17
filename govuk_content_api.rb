@@ -427,10 +427,12 @@ class GovUkContentApi < Sinatra::Application
 
       results = artefacts.map do |artefact|
         if artefact.owning_app == 'publisher'
-          artefact_with_edition(artefact, editions_by_slug)
+          a = artefact_with_edition(artefact, editions_by_slug)
         else
-          artefact
+          a = artefact
         end
+        attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
+        a
       end
 
       results.compact

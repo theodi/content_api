@@ -314,6 +314,29 @@ class GovUkContentApi < Sinatra::Application
 
     render :rabl, :with_tag, format: "json"
   end
+  
+  get "/related.json" do
+    kv = params.first
+    type = kv[0]
+    item = kv[1]
+    
+    allowed_types = ['course']
+    
+    unless allowed_types.include?(type)
+      custom_404
+    else    
+      editions = Edition.where(type => item, :state => 'published')
+    
+      custom_404 if editions.count == 0
+    
+      @description = "All items with #{type} #{item}"
+    
+      @results = map_editions_with_artefacts(editions)
+      @result_set = FakePaginatedResultSet.new(@results)
+    
+      render :rabl, :with_tag, format: "json"
+    end
+  end
 
   get "/licences.json" do
     licence_ids = (params[:ids] || '').split(',')

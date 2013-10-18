@@ -412,8 +412,10 @@ class GovUkContentApi < Sinatra::Application
   def attach_authors(artefacts)
     artefacts.map do |artefact|
       author = get_artefact_author(artefact)
-      artefact.author_name = author.title
-      artefact.author_slug = author.slug
+      unless author.nil?
+        artefact.author_name = author.title
+        artefact.author_slug = author.slug
+      end
       artefact
     end
     artefacts

@@ -8,7 +8,11 @@ child(:results => "results") do
   node :details do |artefact|
     h = {
       "description" => artefact.description,
-      "excerpt" => artefact.excerpt
+      "excerpt" => artefact.excerpt,
+      "author" => {
+        "name" => artefact.author_name,
+        "slug" => artefact.author_slug
+      }
     }
     [:role].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)

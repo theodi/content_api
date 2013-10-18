@@ -309,6 +309,7 @@ class GovUkContentApi < Sinatra::Application
     end
     
     results = map_artefacts_and_add_editions(artefacts)
+    results = attach_authors(results)
     @result_set = FakePaginatedResultSet.new(results)
 
     render :rabl, :with_tag, format: "json"
@@ -406,6 +407,16 @@ class GovUkContentApi < Sinatra::Application
     else
       nil
     end
+  end
+  
+  def attach_authors(artefacts)
+    artefacts.map do |artefact|
+      author = get_artefact_author(artefact)
+      artefact.author_name = author.title
+      artefact.author_slug = author.slug
+      artefact
+    end
+    artefacts
   end
   
   def map_editions_with_artefacts(editions)

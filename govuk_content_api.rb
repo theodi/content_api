@@ -287,7 +287,7 @@ class GovUkContentApi < Sinatra::Application
       custom_404 unless requested_tags.size == 1
 
       if params[:sort]
-        custom_404 unless ["curated", "alphabetical"].include?(params[:sort])
+        custom_404 unless ["curated", "alphabetical", "date"].include?(params[:sort])
       end
 
       tag_id = requested_tags.first.tag_id
@@ -303,6 +303,10 @@ class GovUkContentApi < Sinatra::Application
       type = params[:type].singularize
       @description = "All content with the #{type} type"
       artefacts = Artefact.where(:kind => type)
+      
+      if params[:sort] == "date"
+        artefacts.order_by(:created_at.desc)
+      end
       
       # If there are no artefacts for this content type, return 404
       custom_404 if artefacts.count == 0
@@ -477,45 +481,49 @@ class GovUkContentApi < Sinatra::Application
 
   def sorted_artefacts_for_tag_id(tag_id, sort)
     statsd.time("#{@statsd_scope}.#{tag_id}") do
-      artefacts = Artefact.live.where(tag_ids: tag_id)
-
-      # Load in the curated list and use it as an ordering for the top items in
-      # the list. Any artefacts not present in the list go on the end, in
-      # alphabetical name order.
-      #
-      # For example, if the curated list is
-      #
-      #     [3, 1, 2]
-      #
-      # and the items have ids
-      #
-      #     [1, 2, 3, 4, 5]
-      #
-      # the sorted list will be one of the following:
-      #
-      #     [3, 1, 2, 4, 5]
-      #     [3, 1, 2, 5, 4]
-      #
-      # depending on the names of artefacts 4 and 5.
-      #
-      # If the sort order is alphabetical rather than curated, this is
-      # equivalent to the special case of curated ordering where the curated
-      # list is empty
-
-      if sort == "curated"
-        curated_list = CuratedList.where(tag_ids: [tag_id]).first
-        first_ids = curated_list ? curated_list.artefact_ids : []
+      if sort == "date"
+        artefacts = Artefact.live.where(tag_ids: tag_id).order_by(:created_at.desc)
       else
-        # Just fall back on alphabetical order
-        first_ids = []
-      end
+        artefacts = Artefact.live.where(tag_ids: tag_id)
 
-      return artefacts.to_a.sort_by { |artefact|
-        [
-          first_ids.find_index(artefact._id) || first_ids.length,
-          artefact.name
-        ]
-      }
+        # Load in the curated list and use it as an ordering for the top items in
+        # the list. Any artefacts not present in the list go on the end, in
+        # alphabetical name order.
+        #
+        # For example, if the curated list is
+        #
+        #     [3, 1, 2]
+        #
+        # and the items have ids
+        #
+        #     [1, 2, 3, 4, 5]
+        #
+        # the sorted list will be one of the following:
+        #
+        #     [3, 1, 2, 4, 5]
+        #     [3, 1, 2, 5, 4]
+        #
+        # depending on the names of artefacts 4 and 5.
+        #
+        # If the sort order is alphabetical rather than curated, this is
+        # equivalent to the special case of curated ordering where the curated
+        # list is empty
+
+        if sort == "curated"
+          curated_list = CuratedList.where(tag_ids: [tag_id]).first
+          first_ids = curated_list ? curated_list.artefact_ids : []        
+        else
+          # Just fall back on alphabetical order
+          first_ids = []
+        end
+
+        return artefacts.to_a.sort_by { |artefact|
+          [
+            first_ids.find_index(artefact._id) || first_ids.length,
+            artefact.name
+          ]
+        }
+      end
     end
   end
 

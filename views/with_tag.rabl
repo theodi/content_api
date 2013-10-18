@@ -9,11 +9,13 @@ child(:results => "results") do
     h = {
       "description" => artefact.description,
       "excerpt" => artefact.excerpt,
-      "author" => {
+    }
+    unless artefact.author_name.nil?
+      h["author"] = {
         "name" => artefact.author_name,
         "slug" => artefact.author_slug
       }
-    }
+    end
     [:role].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end

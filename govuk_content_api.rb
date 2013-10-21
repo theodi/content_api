@@ -442,6 +442,7 @@ class GovUkContentApi < Sinatra::Application
       unless author.nil?
         artefact.author_name = author.title
         artefact.author_slug = author.slug
+        artefact.author_tag_ids = author.artefact.tag_ids
       end
       artefact
     end

@@ -15,7 +15,7 @@ node(:format) do |artefact|
     artefact.kind
   end
 end
-
+node(:tags) { |artefact| artefact.tags.map {|x| x.tag_id } }
 node(:updated_at) { |artefact|
   presented_updated_date(artefact).iso8601
 }

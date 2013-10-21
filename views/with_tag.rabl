@@ -13,7 +13,8 @@ child(:results => "results") do
     unless artefact.author_name.nil?
       h["author"] = {
         "name" => artefact.author_name,
-        "slug" => artefact.author_slug
+        "slug" => artefact.author_slug,
+        "tag_ids" => artefact.author_tag_ids
       }
     end
     [:role, :course, :date, :url].each do |field|

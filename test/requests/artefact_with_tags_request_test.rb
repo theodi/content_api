@@ -106,6 +106,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
         details = parsed_response["results"].first
         assert_equal artefact.name, details["title"]
+        assert_equal ["farmers"], details["tag_ids"]
         assert_equal artefact.description, details["details"]["description"]
         assert_equal "A really long description", details["details"]["excerpt"]
       end

@@ -471,7 +471,9 @@ class GovUkContentApi < Sinatra::Application
         else
           a = artefact
         end
-        attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
+        unless a.nil?
+          attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
+        end
         a
       end
 

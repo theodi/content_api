@@ -25,7 +25,8 @@ node :author do
     {
       name: @author.title,
       slug: @author.slug,
-      web_url: artefact_web_url(@author.artefact)
+      web_url: artefact_web_url(@author.artefact),
+      tag_ids: @author.artefact.tag_ids
     }
   else
     nil

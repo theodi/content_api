@@ -7,7 +7,7 @@ require "govspeak"
 module ContentApiArtefactExtensions
   extend ActiveSupport::Concern
   
-  attr_accessor :author_name, :author_slug
+  attr_accessor :author_name, :author_slug, :author_tag_ids
 
   included do
     attr_accessor :edition, :licence, :places, :assets, :country, :extra_related_artefacts

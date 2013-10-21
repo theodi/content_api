@@ -17,7 +17,7 @@ child(:results => "results") do
         "tag_ids" => artefact.author_tag_ids
       }
     end
-    [:role, :course, :date].each do |field|
+    [:role, :course, :date, :url].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end
     if artefact.assets

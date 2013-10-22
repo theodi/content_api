@@ -336,6 +336,23 @@ class GovUkContentApi < Sinatra::Application
     end
     redirect "#{artefact.slug}.json"
   end
+  
+  # Get the next upcoming artefact (such as an event or course_instance) by type
+  get "/upcoming.json" do
+    if params[:order_by] && params[:type]
+      type = "#{params[:type].camelize}Edition"
+      
+      # Check the type exists
+      custom_404 unless Object.const_defined?(type)
+      
+      # Check the field we want to query exists
+      custom_404 unless type.constantize.fields.keys.include? params[:order_by]
+      
+      edition = type.constantize.where(:state => "published", params[:order_by].to_sym => {:$gte => Date.today.to_time.utc}).order_by(params[:order_by].to_sym.asc).first
+      redirect "#{edition.slug}.json"
+    end
+  end
+  
   get "/related.json" do
     kv = params.first
     type = kv[0]

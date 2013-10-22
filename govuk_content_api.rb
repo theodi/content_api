@@ -319,6 +319,23 @@ class GovUkContentApi < Sinatra::Application
     render :rabl, :with_tag, format: "json"
   end
   
+  # Get the newest artefact by tag or type
+  get "/latest.json" do
+    if params[:type]
+      # Check the type exists
+      content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+      custom_404 unless content_types.include? params[:type].singularize 
+      
+      artefact = Artefact.live.where(kind: params[:type]).order_by(:created_at.desc).first
+    elsif params[:tag]
+      # Check the tag exists
+      possible_tags = Tag.where(tag_id: params[:tag]).to_a
+      custom_404 if possible_tags.count == 0
+      
+      artefact = Artefact.live.where(tag_ids: params[:tag]).order_by(:created_at.desc).first
+    end
+    redirect "#{artefact.slug}.json"
+  end
   get "/related.json" do
     kv = params.first
     type = kv[0]

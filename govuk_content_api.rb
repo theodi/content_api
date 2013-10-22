@@ -508,6 +508,7 @@ class GovUkContentApi < Sinatra::Application
         end
         unless a.nil?
           attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
+          attach_assets(a, :file) if a.edition.is_a?(CreativeWorkEdition)
         end
         a
       end

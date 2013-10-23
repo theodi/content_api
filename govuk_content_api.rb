@@ -334,7 +334,7 @@ class GovUkContentApi < Sinatra::Application
       
       artefact = Artefact.live.where(tag_ids: params[:tag]).order_by(:created_at.desc).first
     end
-    redirect "#{artefact.slug}.json"
+    get_artefact(artefact.slug, params)
   end
   
   # Get the next upcoming artefact (such as an event or course_instance) by type
@@ -349,7 +349,7 @@ class GovUkContentApi < Sinatra::Application
       custom_404 unless type.constantize.fields.keys.include? params[:order_by]
       
       edition = type.constantize.where(:state => "published", params[:order_by].to_sym => {:$gte => Date.today.to_time.utc}).order_by(params[:order_by].to_sym.asc).first
-      redirect "#{edition.slug}.json"
+      get_artefact(edition.slug, params)
     end
   end
   

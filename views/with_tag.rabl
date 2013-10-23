@@ -23,7 +23,7 @@ child(:results => "results") do
         "slug" => artefact.edition.send(:artist)
       }
     end
-    [:role, :course, :date, :url].each do |field|
+    [:role, :course, :date, :url, :start_date, :end_date].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end
     if artefact.assets

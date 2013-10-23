@@ -13,8 +13,8 @@ class LatestRequestTest < GovUkContentApiTest
     
     it "should load the latest article by tag" do      
       get "/latest.json?tag=news"
-      assert last_response.redirect?
-      assert_equal "http://example.org/0-days-ago.json", last_response.location
+      assert last_response.ok?
+      assert_equal "This was created 0 days ago", JSON.parse(last_response.body)['title']
     end
     
     it "should return 404 if the tag is unknown" do
@@ -24,8 +24,8 @@ class LatestRequestTest < GovUkContentApiTest
 
     it "should load the latest article by type" do      
       get "/latest.json?type=article"
-      assert last_response.redirect?
-      assert_equal "http://example.org/0-days-ago.json", last_response.location
+      assert last_response.ok?
+      assert_equal "This was created 0 days ago", JSON.parse(last_response.body)['title']
     end   
     
     it "should return 404 if the type is unknown" do

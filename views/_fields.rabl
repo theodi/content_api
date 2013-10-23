@@ -16,8 +16,8 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
     :requirements, :materials, :subtitle, :content, :end_date, :media_enquiries_name,
     :media_enquiries_email, :media_enquiries_telephone, 
     :location, :salary, :closing_date, :joined_at, :tagline, :involvement, :want_to_meet, :case_study,
-    :date_published, :length, :course, :date, :price, :trainers, :start_date, :booking_url, :hashtag, :level, :region,
-    :start_date, :end_date].each do |field|
+    :date_published, :length, :course, :date, :price, :trainers, :start_date, :booking_url, :hashtag, 
+    :level, :region, :end_date].each do |field|
   node(field, :if => lambda { |artefact| artefact.edition.respond_to?(field) }) do |artefact|
     if artefact.edition.class::GOVSPEAK_FIELDS.include?(field)
       process_content(artefact.edition.send(field))

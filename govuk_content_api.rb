@@ -353,6 +353,18 @@ class GovUkContentApi < Sinatra::Application
     end
   end
   
+  get "/course-instance.json" do    
+    if params[:course] && params[:date]          
+      instance = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gt => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
+      
+      custom_404 if instance.count == 0
+      
+      get_artefact(instance.first.slug, { edition: params[:edition] })
+    else
+      custom_404
+    end
+  end
+  
   get "/related.json" do
     kv = params.first
     type = kv[0]
@@ -429,6 +441,12 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/*.json" do |id|
+    get_artefact(id, params)
+  end
+
+  protected
+  
+  def get_artefact(id, params)
     # The edition param is for accessing unpublished editions in order for
     # editors to preview them. These can change frequently and so shouldn't be
     # cached.
@@ -457,8 +475,6 @@ class GovUkContentApi < Sinatra::Application
 
     render :rabl, :artefact, format: "json"
   end
-
-  protected
 
   def get_artefact_author(artefact)
     slug = artefact.author
@@ -592,7 +608,7 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def attach_publisher_edition(artefact, version_number = nil)
+  def attach_publisher_edition(artefact, version_number = nil)    
     statsd.time("#{@statsd_scope}.edition") do
       artefact.edition = if version_number
         Edition.where(panopticon_id: artefact.id, version_number: version_number).first

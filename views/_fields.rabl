@@ -26,6 +26,13 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
   end
 end
 
+node(:artist, :if => lambda { |artefact| artefact.edition.respond_to?(:artist) }) do |artefact|
+  {
+    name: artefact.artist_name,
+    slug: artefact.edition.artist
+  }
+end
+
 node(:parts, :if => lambda { |artefact| artefact.edition.respond_to?(:order_parts) }) do |artefact|
   partial("parts", object: artefact)
 end

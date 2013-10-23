@@ -354,12 +354,12 @@ class GovUkContentApi < Sinatra::Application
   end
   
   get "/course-instance.json" do    
-    if params[:course] && params[:date]
-      edition = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gt => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
+    if params[:course] && params[:date]          
+      instance = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gt => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
       
-      custom_404 if edition.count == 0
+      custom_404 if instance.count == 0
       
-      redirect "#{edition.first.slug}.json"
+      get_artefact(instance.first.slug, { edition: params[:edition] })
     else
       custom_404
     end

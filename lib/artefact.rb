@@ -30,6 +30,13 @@ module ContentApiArtefactExtensions
     end
   end
 
+  def artist_name
+    if edition.respond_to?(:artist)
+      artist = Artefact.find_by_slug(edition.artist)
+      artist.name
+    end
+  end
+
 end
 
 class Artefact

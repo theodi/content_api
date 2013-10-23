@@ -17,6 +17,12 @@ child(:results => "results") do
         "tag_ids" => artefact.author_tag_ids
       }
     end
+    if artefact.edition.respond_to?(:artist)
+      h["artist"] = {
+        "name" => artefact.artist_name,
+        "slug" => artefact.edition.send(:artist)
+      }
+    end
     [:role, :course, :date, :url, :start_date, :end_date].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end

@@ -17,7 +17,7 @@ child(:results => "results") do
         "tag_ids" => artefact.author_tag_ids
       }
     end
-    unless artefact.artist_name.nil?
+    if artefact.edition.respond_to?(:artist)
       h["artist"] = {
         "name" => artefact.artist_name,
         "slug" => artefact.edition.send(:artist)

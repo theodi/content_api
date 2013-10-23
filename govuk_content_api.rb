@@ -441,6 +441,12 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/*.json" do |id|
+    get_artefact(id, params)
+  end
+
+  protected
+  
+  def get_artefact(id, params)
     # The edition param is for accessing unpublished editions in order for
     # editors to preview them. These can change frequently and so shouldn't be
     # cached.
@@ -469,8 +475,6 @@ class GovUkContentApi < Sinatra::Application
 
     render :rabl, :artefact, format: "json"
   end
-
-  protected
 
   def get_artefact_author(artefact)
     slug = artefact.author
@@ -603,7 +607,7 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def attach_publisher_edition(artefact, version_number = nil)
+  def attach_publisher_edition(artefact, version_number = nil)    
     statsd.time("#{@statsd_scope}.edition") do
       artefact.edition = if version_number
         Edition.where(panopticon_id: artefact.id, version_number: version_number).first

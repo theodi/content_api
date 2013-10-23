@@ -353,6 +353,18 @@ class GovUkContentApi < Sinatra::Application
     end
   end
   
+  get "/course-instance.json" do    
+    if params[:course] && params[:date]
+      edition = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gt => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
+      
+      custom_404 if edition.count == 0
+      
+      redirect "#{edition.first.slug}.json"
+    else
+      custom_404
+    end
+  end
+  
   get "/related.json" do
     kv = params.first
     type = kv[0]

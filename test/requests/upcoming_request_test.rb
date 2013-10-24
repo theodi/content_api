@@ -5,7 +5,8 @@ class UpcomingRequestTest < GovUkContentApiTest
   describe "latest.json" do
     before :each do
       5.times do |n|
-        artefact = FactoryGirl.create(:artefact, name: "An event #{n} days from now", owning_app: "publisher", state: 'live', kind: "Event", slug: "#{n}-days-from-now")
+        tag = FactoryGirl.create(:tag, tag_id: 'lunchtime-lecture', title: "Lunchtime Lecture", tag_type: "event")
+        artefact = FactoryGirl.create(:artefact, name: "An event #{n} days from now", owning_app: "publisher", state: 'live', kind: "Event", slug: "#{n}-days-from-now", event: ["lunchtime-lecture"])
         edition = EventEdition.create(panopticon_id: artefact.id, title: artefact.name, start_date: n.days.from_now.to_time.utc, state: "published", slug: artefact.slug)
       end
     end

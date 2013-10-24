@@ -33,7 +33,7 @@ module ContentApiArtefactExtensions
   def artist_name
     if edition.respond_to?(:artist)
       artist = Artefact.find_by_slug(edition.artist)
-      artist.name
+      artist ? artist.name : nil
     end
   end
 

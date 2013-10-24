@@ -355,7 +355,7 @@ class GovUkContentApi < Sinatra::Application
   
   get "/course-instance.json" do    
     if params[:course] && params[:date]          
-      instance = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gt => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
+      instance = CourseInstanceEdition.where(:state => "published", :course => params[:course], :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
       
       custom_404 if instance.count == 0
       

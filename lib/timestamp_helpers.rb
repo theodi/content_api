@@ -16,8 +16,6 @@ module TimestampHelpers
   
   # Returns the created date that should be presented to the user
   def presented_created_date(artefact)
-    updated_options = [artefact.created_at]
-    updated_options << artefact.edition.created_at if artefact.edition
-    updated_options.compact.max
+    artefact.created_at
   end
 end

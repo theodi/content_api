@@ -27,6 +27,12 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
   end
 end
 
+node(:course_title, :if => lambda { |artefact| artefact.edition.respond_to?("course") }) do |artefact|
+  course = CourseEdition.where(:state => "published", :slug => artefact.edition.course).first
+  course.try(:title)
+end
+
+
 node(:artist, :if => lambda { |artefact| artefact.edition.respond_to?(:artist) }) do |artefact|
   {
     name: artefact.artist_name,

@@ -26,6 +26,10 @@ child(:results => "results") do
     [:role, :course, :date, :url, :start_date, :end_date].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end
+    if artefact.edition.respond_to?(:course)
+      course = CourseEdition.where(:state => "published", :slug => artefact.edition.course).first
+      h["course_title"] = course.try(:title)
+    end
     if artefact.assets
       artefact.assets.each_with_object({}) do |(key, details), assets|
         details["file_versions"].each do |version, url|

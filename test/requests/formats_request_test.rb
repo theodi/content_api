@@ -442,20 +442,25 @@ class FormatsRequestTest < GovUkContentApiTest
     
   describe "course instance editions" do
     before :each do
+      @course_artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')      
       @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas-2013-02-03', kind: 'course_instance', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic course_edition" do
-      course = "all-the-datas"
+      course_title = "All the datas"
       date = 1.month.from_now
       location = "The ODI"
       price = "1 shiny penny"
       description = "Foo bar baz"
       trainers = ['ian', 'mike', 'stu']
 
-      course_edition = FactoryGirl.create(:course_instance_edition, title: 'All the datas', 
+      course_edition = FactoryGirl.create(:course_edition, title: course_title, 
+                                          panopticon_id: @course_artefact.id, slug: @course_artefact.slug,
+                                          description: 'description', length: 'length',
+                                          state: 'published')
+      course_instance_edition = FactoryGirl.create(:course_instance_edition, title: 'All the datas: 2013-02-03', 
                                           panopticon_id: @artefact.id, slug: @artefact.slug,
-                                          course: course, date: date, location: location, 
+                                          course: @course_artefact.slug, date: date, location: location, 
                                           price: price, description: description, trainers: trainers,
                                           state: 'published')
       
@@ -471,7 +476,8 @@ class FormatsRequestTest < GovUkContentApiTest
 
       assert_has_expected_fields(fields, expected_fields)  
       assert_equal "<p>Foo bar baz</p>\n", fields["description"]
-      assert_equal course, fields["course"]     
+      assert_equal @course_artefact.slug, fields["course"]     
+      assert_equal course_title, fields["course_title"]     
       assert_equal date.to_s, Time.zone.parse(fields["date"]).to_s
       assert_equal location, fields["location"] 
       assert_equal price, fields["price"]

@@ -534,6 +534,7 @@ class FormatsRequestTest < GovUkContentApiTest
       beta = false
       join_date = Date.new(2013,10,2)
       region = "GB"
+      area = "Birmingham"
       location = [51.43242,-1.534543543]
       description = "This is a really long description"
       telephone = "123456677788"
@@ -542,7 +543,7 @@ class FormatsRequestTest < GovUkContentApiTest
       
       node_edition = FactoryGirl.create(:node_edition, title: 'Birmingham', 
                                           panopticon_id: @artefact.id, slug: @artefact.slug,
-                                          beta: beta, join_date: join_date,
+                                          beta: beta, join_date: join_date, area: area,
                                           level: level, region: region, location: location, 
                                           description: description, telephone: telephone, twitter: twitter,
                                           linkedin: linkedin, state: 'published')
@@ -562,6 +563,7 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_equal level, fields["level"]
       assert_equal beta, fields["beta"]
       assert_equal region, fields["region"] 
+      assert_equal area, fields["area"] 
       assert_equal location, fields["location"]
       assert_equal telephone, fields["telephone"]
       assert_equal twitter, fields["twitter"]

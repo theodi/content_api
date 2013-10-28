@@ -530,7 +530,9 @@ class FormatsRequestTest < GovUkContentApiTest
     end
     
     it "should work with basic node_edition" do
-      level = 1
+      level = "country"
+      beta = false
+      join_date = Date.new(2013,10,2)
       region = "GB"
       location = [51.43242,-1.534543543]
       description = "This is a really long description"
@@ -540,6 +542,7 @@ class FormatsRequestTest < GovUkContentApiTest
       
       node_edition = FactoryGirl.create(:node_edition, title: 'Birmingham', 
                                           panopticon_id: @artefact.id, slug: @artefact.slug,
+                                          beta: beta, join_date: join_date,
                                           level: level, region: region, location: location, 
                                           description: description, telephone: telephone, twitter: twitter,
                                           linkedin: linkedin, state: 'published')
@@ -557,11 +560,13 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_has_expected_fields(fields, expected_fields)  
       assert_equal "<p>This is a really long description</p>\n", fields["description"]    
       assert_equal level, fields["level"]
+      assert_equal beta, fields["beta"]
       assert_equal region, fields["region"] 
       assert_equal location, fields["location"]
       assert_equal telephone, fields["telephone"]
       assert_equal twitter, fields["twitter"]
       assert_equal linkedin, fields["linkedin"]
+      assert_equal join_date, Date.parse(fields["join_date"])
     end
 
   end

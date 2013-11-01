@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'rabl'
 require 'mongoid'
 require 'govspeak'
@@ -24,6 +25,10 @@ require 'country'
 
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
+  
+  configure do
+    enable :cross_origin
+  end
 
   include Pagination
 

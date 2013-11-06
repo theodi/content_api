@@ -421,7 +421,7 @@ class ArtefactRequestTest < GovUkContentApiTest
 
     it "should return publication data if published" do
       artefact = FactoryGirl.create(:artefact, business_proposition: true, need_id: 1234, state: 'live')
-      edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, body: '# Important information', state: 'published')
+      edition = FactoryGirl.create(:edition, slug: artefact.slug, panopticon_id: artefact.id, body: '# Important information', state: 'published')
 
       get "/#{artefact.slug}.json"
       parsed_response = JSON.parse(last_response.body)
@@ -551,6 +551,7 @@ class ArtefactRequestTest < GovUkContentApiTest
     it "should return parts in the correct order" do
       artefact = FactoryGirl.create(:artefact, state: 'live')
       FactoryGirl.create(:guide_edition,
+        slug: artefact.slug, 
         panopticon_id: artefact.id,
         parts: [
           Part.new(title: "Part Two", order: 2, body: "## Header 3", slug: "part-two"),

@@ -49,6 +49,13 @@ class CourseInstanceRequest < GovUkContentApiTest
       assert_equal @newstartdate.to_datetime.to_s, DateTime.parse(json['details']['date']).to_s
     end
   
+    it "should give correct course instance" do    
+      get "/course-instance.json?date=#{@date_str}&course=this-is-a-course"
+      assert last_response.ok?
+      json = JSON.parse(last_response.body)
+      assert_equal "https://www.gov.uk/courses/this-is-a-course/#{@date_str}", json['web_url']
+    end
+    
   end
   
 end

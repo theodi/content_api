@@ -15,4 +15,6 @@ Rabl.configure do |config|
   # environments. You can also explicitly set RABL_CACHE=1 to turn on template
   # source caching.
   config.cache_sources = ENV['RABL_CACHE'] || ENV['RACK_ENV'] != 'development'
+  
+  config.enable_json_callbacks = true
 end

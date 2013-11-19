@@ -424,7 +424,12 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
-      Artefact.live
+      a = Artefact.live
+      sliced_params = params.slice('author', 'node', 'organization_name')
+      if !sliced_params.empty?
+        a = a.where(sliced_params)
+      end
+      a
     end
 
     if settings.pagination
@@ -539,13 +544,13 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def sorted_artefacts_for_tag_id(tag_id, sort)
-    statsd.time("#{@statsd_scope}.#{tag_id}") do
+  def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
+    statsd.time("#{@statsd_scope}.#{tag_id}") do   
+      artefacts = Artefact.live.where(filter.merge(tag_ids: tag_id))
+         
       if sort == "date"
-        artefacts = Artefact.live.where(tag_ids: tag_id).order_by(:created_at.desc)
+        artefacts = artefacts.order_by(:created_at.desc)
       else
-        artefacts = Artefact.live.where(tag_ids: tag_id)
-
         # Load in the curated list and use it as an ordering for the top items in
         # the list. Any artefacts not present in the list go on the end, in
         # alphabetical name order.

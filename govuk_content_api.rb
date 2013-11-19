@@ -300,7 +300,8 @@ class GovUkContentApi < Sinatra::Application
 
       artefacts = sorted_artefacts_for_tag_id(
         tag_id,
-        params[:sort]
+        params[:sort],
+        params.slice('author', 'node', 'organization_name')
       )
     else
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app

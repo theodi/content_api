@@ -182,6 +182,54 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert last_response.ok?, "request failed: #{last_response.status}"
         assert_equal 0, JSON.parse(last_response.body)["results"].count
       end
+      
+      it "should only return those artefacts with a particular node" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: 'westward-ho!')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        
+        get "/with_tag.json?keyword=farmers&node=westward-ho!"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
+      
+      it "should only return those artefacts with a particular organization_name" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: 'mom-corp')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        
+        get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
+
+      it "should only return those artefacts with a particular author" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', author: "ian-mac-shane")
+        
+        get "/with_tag.json?keyword=farmers&author=barry-scott"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
     end
 
     describe "error handling" do

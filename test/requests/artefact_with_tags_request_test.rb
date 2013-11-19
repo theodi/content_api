@@ -75,6 +75,36 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         last_response.location
       )
     end
+    
+    it "should preserve the specified node when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&node=thing"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&node=thing",
+        last_response.location
+      )
+    end
+    
+    it "should preserve the specified author when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&author=bloke"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&author=bloke",
+        last_response.location
+      )
+    end
+    
+    it "should preserve the specified organization_name when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&organization_name=wayne-enterprises"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&organization_name=wayne-enterprises",
+        last_response.location
+      )
+    end
 
     it "should not allow filtering by multiple tags" do
       farmers = FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')
@@ -151,6 +181,54 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
         assert last_response.ok?, "request failed: #{last_response.status}"
         assert_equal 0, JSON.parse(last_response.body)["results"].count
+      end
+      
+      it "should only return those artefacts with a particular node" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: 'westward-ho!')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        
+        get "/with_tag.json?keyword=farmers&node=westward-ho!"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
+      
+      it "should only return those artefacts with a particular organization_name" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: 'mom-corp')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        
+        get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
+
+      it "should only return those artefacts with a particular author" do
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', author: "ian-mac-shane")
+        
+        get "/with_tag.json?keyword=farmers&author=barry-scott"
+        
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
       end
     end
 

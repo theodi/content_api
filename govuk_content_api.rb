@@ -265,13 +265,12 @@ class GovUkContentApi < Sinatra::Application
 
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+      modifier_params = params.slice('sort', 'author', 'node', 'organization_name')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
-        modifier_params = params.slice('sort')
         redirect with_tag_url(possible_tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
-        modifier_params = params.slice('sort')
         redirect with_type_url(params[:tag], modifier_params)
       else
         custom_404
@@ -301,7 +300,8 @@ class GovUkContentApi < Sinatra::Application
 
       artefacts = sorted_artefacts_for_tag_id(
         tag_id,
-        params[:sort]
+        params[:sort],
+        params.slice('author', 'node', 'organization_name')
       )
     else
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
@@ -424,7 +424,12 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
-      Artefact.live
+      a = Artefact.live
+      sliced_params = params.slice('author', 'node', 'organization_name')
+      if !sliced_params.empty?
+        a = a.where(sliced_params)
+      end
+      a
     end
 
     if settings.pagination
@@ -539,13 +544,13 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def sorted_artefacts_for_tag_id(tag_id, sort)
-    statsd.time("#{@statsd_scope}.#{tag_id}") do
+  def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
+    statsd.time("#{@statsd_scope}.#{tag_id}") do   
+      artefacts = Artefact.live.where(filter.merge(tag_ids: tag_id))
+         
       if sort == "date"
-        artefacts = Artefact.live.where(tag_ids: tag_id).order_by(:created_at.desc)
+        artefacts = artefacts.order_by(:created_at.desc)
       else
-        artefacts = Artefact.live.where(tag_ids: tag_id)
-
         # Load in the curated list and use it as an ordering for the top items in
         # the list. Any artefacts not present in the list go on the end, in
         # alphabetical name order.

@@ -265,13 +265,12 @@ class GovUkContentApi < Sinatra::Application
 
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+      modifier_params = params.slice('sort', 'author', 'node', 'organization_name')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
-        modifier_params = params.slice('sort')
         redirect with_tag_url(possible_tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
-        modifier_params = params.slice('sort')
         redirect with_type_url(params[:tag], modifier_params)
       else
         custom_404

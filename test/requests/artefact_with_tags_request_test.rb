@@ -75,6 +75,36 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         last_response.location
       )
     end
+    
+    it "should preserve the specified node when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&node=thing"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&node=thing",
+        last_response.location
+      )
+    end
+    
+    it "should preserve the specified author when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&author=bloke"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&author=bloke",
+        last_response.location
+      )
+    end
+    
+    it "should preserve the specified organization_name when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&organization_name=wayne-enterprises"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&organization_name=wayne-enterprises",
+        last_response.location
+      )
+    end
 
     it "should not allow filtering by multiple tags" do
       farmers = FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')

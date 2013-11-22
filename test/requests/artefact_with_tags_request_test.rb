@@ -184,7 +184,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
       
       it "should only return those artefacts with a particular node" do
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: 'westward-ho!')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
         FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
         
         get "/with_tag.json?keyword=farmers&node=westward-ho!"
@@ -200,8 +200,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
       
       it "should only return those artefacts with a particular organization_name" do
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: 'mom-corp')
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: ["mom-corp", "planet-express"])
+        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', organization_name: ["wayne-enterprises"])
         
         get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
         

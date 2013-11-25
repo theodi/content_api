@@ -318,7 +318,6 @@ class GovUkContentApi < Sinatra::Application
     end
     
     results = map_artefacts_and_add_editions(artefacts)
-    results = attach_authors(results)
     @result_set = FakePaginatedResultSet.new(results)
 
     render :rabl, :with_tag, format: "json"
@@ -473,7 +472,9 @@ class GovUkContentApi < Sinatra::Application
     custom_404 unless @artefact
     handle_unpublished_artefact(@artefact) unless params[:edition]
     
-    @author = get_artefact_author(@artefact)
+    @author = @artefact.author_edition
+    @nodes = @artefact.node_editions
+    @organizations = @artefact.organization_editions
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
@@ -486,29 +487,6 @@ class GovUkContentApi < Sinatra::Application
     render :rabl, :artefact, format: "json"
   end
 
-  def get_artefact_author(artefact)
-    slug = artefact.author
-    if slug
-      artefact = Artefact.find_by_slug(slug)
-      Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
-    else
-      nil
-    end
-  end
-  
-  def attach_authors(artefacts)
-    artefacts.map do |artefact|
-      author = get_artefact_author(artefact)
-      unless author.nil?
-        artefact.author_name = author.title
-        artefact.author_slug = author.slug
-        artefact.author_tag_ids = author.artefact.tag_ids
-      end
-      artefact
-    end
-    artefacts
-  end
-  
   def map_editions_with_artefacts(editions)
     statsd.time("#{@statsd_scope}.map_editions_to_artefacts") do
       artefact_ids = editions.collect(&:panopticon_id)

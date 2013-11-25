@@ -10,12 +10,28 @@ child(:results => "results") do
       "description" => artefact.description,
       "excerpt" => artefact.excerpt,
     }
-    unless artefact.author_name.nil?
+    if artefact.author_edition
       h["author"] = {
-        "name" => artefact.author_name,
-        "slug" => artefact.author_slug,
-        "tag_ids" => artefact.author_tag_ids
+        "name" => artefact.author_edition.title,
+        "slug" => artefact.author_edition.slug,
+        "tag_ids" => artefact.author_edition.artefact.tag_ids
       }
+    end
+    unless artefact.node_editions.empty?
+      h["nodes"] = artefact.node_editions.map do |node| 
+        {
+          "name" => node.title,
+          "slug" => node.slug,
+        }
+      end
+    end
+    unless artefact.organization_editions.empty?
+      h["organizations"] = artefact.organization_editions.map do |org| 
+        {
+          "name" => org.title,
+          "slug" => org.slug,
+        }
+      end
     end
     if artefact.edition.respond_to?(:artist)
       h["artist"] = {

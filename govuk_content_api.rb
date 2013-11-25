@@ -473,6 +473,7 @@ class GovUkContentApi < Sinatra::Application
     handle_unpublished_artefact(@artefact) unless params[:edition]
     
     @author = @artefact.author_edition
+    @nodes = @artefact.node_editions
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])

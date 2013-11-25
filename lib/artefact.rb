@@ -46,6 +46,19 @@ module ContentApiArtefactExtensions
     end
   end
 
+  def node_editions
+    @node_editions ||= begin
+      if node
+        node.map do |x|
+          artefact = Artefact.find_by_slug(x)
+          Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+        end
+      else
+        []
+      end
+    end.compact
+  end
+
 end
 
 class Artefact

@@ -33,6 +33,16 @@ node :author do
   end
 end
 
+node :nodes do
+  @nodes.map do |node|
+    {
+      name: node.title,
+      slug: node.slug,
+      web_url: artefact_web_url(node.artefact),
+    }
+  end
+end
+
 node(:related_external_links) do
   @artefact.external_links.map do |link|
     {

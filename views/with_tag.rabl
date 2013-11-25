@@ -17,6 +17,14 @@ child(:results => "results") do
         "tag_ids" => artefact.author_edition.artefact.tag_ids
       }
     end
+    unless artefact.node_editions.empty?
+      h["nodes"] = artefact.node_editions.map do |node| 
+        {
+          "name" => node.title,
+          "slug" => node.slug,
+        }
+      end
+    end
     if artefact.edition.respond_to?(:artist)
       h["artist"] = {
         "name" => artefact.artist_name,

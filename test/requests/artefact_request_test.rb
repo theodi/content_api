@@ -596,4 +596,35 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal ['writers'], parsed_response["author"]["tag_ids"]
   end
 
+  it "should include node details" do
+    node = FactoryGirl.create(:artefact, state: 'live', slug: 'westward-ho', name: "Westward Ho!", kind: "node")
+    FactoryGirl.create(:node_edition,      
+      title: node.name,
+      slug: node.slug, 
+      panopticon_id: node.id,
+      state: 'published')
+    node = FactoryGirl.create(:artefact, state: 'live', slug: 'crinkly-bottom', name: "Crinkly Bottom", kind: "node")
+    FactoryGirl.create(:node_edition,      
+      title: node.name,
+      slug: node.slug, 
+      panopticon_id: node.id,
+      state: 'published')
+
+
+    artefact = FactoryGirl.create(:artefact, state: 'live', node: ['westward-ho', 'crinkly-bottom'])
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/#{artefact.slug}.json"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Westward Ho!', parsed_response["nodes"][0]["name"]
+    assert_equal 'westward-ho', parsed_response["nodes"][0]["slug"]
+    assert_equal 'Crinkly Bottom', parsed_response["nodes"][1]["name"]
+    assert_equal 'crinkly-bottom', parsed_response["nodes"][1]["slug"]
+  end
+
 end

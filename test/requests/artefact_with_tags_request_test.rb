@@ -354,4 +354,37 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     assert_equal 'crinkly-bottom', parsed_response["results"][0]["details"]["nodes"][1]["slug"]
   end
 
+  it "should include organization details" do
+    FactoryGirl.create(:tag, tag_id: 'start-up', title: 'Start Up', tag_type: "organization")
+    organization = FactoryGirl.create(:artefact, state: 'live', slug: 'mom-corp', name: "Mom Corp.", kind: "organization", organization: ['start-up'])
+    FactoryGirl.create(:organization_edition,      
+      title: organization.name,
+      slug: organization.slug, 
+      panopticon_id: organization.id,
+      state: 'published')
+    organization = FactoryGirl.create(:artefact, state: 'live', slug: 'planet-express', name: "Planet Express", kind: "organization", organization: ['start-up'])
+    FactoryGirl.create(:organization_edition,      
+      title: organization.name,
+      slug: organization.slug, 
+      panopticon_id: organization.id,
+      state: 'published')
+
+
+    FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
+    artefact = FactoryGirl.create(:artefact, keywords: ['farmers'], state: 'live', organization_name: ['mom-corp', 'planet-express'])
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/with_tag.json?keyword=farmers&organization_name=planet-express"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Mom Corp.', parsed_response["results"][0]["details"]["organizations"][0]["name"]
+    assert_equal 'mom-corp', parsed_response["results"][0]["details"]["organizations"][0]["slug"]
+    assert_equal 'Planet Express', parsed_response["results"][0]["details"]["organizations"][1]["name"]
+    assert_equal 'planet-express', parsed_response["results"][0]["details"]["organizations"][1]["slug"]
+  end
+
 end

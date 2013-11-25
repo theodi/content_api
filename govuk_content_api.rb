@@ -474,6 +474,7 @@ class GovUkContentApi < Sinatra::Application
     
     @author = @artefact.author_edition
     @nodes = @artefact.node_editions
+    @organizations = @artefact.organization_editions
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])

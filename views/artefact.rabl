@@ -43,6 +43,17 @@ node :nodes do
   end
 end
 
+
+node :organizations do
+  @organizations.map do |org|
+    {
+      name: org.title,
+      slug: org.slug,
+      web_url: artefact_web_url(org.artefact),
+    }
+  end
+end
+
 node(:related_external_links) do
   @artefact.external_links.map do |link|
     {

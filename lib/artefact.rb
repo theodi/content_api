@@ -59,6 +59,20 @@ module ContentApiArtefactExtensions
     end.compact
   end
 
+
+  def organization_editions
+    @organization_editions ||= begin
+      if organization_name
+        organization_name.map do |x|
+          artefact = Artefact.find_by_slug(x)
+          Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+        end
+      else
+        []
+      end
+    end.compact
+  end
+
 end
 
 class Artefact

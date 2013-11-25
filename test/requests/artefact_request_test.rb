@@ -572,4 +572,28 @@ class ArtefactRequestTest < GovUkContentApiTest
       assert_equal expected_first_part, parsed_response["details"]["parts"][0]
     end
   end
+
+  it "should include author details" do
+    barry = FactoryGirl.create(:artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
+    FactoryGirl.create(:person_edition,      
+      title: barry.name,
+      slug: barry.slug, 
+      panopticon_id: barry.id,
+      state: 'published')
+
+    artefact = FactoryGirl.create(:artefact, state: 'live', author: 'barry-scott')
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/#{artefact.slug}.json"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Barry Scott', parsed_response["author"]["name"]
+    assert_equal 'barry-scott', parsed_response["author"]["slug"]
+    assert_equal ['writers'], parsed_response["author"]["tag_ids"]
+  end
+
 end

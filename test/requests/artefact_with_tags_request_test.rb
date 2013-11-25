@@ -295,5 +295,31 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     end
     
   end
+
+  it "should include author details" do
+    barry = FactoryGirl.create(:artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
+    FactoryGirl.create(:person_edition,      
+      title: barry.name,
+      slug: barry.slug, 
+      panopticon_id: barry.id,
+      state: 'published')
+
+    FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
+    FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
+
+    get "/with_tag.json?keyword=farmers&author=barry-scott"
+    
+    assert_equal 200, last_response.status
+    assert_status_field "ok", last_response
+
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal 1, parsed_response["results"].count
+
+    assert_equal "Thing 1", parsed_response["results"][0]["title"]
+    assert_equal 'Barry Scott', parsed_response["results"][0]["details"]["author"]["name"]
+    assert_equal 'barry-scott', parsed_response["results"][0]["details"]["author"]["slug"]
+    assert_equal ['writers'], parsed_response["results"][0]["details"]["author"]["tag_ids"]
+  end
   
 end

@@ -10,11 +10,11 @@ child(:results => "results") do
       "description" => artefact.description,
       "excerpt" => artefact.excerpt,
     }
-    unless artefact.author_name.nil?
+    if artefact.author_edition
       h["author"] = {
-        "name" => artefact.author_name,
-        "slug" => artefact.author_slug,
-        "tag_ids" => artefact.author_tag_ids
+        "name" => artefact.author_edition.title,
+        "slug" => artefact.author_edition.slug,
+        "tag_ids" => artefact.author_edition.artefact.tag_ids
       }
     end
     if artefact.edition.respond_to?(:artist)

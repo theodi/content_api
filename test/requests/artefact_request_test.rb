@@ -602,12 +602,16 @@ class ArtefactRequestTest < GovUkContentApiTest
       title: node.name,
       slug: node.slug, 
       panopticon_id: node.id,
+      level: "comms",
+      beta: false,
       state: 'published')
     node = FactoryGirl.create(:artefact, state: 'live', slug: 'crinkly-bottom', name: "Crinkly Bottom", kind: "node")
     FactoryGirl.create(:node_edition,      
       title: node.name,
       slug: node.slug, 
       panopticon_id: node.id,
+      level: "city",
+      beta: true,
       state: 'published')
 
 
@@ -623,8 +627,12 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 200, last_response.status
     assert_equal 'Westward Ho!', parsed_response["nodes"][0]["name"]
     assert_equal 'westward-ho', parsed_response["nodes"][0]["slug"]
+    assert_equal 'comms', parsed_response["nodes"][0]["level"]
+    assert_equal false, parsed_response["nodes"][0]["beta"]
     assert_equal 'Crinkly Bottom', parsed_response["nodes"][1]["name"]
     assert_equal 'crinkly-bottom', parsed_response["nodes"][1]["slug"]
+    assert_equal 'city', parsed_response["nodes"][1]["level"]
+    assert_equal true, parsed_response["nodes"][1]["beta"]
   end
 
   it "should include organization details" do

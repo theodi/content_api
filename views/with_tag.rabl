@@ -22,6 +22,8 @@ child(:results => "results") do
         {
           "name" => node.title,
           "slug" => node.slug,
+          "level" => node.level,
+          "beta" => node.beta,
         }
       end
     end

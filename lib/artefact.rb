@@ -48,8 +48,8 @@ module ContentApiArtefactExtensions
 
   def node_editions
     @node_editions ||= begin
-      if node
-        node.map do |x|
+      if node && !node.empty?
+        [node].flatten.map do |x|
           artefact = Artefact.find_by_slug(x)
           Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
         end
@@ -62,8 +62,8 @@ module ContentApiArtefactExtensions
 
   def organization_editions
     @organization_editions ||= begin
-      if organization_name
-        organization_name.map do |x|
+      if organization_name && !organization_name.empty?
+        [organization_name].flatten.map do |x|
           artefact = Artefact.find_by_slug(x)
           Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
         end

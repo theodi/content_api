@@ -667,5 +667,35 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 'Planet Express', parsed_response["organizations"][1]["name"]
     assert_equal 'planet-express', parsed_response["organizations"][1]["slug"]
   end
+  
+  it "should return correct urls for an edition type" do
+    artefact = FactoryGirl.create(:artefact, state: 'live')
+    FactoryGirl.create(:job_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+      
+    get "/#{artefact.slug}.json"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal "https://www.gov.uk/jobs/#{artefact.slug}", parsed_response['web_url']
+  end
+  
+  it "should return correct urls for an edition tag" do
+    FactoryGirl.create(:tag, :tag_id => "team", :tag_type => 'person', :title => "Team Member")
+    FactoryGirl.create(:tag, :tag_id => "technical", :tag_type => 'team', :title => "Tech Team")
+    artefact = FactoryGirl.create(:artefact, state: 'live', person: ['team'], team: ['technical'])
+    n = PersonEdition.create(:title         => "Person", 
+                             :panopticon_id => artefact.id,
+                             :slug          => artefact.slug,
+                             :state         => "published")
+        
+    get "/#{artefact.slug}.json"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal "https://www.gov.uk/team/#{artefact.slug}", parsed_response['web_url']
+  end
 
 end

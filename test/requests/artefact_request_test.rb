@@ -573,4 +573,99 @@ class ArtefactRequestTest < GovUkContentApiTest
       assert_equal expected_first_part, parsed_response["details"]["parts"][0]
     end
   end
+
+  it "should include author details" do
+    barry = FactoryGirl.create(:artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
+    FactoryGirl.create(:person_edition,      
+      title: barry.name,
+      slug: barry.slug, 
+      panopticon_id: barry.id,
+      state: 'published')
+
+    artefact = FactoryGirl.create(:artefact, state: 'live', author: 'barry-scott')
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/#{artefact.slug}.json"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Barry Scott', parsed_response["author"]["name"]
+    assert_equal 'barry-scott', parsed_response["author"]["slug"]
+    assert_equal ['writers'], parsed_response["author"]["tag_ids"]
+  end
+
+  it "should include node details" do
+    node = FactoryGirl.create(:artefact, state: 'live', slug: 'westward-ho', name: "Westward Ho!", kind: "node")
+    FactoryGirl.create(:node_edition,      
+      title: node.name,
+      slug: node.slug, 
+      panopticon_id: node.id,
+      level: "comms",
+      beta: false,
+      state: 'published')
+    node = FactoryGirl.create(:artefact, state: 'live', slug: 'crinkly-bottom', name: "Crinkly Bottom", kind: "node")
+    FactoryGirl.create(:node_edition,      
+      title: node.name,
+      slug: node.slug, 
+      panopticon_id: node.id,
+      level: "city",
+      beta: true,
+      state: 'published')
+
+
+    artefact = FactoryGirl.create(:artefact, state: 'live', node: ['westward-ho', 'crinkly-bottom'])
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/#{artefact.slug}.json"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Westward Ho!', parsed_response["nodes"][0]["name"]
+    assert_equal 'westward-ho', parsed_response["nodes"][0]["slug"]
+    assert_equal 'comms', parsed_response["nodes"][0]["level"]
+    assert_equal false, parsed_response["nodes"][0]["beta"]
+    assert_equal 'Crinkly Bottom', parsed_response["nodes"][1]["name"]
+    assert_equal 'crinkly-bottom', parsed_response["nodes"][1]["slug"]
+    assert_equal 'city', parsed_response["nodes"][1]["level"]
+    assert_equal true, parsed_response["nodes"][1]["beta"]
+  end
+
+  it "should include organization details" do
+    FactoryGirl.create(:tag, tag_id: 'start-up', title: 'Start Up', tag_type: "organization")
+    org = FactoryGirl.create(:artefact, state: 'live', slug: 'mom-corp', name: "Mom Corp.", kind: "organization", organization: ["start-up"])
+    FactoryGirl.create(:organization_edition,      
+      title: org.name,
+      slug: org.slug, 
+      panopticon_id: org.id,
+      state: 'published')
+    org = FactoryGirl.create(:artefact, state: 'live', slug: 'planet-express', name: "Planet Express", kind: "organization", organization: ["start-up"])
+    FactoryGirl.create(:organization_edition,      
+      title: org.name,
+      slug: org.slug, 
+      panopticon_id: org.id,
+      state: 'published')
+
+
+    artefact = FactoryGirl.create(:artefact, state: 'live', organization_name: ['mom-corp', 'planet-express'])
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    get "/#{artefact.slug}.json"
+
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Mom Corp.', parsed_response["organizations"][0]["name"]
+    assert_equal 'mom-corp', parsed_response["organizations"][0]["slug"]
+    assert_equal 'Planet Express', parsed_response["organizations"][1]["name"]
+    assert_equal 'planet-express', parsed_response["organizations"][1]["slug"]
+  end
+
 end

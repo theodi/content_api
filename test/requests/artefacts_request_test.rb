@@ -65,6 +65,54 @@ class ArtefactsRequestTest < GovUkContentApiTest
     assert_equal "#{public_web_url}/bravo", result["web_url"]
     assert_equal "http://example.org/bravo.json", result["id"]
   end
+  
+  it "should only return those artefacts with a particular node" do
+    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :node => ["westward-ho!", "john-o-groats"])
+    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide")
+    
+    get "/artefacts.json?node=westward-ho!"
+    
+    assert_equal 200, last_response.status
+    assert_status_field "ok", last_response
+
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal 1, parsed_response["total"]
+        
+    assert_equal "Bravo", parsed_response["results"][0]["title"]
+  end
+  
+  it "should only return those artefacts with a particular author" do
+    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :author => "barry-scott")
+    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :author => "ian-mac-shane")
+    
+    get "/artefacts.json?author=barry-scott"
+    
+    assert_equal 200, last_response.status
+    assert_status_field "ok", last_response
+
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal 1, parsed_response["total"]
+    
+    assert_equal "Bravo", parsed_response["results"][0]["title"]
+  end
+  
+  it "should only return those artefacts with a particular organization_name" do
+    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :organization_name => ["mom-corp", "planet-express"])
+    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :organization_name => ["wayne-enterprises"])
+    
+    get "/artefacts.json?organization_name=mom-corp"
+    
+    assert_equal 200, last_response.status
+    assert_status_field "ok", last_response
+
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal 1, parsed_response["total"]
+    
+    assert_equal "Bravo", parsed_response["results"][0]["title"]
+  end
 
   describe "with pagination" do
     def setup

@@ -265,13 +265,12 @@ class GovUkContentApi < Sinatra::Application
 
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+      modifier_params = params.slice('sort', 'author', 'node', 'organization_name')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
-        modifier_params = params.slice('sort')
         redirect with_tag_url(possible_tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
-        modifier_params = params.slice('sort')
         redirect with_type_url(params[:tag], modifier_params)
       else
         custom_404
@@ -301,7 +300,8 @@ class GovUkContentApi < Sinatra::Application
 
       artefacts = sorted_artefacts_for_tag_id(
         tag_id,
-        params[:sort]
+        params[:sort],
+        params.slice('author', 'node', 'organization_name')
       )
     else
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
@@ -318,7 +318,6 @@ class GovUkContentApi < Sinatra::Application
     end
     
     results = map_artefacts_and_add_editions(artefacts)
-    results = attach_authors(results)
     @result_set = FakePaginatedResultSet.new(results)
 
     render :rabl, :with_tag, format: "json"
@@ -424,7 +423,12 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
-      Artefact.live
+      a = Artefact.live
+      sliced_params = params.slice('author', 'node', 'organization_name')
+      if !sliced_params.empty?
+        a = a.where(sliced_params)
+      end
+      a
     end
 
     if settings.pagination
@@ -468,7 +472,9 @@ class GovUkContentApi < Sinatra::Application
     custom_404 unless @artefact
     handle_unpublished_artefact(@artefact) unless params[:edition]
     
-    @author = get_artefact_author(@artefact)
+    @author = @artefact.author_edition
+    @nodes = @artefact.node_editions
+    @organizations = @artefact.organization_editions
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
@@ -481,29 +487,6 @@ class GovUkContentApi < Sinatra::Application
     render :rabl, :artefact, format: "json"
   end
 
-  def get_artefact_author(artefact)
-    slug = artefact.author
-    if slug
-      artefact = Artefact.find_by_slug(slug)
-      Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
-    else
-      nil
-    end
-  end
-  
-  def attach_authors(artefacts)
-    artefacts.map do |artefact|
-      author = get_artefact_author(artefact)
-      unless author.nil?
-        artefact.author_name = author.title
-        artefact.author_slug = author.slug
-        artefact.author_tag_ids = author.artefact.tag_ids
-      end
-      artefact
-    end
-    artefacts
-  end
-  
   def map_editions_with_artefacts(editions)
     statsd.time("#{@statsd_scope}.map_editions_to_artefacts") do
       artefact_ids = editions.collect(&:panopticon_id)
@@ -539,13 +522,13 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def sorted_artefacts_for_tag_id(tag_id, sort)
-    statsd.time("#{@statsd_scope}.#{tag_id}") do
+  def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
+    statsd.time("#{@statsd_scope}.#{tag_id}") do   
+      artefacts = Artefact.live.where(filter.merge(tag_ids: tag_id))
+         
       if sort == "date"
-        artefacts = Artefact.live.where(tag_ids: tag_id).order_by(:created_at.desc)
+        artefacts = artefacts.order_by(:created_at.desc)
       else
-        artefacts = Artefact.live.where(tag_ids: tag_id)
-
         # Load in the curated list and use it as an ordering for the top items in
         # the list. Any artefacts not present in the list go on the end, in
         # alphabetical name order.

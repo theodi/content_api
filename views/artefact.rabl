@@ -33,6 +33,29 @@ node :author do
   end
 end
 
+node :nodes do
+  @nodes.map do |node|
+    {
+      name: node.title,
+      slug: node.slug,
+      level: node.level,
+      beta: node.beta,
+      web_url: artefact_web_url(node.artefact),
+    }
+  end
+end
+
+
+node :organizations do
+  @organizations.map do |org|
+    {
+      name: org.title,
+      slug: org.slug,
+      web_url: artefact_web_url(org.artefact),
+    }
+  end
+end
+
 node(:related_external_links) do
   @artefact.external_links.map do |link|
     {

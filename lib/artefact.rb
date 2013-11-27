@@ -7,8 +7,6 @@ require "govspeak"
 module ContentApiArtefactExtensions
   extend ActiveSupport::Concern
   
-  attr_accessor :author_name, :author_slug, :author_tag_ids
-
   included do
     attr_accessor :edition, :licence, :places, :assets, :country, :extra_related_artefacts
     scope :live, where(state: 'live')
@@ -35,6 +33,44 @@ module ContentApiArtefactExtensions
       artist = Artefact.find_by_slug(edition.artist)
       artist ? artist.name : nil
     end
+  end
+
+  def author_edition
+    @author_edition ||= begin
+      if author
+        artefact = Artefact.find_by_slug(author)
+        Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+      else
+        nil
+      end
+    end
+  end
+
+  def node_editions
+    @node_editions ||= begin
+      if node && !node.empty?
+        [node].flatten.map do |x|
+          artefact = Artefact.find_by_slug(x)
+          Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+        end
+      else
+        []
+      end
+    end.compact
+  end
+
+
+  def organization_editions
+    @organization_editions ||= begin
+      if organization_name && !organization_name.empty?
+        [organization_name].flatten.map do |x|
+          artefact = Artefact.find_by_slug(x)
+          Edition.where(panopticon_id: artefact.id, state: 'published').first rescue nil
+        end
+      else
+        []
+      end
+    end.compact
   end
 
 end

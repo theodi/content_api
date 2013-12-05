@@ -308,7 +308,7 @@ class GovUkContentApi < Sinatra::Application
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
       type = params[:type].singularize
       @description = "All content with the #{type} type"
-      artefacts = Artefact.where(:kind => type)
+      artefacts = Artefact.where(:kind => type, :tag_ids => @role)
       
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)

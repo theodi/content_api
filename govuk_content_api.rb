@@ -524,9 +524,9 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
-    statsd.time("#{@statsd_scope}.#{tag_id}") do   
-      artefacts = Artefact.live.where(filter.merge(tag_ids: tag_id))
-         
+    statsd.time("#{@statsd_scope}.#{tag_id}") do    
+      artefacts = Artefact.live.where(filter).all(tag_ids: [tag_id])
+      
       if sort == "date"
         artefacts = artefacts.order_by(:created_at.desc)
       else

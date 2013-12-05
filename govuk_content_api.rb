@@ -49,6 +49,7 @@ class GovUkContentApi < Sinatra::Application
 
   before do
     content_type :json
+    @role = env['HTTP_CONTENT_API_ROLE'] || 'odi'
   end
 
   get "/local_authorities.json" do

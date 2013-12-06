@@ -424,7 +424,7 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
-      a = Artefact.live
+      a = Artefact.live.where(:tag_ids => @role)
       sliced_params = params.slice('author', 'node', 'organization_name')
       if !sliced_params.empty?
         a = a.where(sliced_params)

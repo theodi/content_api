@@ -238,7 +238,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', roles: ['foo'])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', roles: ['bar'])
         
-        get "/with_tag.json?keyword=farmers", {}, { 'HTTP_CONTENT_API_ROLE' => 'foo' }
+        get "/with_tag.json?keyword=farmers&role=foo"
 
         assert_equal 200, last_response.status
         assert_status_field "ok", last_response
@@ -320,7 +320,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', kind: 'job', state: 'live', roles: ['foo'])
       FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', kind: 'job', state: 'live', roles: ['bar'])
       
-      get "/with_tag.json?type=jobs", {}, { 'HTTP_CONTENT_API_ROLE' => 'foo' }
+      get "/with_tag.json?type=jobs&role=foo"
 
       assert_equal 200, last_response.status
       assert_status_field "ok", last_response

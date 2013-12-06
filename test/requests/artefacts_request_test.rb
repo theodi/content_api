@@ -121,7 +121,7 @@ class ArtefactsRequestTest < GovUkContentApiTest
     FactoryGirl.create(:my_artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :roles => ['foo'])
     FactoryGirl.create(:my_artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :roles => ['bar'])
     
-    get "/artefacts.json", {}, { 'HTTP_CONTENT_API_ROLE' => 'foo' }
+    get "/artefacts.json?role=foo"
     
     assert_equal 200, last_response.status
     assert_status_field "ok", last_response

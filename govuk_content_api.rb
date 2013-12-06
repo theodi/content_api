@@ -39,7 +39,7 @@ class GovUkContentApi < Sinatra::Application
   set :show_exceptions, false
 
   def known_tag_types
-    @known_tag_types ||= TagTypes.new(Artefact.tag_types)
+    @known_tag_types ||= TagTypes.new(Artefact.tag_types - ["roles"])
   end
 
   error Mongo::MongoDBError, Mongo::MongoRubyError do
@@ -49,7 +49,7 @@ class GovUkContentApi < Sinatra::Application
 
   before do
     content_type :json
-    @role = env['HTTP_CONTENT_API_ROLE'] || 'odi'
+    @role = params[:role] || 'odi'
   end
 
   get "/local_authorities.json" do
@@ -290,7 +290,7 @@ class GovUkContentApi < Sinatra::Application
 
       # For now, we only support retrieving by a single tag
       custom_404 unless requested_tags.size == 1
-
+      
       if params[:sort]
         custom_404 unless ["curated", "alphabetical", "date"].include?(params[:sort])
       end

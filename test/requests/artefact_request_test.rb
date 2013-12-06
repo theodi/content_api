@@ -666,5 +666,21 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 'Planet Express', parsed_response["organizations"][1]["name"]
     assert_equal 'planet-express', parsed_response["organizations"][1]["slug"]
   end
+  
+  it "should 404 if the role requested does not match the artefact's role" do
+    FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "ODI")
+    artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live', roles: ['odi'])
+    
+    get "/#{artefact.slug}.json", {}, { 'HTTP_CONTENT_API_ROLE' => 'bar' }
+    assert_equal 404, last_response.status
+  end
+  
+  it "should return 200 if the role requested matches the artefact's role" do
+    FactoryGirl.create(:tag, :tag_id => "bar", :tag_type => 'role', :title => "bar")
+    artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live', roles: ['bar'])
+    
+    get "/#{artefact.slug}.json", {}, { 'HTTP_CONTENT_API_ROLE' => 'bar' }
+    assert_equal 200, last_response.status
+  end
 
 end

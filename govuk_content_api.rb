@@ -467,7 +467,7 @@ class GovUkContentApi < Sinatra::Application
     verify_unpublished_permission if params[:edition]
 
     statsd.time(@statsd_scope) do
-      @artefact = Artefact.find_by_slug(id)
+      @artefact = Artefact.find_by_slug_and_tag_ids(id, @role)
     end
 
     custom_404 unless @artefact

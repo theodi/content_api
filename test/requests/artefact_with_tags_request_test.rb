@@ -313,6 +313,25 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       assert_status_field "not found", last_response
     end
     
+    it "should only return those artefacts with a particular role" do
+      FactoryGirl.create(:tag, :tag_id => "foo", :tag_type => 'role', :title => "foo")
+      FactoryGirl.create(:tag, :tag_id => "bar", :tag_type => 'role', :title => "bar")
+      
+      FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', kind: 'job', state: 'live', roles: ['foo'])
+      FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', kind: 'job', state: 'live', roles: ['bar'])
+      
+      get "/with_tag.json?type=jobs", {}, { 'HTTP_CONTENT_API_ROLE' => 'foo' }
+
+      assert_equal 200, last_response.status
+      assert_status_field "ok", last_response
+
+      parsed_response = JSON.parse(last_response.body)
+
+      assert_equal 1, parsed_response["results"].count
+
+      assert_equal "Thing 1", parsed_response["results"][0]["title"]
+    end
+    
   end
 
   it "should include author details" do

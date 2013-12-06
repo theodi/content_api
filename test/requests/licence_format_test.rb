@@ -5,7 +5,7 @@ class LicenceFormatsTest < GovUkContentApiTest
   include GdsApi::TestHelpers::LicenceApplication
 
   def create_stub_licence
-    stub_artefact = FactoryGirl.create(:artefact, slug: 'licence-artefact', state: 'live')
+    stub_artefact = FactoryGirl.create(:my_artefact, slug: 'licence-artefact', state: 'live')
     FactoryGirl.create(:licence_edition, panopticon_id: stub_artefact.id,
       licence_identifier: '123-2-1', licence_short_description: "A licence for stuff", state: 'published')
   end
@@ -50,7 +50,7 @@ class LicenceFormatsTest < GovUkContentApiTest
   end
 
   it "should not clobber artefact requests that start with 'licences'" do
-    artefact = FactoryGirl.create(:artefact, slug: 'licences-to-play-music', owning_app: 'publisher', state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'licences-to-play-music', owning_app: 'publisher', state: 'live')
     licence_edition = FactoryGirl.create(:licence_edition, slug: artefact.slug, licence_short_description: 'Music licence',
                                 panopticon_id: artefact.id, state: 'published', licence_identifier: "123-4-5")
     licence_exists('123-4-5', { })

@@ -14,9 +14,9 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
 
   it "should return all artefacts" do
-    FactoryGirl.create(:artefact, :name => "Alpha", :state => 'live')
-    FactoryGirl.create(:artefact, :name => "Bravo", :state => 'live')
-    FactoryGirl.create(:artefact, :name => "Charlie", :state => 'live')
+    FactoryGirl.create(:my_artefact, :name => "Alpha", :state => 'live')
+    FactoryGirl.create(:my_artefact, :name => "Bravo", :state => 'live')
+    FactoryGirl.create(:my_artefact, :name => "Charlie", :state => 'live')
 
     get "/artefacts.json"
 
@@ -30,9 +30,9 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
 
   it "should only include live artefacts" do
-    FactoryGirl.create(:artefact, :name => "Alpha", :state => 'draft')
-    FactoryGirl.create(:artefact, :name => "Bravo", :state => 'live')
-    FactoryGirl.create(:artefact, :name => "Charlie", :state => 'archived')
+    FactoryGirl.create(:my_artefact, :name => "Alpha", :state => 'draft')
+    FactoryGirl.create(:my_artefact, :name => "Bravo", :state => 'live')
+    FactoryGirl.create(:my_artefact, :name => "Charlie", :state => 'archived')
 
     get "/artefacts.json"
 
@@ -46,7 +46,7 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
 
   it "should only include minimal information for each artefact" do
-    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide")
+    FactoryGirl.create(:my_artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide")
 
     get "/artefacts.json"
 
@@ -67,8 +67,8 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
   
   it "should only return those artefacts with a particular node" do
-    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :node => ["westward-ho!", "john-o-groats"])
-    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide")
+    FactoryGirl.create(:my_artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :node => ["westward-ho!", "john-o-groats"])
+    FactoryGirl.create(:my_artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide")
     
     get "/artefacts.json?node=westward-ho!"
     
@@ -83,8 +83,8 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
   
   it "should only return those artefacts with a particular author" do
-    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :author => "barry-scott")
-    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :author => "ian-mac-shane")
+    FactoryGirl.create(:my_artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :author => "barry-scott")
+    FactoryGirl.create(:my_artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :author => "ian-mac-shane")
     
     get "/artefacts.json?author=barry-scott"
     
@@ -99,8 +99,8 @@ class ArtefactsRequestTest < GovUkContentApiTest
   end
   
   it "should only return those artefacts with a particular organization_name" do
-    FactoryGirl.create(:artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :organization_name => ["mom-corp", "planet-express"])
-    FactoryGirl.create(:artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :organization_name => ["wayne-enterprises"])
+    FactoryGirl.create(:my_artefact, :slug => "bravo", :name => "Bravo", :state => 'live', :kind => "guide", :organization_name => ["mom-corp", "planet-express"])
+    FactoryGirl.create(:my_artefact, :slug => "alpha", :name => "Alpha", :state => 'live', :kind => "guide", :organization_name => ["wayne-enterprises"])
     
     get "/artefacts.json?organization_name=mom-corp"
     

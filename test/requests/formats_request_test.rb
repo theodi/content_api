@@ -13,7 +13,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with answer_edition" do
-    artefact = FactoryGirl.create(:artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     answer = FactoryGirl.create(:edition, slug: artefact.slug, body: 'Important batman information', panopticon_id: artefact.id, state: 'published')
 
     get '/batman.json'
@@ -31,7 +31,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with business_support_edition" do
-    artefact = FactoryGirl.create(:artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     business_support = FactoryGirl.create(:business_support_edition, slug: artefact.slug,
                                 short_description: "No policeman is going to give the Batmobile a ticket",
                                 body: "batman body", eligibility: "batman eligibility", evaluation: "batman evaluation",
@@ -69,7 +69,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with guide_edition" do
-    artefact = FactoryGirl.create(:artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     guide_edition = FactoryGirl.create(:guide_edition_with_two_govspeak_parts, slug: artefact.slug,
                                 panopticon_id: artefact.id, state: 'published')
     guide_edition.save!
@@ -92,7 +92,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with programme_edition" do
-    artefact = FactoryGirl.create(:artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     programme_edition = FactoryGirl.create(:programme_edition, slug: artefact.slug,
                                 panopticon_id: artefact.id, state: 'published')
     programme_edition.save!
@@ -115,7 +115,8 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "person editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'batman', kind: 'person', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      FactoryGirl.create(:tag, :tag_id => "team-member", :tag_type => 'person')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'batman', kind: 'person', person: ['team-member'], owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic person edtion" do
@@ -164,7 +165,8 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "timed item editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'timey-wimey', kind: 'timed_item', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      FactoryGirl.create(:tag, :tag_id => "time", :tag_type => 'timed_item')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'timey-wimey', kind: 'timed_item', timed_item: ['time'], owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
 
     it "should work with basic timed_item_edition" do
@@ -194,7 +196,8 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "article editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'some-news', kind: 'article', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      FactoryGirl.create(:tag, :tag_id => "news", :tag_type => 'article')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'some-news', kind: 'article', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live', article: ['news'])
     end
     
     it "should work with basic article edition" do
@@ -231,7 +234,7 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "case study editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'case-study', kind: 'case_study', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'case-study', kind: 'case_study', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic case study edition" do
@@ -268,7 +271,7 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "FAQ editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'meaning-of-life', kind: 'faq', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'meaning-of-life', kind: 'faq', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic FAQ edition" do
@@ -296,7 +299,7 @@ class FormatsRequestTest < GovUkContentApiTest
 
   describe "Job editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'jobby-job', kind: 'job', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'jobby-job', kind: 'job', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic job edition" do
@@ -332,7 +335,8 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "organization editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'widgets-inc', kind: 'organization', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      FactoryGirl.create(:tag, :tag_id => "startup", :tag_type => 'organization')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'widgets-inc', kind: 'organization', organization: ['startup'], owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic organization edtion" do
@@ -381,7 +385,7 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "creative work editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'mona-lisa', kind: 'creative_work', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'mona-lisa', kind: 'creative_work', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end   
     
     it "should work with basic creative_work_edition" do
@@ -411,7 +415,7 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "course editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic course_edition" do
@@ -442,8 +446,8 @@ class FormatsRequestTest < GovUkContentApiTest
     
   describe "course instance editions" do
     before :each do
-      @course_artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')      
-      @artefact = FactoryGirl.create(:artefact, slug: 'all-the-datas-2013-02-03', kind: 'course_instance', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @course_artefact = FactoryGirl.create(:my_artefact, slug: 'all-the-datas', kind: 'course', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')      
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'all-the-datas-2013-02-03', kind: 'course_instance', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic course_edition" do
@@ -487,7 +491,8 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "event editons" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'lunchtime-lecture', kind: 'event', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      FactoryGirl.create(:tag, :tag_id => "lunchtime-lecture", :tag_type => 'event')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'lunchtime-lecture', kind: 'event', event: ['lunchtime-lecture'], owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic event_edition" do
@@ -526,7 +531,7 @@ class FormatsRequestTest < GovUkContentApiTest
   
   describe "node editons" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'birmingham', kind: 'node', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'birmingham', kind: 'node', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
     
     it "should work with basic node_edition" do
@@ -575,7 +580,7 @@ class FormatsRequestTest < GovUkContentApiTest
 
   describe "video editions" do
     before :each do
-      @artefact = FactoryGirl.create(:artefact, slug: 'batman', kind: 'video', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+      @artefact = FactoryGirl.create(:my_artefact, slug: 'batman', kind: 'video', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     end
 
     it "should work with basic video_edition" do
@@ -662,7 +667,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with licence_edition" do
-    artefact = FactoryGirl.create(:artefact, slug: 'batman-licence', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-licence', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     licence_edition = FactoryGirl.create(:licence_edition, slug: artefact.slug, licence_short_description: 'Batman licence',
                                 licence_overview: 'Not just anyone can be Batman', panopticon_id: artefact.id, state: 'published',
                                 will_continue_on: 'The Batman', continuation_link: 'http://www.batman.com', licence_identifier: "123-4-5")
@@ -688,7 +693,7 @@ class FormatsRequestTest < GovUkContentApiTest
   it "should work with local_transaction_edition" do
     service = FactoryGirl.create(:local_service, lgsl_code: 42)
     expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     local_transaction_edition = FactoryGirl.create(:local_transaction_edition, slug: artefact.slug, lgsl_code: 42, lgil_override: 3345,
                                 expectation_ids: [expectation.id], minutes_to_complete: 3,
                                 introduction: "batman introduction", more_information: "batman more_information",
@@ -713,7 +718,7 @@ class FormatsRequestTest < GovUkContentApiTest
 
   it "should work with transaction_edition" do
     expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     transaction_edition = FactoryGirl.create(:transaction_edition, slug: artefact.slug,
                                 expectation_ids: [expectation.id], minutes_to_complete: 3,
                                 introduction: "batman introduction", more_information: "batman more_information",
@@ -741,7 +746,7 @@ class FormatsRequestTest < GovUkContentApiTest
 
   it "should work with place_edition" do
     expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:artefact, slug: 'batman-place', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-place', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     place_edition = FactoryGirl.create(:place_edition, slug: artefact.slug, expectation_ids: [expectation.id],
                                 introduction: "batman introduction", more_information: "batman more_information",
                                 place_type: "batman-locations",
@@ -762,7 +767,7 @@ class FormatsRequestTest < GovUkContentApiTest
   end
 
   it "should work with simple smart-answers" do
-    artefact = FactoryGirl.create(:artefact, :slug => 'the-bridge-of-death', :owning_app => 'publisher', :state => 'live')
+    artefact = FactoryGirl.create(:my_artefact, :slug => 'the-bridge-of-death', :owning_app => 'publisher', :state => 'live')
     smart_answer = FactoryGirl.build(:simple_smart_answer_edition, :panopticon_id => artefact.id, :state => 'published',
                         :body => "STOP!\n-----\n\nHe who would cross the Bridge of Death  \nMust answer me  \nThese questions three  \nEre the other side he see.\n")
 

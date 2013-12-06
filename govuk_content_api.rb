@@ -39,7 +39,7 @@ class GovUkContentApi < Sinatra::Application
   set :show_exceptions, false
 
   def known_tag_types
-    @known_tag_types ||= TagTypes.new(Artefact.tag_types)
+    @known_tag_types ||= TagTypes.new(Artefact.tag_types - ["roles"])
   end
 
   error Mongo::MongoDBError, Mongo::MongoRubyError do
@@ -49,6 +49,7 @@ class GovUkContentApi < Sinatra::Application
 
   before do
     content_type :json
+    @role = params[:role] || ENV['CONTENTAPI_DEFAULT_ROLE']
   end
 
   get "/local_authorities.json" do
@@ -289,7 +290,7 @@ class GovUkContentApi < Sinatra::Application
 
       # For now, we only support retrieving by a single tag
       custom_404 unless requested_tags.size == 1
-
+      
       if params[:sort]
         custom_404 unless ["curated", "alphabetical", "date"].include?(params[:sort])
       end
@@ -307,7 +308,7 @@ class GovUkContentApi < Sinatra::Application
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
       type = params[:type].singularize
       @description = "All content with the #{type} type"
-      artefacts = Artefact.where(:kind => type)
+      artefacts = Artefact.where(:kind => type, :tag_ids => @role)
       
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)
@@ -423,7 +424,7 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
-      a = Artefact.live
+      a = Artefact.live.where(:tag_ids => @role)
       sliced_params = params.slice('author', 'node', 'organization_name')
       if !sliced_params.empty?
         a = a.where(sliced_params)
@@ -466,7 +467,7 @@ class GovUkContentApi < Sinatra::Application
     verify_unpublished_permission if params[:edition]
 
     statsd.time(@statsd_scope) do
-      @artefact = Artefact.find_by_slug(id)
+      @artefact = Artefact.find_by_slug_and_tag_ids(id, @role)
     end
 
     custom_404 unless @artefact
@@ -523,9 +524,9 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
-    statsd.time("#{@statsd_scope}.#{tag_id}") do   
-      artefacts = Artefact.live.where(filter.merge(tag_ids: tag_id))
-         
+    statsd.time("#{@statsd_scope}.#{tag_id}") do    
+      artefacts = Artefact.live.where(filter).all(tag_ids: [tag_id, @role])
+      
       if sort == "date"
         artefacts = artefacts.order_by(:created_at.desc)
       else

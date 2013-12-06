@@ -6,7 +6,7 @@ class TravelAdviceTest < GovUkContentApiTest
 
   describe "loading the travel-advice index artefact" do
     before do
-      @artefact = FactoryGirl.create(:artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
+      @artefact = FactoryGirl.create(:my_artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
                                      :owning_app => 'travel-advice-publisher', :rendering_app => 'frontend',
                                      :name => 'Foreign travel advice', :description => 'Oh I do want to live beside the seaside!')
     end
@@ -89,7 +89,7 @@ class TravelAdviceTest < GovUkContentApiTest
   describe "loading data for a travel advice country page" do
 
     it "should return details for a country with published advice" do
-      artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                     kind: 'travel-advice', owning_app: 'travel-advice-publisher', name: "Aruba travel advice",
                                     description: "This is the travel advice for people planning a visit to Aruba.")
       edition = FactoryGirl.build(:travel_advice_edition, country_slug: 'aruba',
@@ -138,7 +138,7 @@ class TravelAdviceTest < GovUkContentApiTest
     end
 
     it "should work with % encoded slugs" do
-      artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                     kind: 'travel-advice', owning_app: 'travel-advice-publisher', name: "Aruba travel advice",
                                     description: "This is the travel advice for people planning a visit to Aruba.")
       edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
@@ -162,19 +162,19 @@ class TravelAdviceTest < GovUkContentApiTest
       it "should include related links from the foreign-travel-advice index page" do
 
         index_related_artefacts = [
-          FactoryGirl.create(:artefact, slug: "related-artefact-1", name: "Pies", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-2", name: "Cake", state: 'live')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-1", name: "Pies", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-2", name: "Cake", state: 'live')
         ]
 
-        travel_index_artefact = FactoryGirl.create(:artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
+        travel_index_artefact = FactoryGirl.create(:my_artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
                                        :owning_app => 'travel-advice-publisher', :rendering_app => 'frontend', related_artefacts: index_related_artefacts)
 
 
         aruba_related_artefacts = [
-          FactoryGirl.create(:artefact, slug: "related-artefact-3", name: "Pasties", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-4", name: "Sausages", state: 'live')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-3", name: "Pasties", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-4", name: "Sausages", state: 'live')
         ]
-        aruba_artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        aruba_artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher', related_artefacts: aruba_related_artefacts)
 
         aruba_edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba')
@@ -191,21 +191,21 @@ class TravelAdviceTest < GovUkContentApiTest
 
       it "should not include links that are drafts" do
         index_related_artefacts = [
-          FactoryGirl.create(:artefact, slug: "related-artefact-1", name: "Pies", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-2", name: "Cake", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-3", name: "Burgers", state: 'draft')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-1", name: "Pies", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-2", name: "Cake", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-3", name: "Burgers", state: 'draft')
         ]
 
-        travel_index_artefact = FactoryGirl.create(:artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
+        travel_index_artefact = FactoryGirl.create(:my_artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
                                        :owning_app => 'travel-advice-publisher', :rendering_app => 'frontend', related_artefacts: index_related_artefacts)
 
 
         aruba_related_artefacts = [
-          FactoryGirl.create(:artefact, slug: "related-artefact-4", name: "Pasties", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-5", name: "Sausages", state: 'live'),
-          FactoryGirl.create(:artefact, slug: "related-artefact-6", name: "Burritos", state: 'draft')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-4", name: "Pasties", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-5", name: "Sausages", state: 'live'),
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-6", name: "Burritos", state: 'draft')
         ]
-        aruba_artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        aruba_artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher', related_artefacts: aruba_related_artefacts)
 
         aruba_edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba')
@@ -222,19 +222,19 @@ class TravelAdviceTest < GovUkContentApiTest
 
 
       it "should not duplicate related links if they are on both the home page and the country page" do
-        shared_artefact = FactoryGirl.create(:artefact, slug: "related-artefact-1", name: "Pies", state: "live")
+        shared_artefact = FactoryGirl.create(:my_artefact, slug: "related-artefact-1", name: "Pies", state: "live")
         index_related_artefacts = [
           shared_artefact,
-          FactoryGirl.create(:artefact, slug: "related-artefact-2", name: "Cake", state: 'live')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-2", name: "Cake", state: 'live')
         ]
 
-        travel_index_artefact = FactoryGirl.create(:artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
+        travel_index_artefact = FactoryGirl.create(:my_artefact, :slug => 'foreign-travel-advice', :state => 'live', :need_id => '133',
                                        :owning_app => 'travel-advice-publisher', :rendering_app => 'frontend', related_artefacts: index_related_artefacts)
         aruba_related_artefacts = [
           shared_artefact,
-          FactoryGirl.create(:artefact, slug: "related-artefact-3", name: "Sausages", state: 'live')
+          FactoryGirl.create(:my_artefact, slug: "related-artefact-3", name: "Sausages", state: 'live')
         ]
-        aruba_artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        aruba_artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher', related_artefacts: aruba_related_artefacts)
 
         aruba_edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba')
@@ -254,7 +254,7 @@ class TravelAdviceTest < GovUkContentApiTest
 
     describe "loading assets from asset-manager" do
       it "should include image and document details if present" do
-        artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher')
         edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
                                      :image_id => "512c9019686c82191d000001",
@@ -291,7 +291,7 @@ class TravelAdviceTest < GovUkContentApiTest
       end
 
       it "should not include details if asset-manager returns 404 for the asset" do
-        artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher')
         edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
                                      :image_id => "512c9019686c82191d000001",
@@ -319,7 +319,7 @@ class TravelAdviceTest < GovUkContentApiTest
       end
 
       # it "should not include details if the asset isn't marked as clean" do
-      #   artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      #   artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
       #                                 kind: 'travel-advice', owning_app: 'travel-advice-publisher')
       #   edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
       #                                :image_id => "512c9019686c82191d000001",
@@ -354,7 +354,7 @@ class TravelAdviceTest < GovUkContentApiTest
         ::API_CLIENT_CREDENTIALS = {:bearer_token => "foobar"}
         GovUkContentApi.instance_variable_set('@asset_manager_api', nil)
 
-        artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher')
         edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
                                      :image_id => "512c9019686c82191d000003")
@@ -374,7 +374,7 @@ class TravelAdviceTest < GovUkContentApiTest
       end
 
       it "should not include details if asset manager is unavailable or returns an error" do
-        artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+        artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                       kind: 'travel-advice', owning_app: 'travel-advice-publisher')
         edition = FactoryGirl.create(:published_travel_advice_edition, country_slug: 'aruba',
                                      :image_id => "512c9019686c82191d000001",
@@ -400,7 +400,7 @@ class TravelAdviceTest < GovUkContentApiTest
     end
 
     it "should return draft data when authenticated" do
-      artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                     kind: 'travel-advice', owning_app: 'travel-advice-publisher', name: "Aruba travel advice",
                                     description: "This is the travel advice for people planning a visit to Aruba.")
       edition = FactoryGirl.build(:travel_advice_edition, country_slug: 'aruba',
@@ -439,7 +439,7 @@ class TravelAdviceTest < GovUkContentApiTest
     end
 
     it "should 404 for a country with a draft edition only" do
-      artefact = FactoryGirl.create(:artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
+      artefact = FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice/aruba', state: 'live',
                                     kind: 'travel-advice', owning_app: 'travel-advice-publisher', name: "Aruba travel advice",
                                     description: "This is the travel advice for people planning a visit to Aruba.")
       edition = FactoryGirl.build(:travel_advice_edition, country_slug: 'aruba',

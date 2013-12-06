@@ -33,6 +33,16 @@ DatabaseCleaner.clean
 
 WebMock.disable_net_connect!
 
+FactoryGirl.define do
+  factory :my_artefact, parent: :artefact do
+    roles ['odi']
+  end
+  
+  factory :my_non_publisher_artefact, parent: :non_publisher_artefact do
+    roles ['odi']
+  end
+end
+
 module ResponseTestMethods
   def assert_status_field(expected, response)
     assert_equal expected, JSON.parse(response.body)["_response_info"]["status"]
@@ -88,6 +98,7 @@ class MiniTest::Spec
   before :each do
     DatabaseCleaner.start
     Tag.create(title: "Team", tag_type: "person", tag_id: "writers")
+    Tag.create(tag_id: "odi", tag_type: 'role', title: "ODI")
   end
 
   after :each do

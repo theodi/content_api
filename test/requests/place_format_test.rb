@@ -7,7 +7,7 @@ class PlaceFormatTest < GovUkContentApiTest
   def setup
     super
     expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:artefact, slug: 'batman-place', owning_app: 'publisher', state: 'live')
+    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-place', owning_app: 'publisher', state: 'live')
     place_edition = FactoryGirl.create(:place_edition, 
                                 place_type: "batman-place",
                                 slug: artefact.slug, expectation_ids: [expectation.id],

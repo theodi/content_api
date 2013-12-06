@@ -6,7 +6,7 @@ class LatestRequestTest < GovUkContentApiTest
     before :each do
       tag = FactoryGirl.create(:tag, tag_id: "news", tag_type: "article")
       5.times do |n|
-        artefact = FactoryGirl.create(:artefact, name: "This was created #{n} days ago", owning_app: "publisher", article: ['news'], state: 'live', kind: "Article", created_at: n.days.ago, slug: "#{n}-days-ago")
+        artefact = FactoryGirl.create(:my_artefact, name: "This was created #{n} days ago", owning_app: "publisher", article: ['news'], state: 'live', kind: "Article", created_at: n.days.ago, slug: "#{n}-days-ago")
         edition = ArticleEdition.create(panopticon_id: artefact.id, title: artefact.name, content: "A really long description\n\nWith line breaks.", state: "published", slug: artefact.slug)
       end
     end

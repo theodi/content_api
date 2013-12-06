@@ -77,4 +77,10 @@ end
 
 class Artefact
   include ContentApiArtefactExtensions
+  
+  class << self
+    def find_by_slug_and_tag_ids(slug, tag_id)
+      where(:slug => slug, :tag_ids => tag_id).first
+    end
+  end
 end

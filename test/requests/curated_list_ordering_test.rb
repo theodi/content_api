@@ -19,7 +19,7 @@ class CuratedListOrderingTest < GovUkContentApiTest
     ]
     @live_artefacts = bat_data.map { |slug, name|
       FactoryGirl.create(
-        :artefact,
+        :my_artefact,
         owning_app: "publisher",
         sections: ["batman"],
         name: name,
@@ -35,7 +35,7 @@ class CuratedListOrderingTest < GovUkContentApiTest
 
     @draft_artefacts = joker_data.map { |slug, name|
       FactoryGirl.create(
-        :artefact,
+        :my_artefact,
         owning_app: "publisher",
         sections: ["batman"],
         name: name,
@@ -62,7 +62,7 @@ class CuratedListOrderingTest < GovUkContentApiTest
     )
 
     @other_section_artefact = FactoryGirl.create(
-      :artefact,
+      :my_artefact,
       owning_app: "publisher",
       sections: ["x-men"],
       name: "James Howlett",

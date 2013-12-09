@@ -96,6 +96,16 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       )
     end
     
+    it "should preserve the specified role when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&role=odi"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&role=odi",
+        last_response.location
+      )
+    end
+
     it "should preserve the specified organization_name when redirecting" do
       batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
       get "/with_tag.json?tag=batman&organization_name=wayne-enterprises"

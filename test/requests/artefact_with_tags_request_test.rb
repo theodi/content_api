@@ -442,5 +442,22 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     assert_equal 'Planet Express', parsed_response["results"][0]["details"]["organizations"][1]["name"]
     assert_equal 'planet-express', parsed_response["results"][0]["details"]["organizations"][1]["slug"]
   end
+  
+  it "should show the event type for events" do
+     FactoryGirl.create(:tag, tag_id: 'lunchtime-lecture', title: 'Lunchtime Lecture', tag_type: "event")
+     lecture = FactoryGirl.create(:my_artefact, state: 'live', slug: 'lunchtime-lecture', name: "Lunchtime Lecture", kind: "event", event: ['lunchtime-lecture'])
+     FactoryGirl.create(:event_edition,      
+       title: lecture.name,
+       slug: lecture.slug, 
+       panopticon_id: lecture.id,
+       state: 'published')
+       
+    get "/with_tag.json?type=event"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    
+    assert_equal "lunchtime-lecture", parsed_response["results"][0]["details"]["event_type"]
+  end
 
 end

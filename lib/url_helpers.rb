@@ -73,7 +73,8 @@ module URLHelpers
   end
 
   def artefact_web_url(artefact)
-    "#{base_web_url(artefact)}/#{artefact.slug}"
+    path = artefact.respond_to?(:rendering_path) ? artefact.rendering_path : "/#{artefact.slug}"
+    "#{base_web_url(artefact)}#{path}"
   end
 
   def artefact_part_web_url(artefact, part)

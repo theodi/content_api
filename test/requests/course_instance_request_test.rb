@@ -20,15 +20,16 @@ class CourseInstanceRequest < GovUkContentApiTest
         panopticon_id: @artefact.id,
         state: "published", 
         course: "this-is-a-course", 
+        description: "old description",
         version_number: 1,
         date: @startdate)
-      @newstartdate = 6.days.from_now.to_time.utc
       @edition2 = FactoryGirl.create(:course_instance_edition, 
         slug: "this-is-a-course-#{@date_str}",
         panopticon_id: @artefact.id,
         course: "this-is-a-course",
+        description: "new description",
         version_number: 2,
-        date: @newstartdate)
+        date: @startdate)
     end
     
     it "should give correct course instance" do    
@@ -36,6 +37,7 @@ class CourseInstanceRequest < GovUkContentApiTest
       assert last_response.ok?
       json = JSON.parse(last_response.body)
       assert_equal "this-is-a-course", json['details']['course']
+      assert_includes json['details']['description'], "old description"
       assert_equal @startdate.to_datetime.to_s, DateTime.parse(json['details']['date']).to_s
     end
     
@@ -47,9 +49,16 @@ class CourseInstanceRequest < GovUkContentApiTest
       assert last_response.ok?
       json = JSON.parse(last_response.body)
       assert_equal "this-is-a-course", json['details']['course']
-      assert_equal @newstartdate.to_datetime.to_s, DateTime.parse(json['details']['date']).to_s
+      assert_includes json['details']['description'], "new description"
     end
   
+    it "should give correct course instance" do    
+      get "/course-instance.json?date=#{@date_str}&course=this-is-a-course"
+      assert last_response.ok?
+      json = JSON.parse(last_response.body)
+      assert_equal "https://www.gov.uk/courses/this-is-a-course/#{@date_str}", json['web_url']
+    end
+    
   end
   
 end

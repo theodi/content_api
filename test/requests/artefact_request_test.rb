@@ -426,7 +426,7 @@ class ArtefactRequestTest < GovUkContentApiTest
   
     it "should return publication data if published" do
       artefact = FactoryGirl.create(:my_artefact, business_proposition: true, need_id: 1234, state: 'live')
-      edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, body: '# Important information', state: 'published')
+      edition = FactoryGirl.create(:edition, slug: artefact.slug, panopticon_id: artefact.id, body: '# Important information', state: 'published')
   
       get "/#{artefact.slug}.json"
       parsed_response = JSON.parse(last_response.body)
@@ -556,6 +556,7 @@ class ArtefactRequestTest < GovUkContentApiTest
     it "should return parts in the correct order" do
       artefact = FactoryGirl.create(:my_artefact, state: 'live')
       FactoryGirl.create(:guide_edition,
+        slug: artefact.slug, 
         panopticon_id: artefact.id,
         parts: [
           Part.new(title: "Part Two", order: 2, body: "## Header 3", slug: "part-two"),
@@ -672,6 +673,36 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 'planet-express', parsed_response["organizations"][1]["slug"]
   end
   
+  it "should return correct urls for an edition type" do
+    artefact = FactoryGirl.create(:my_artefact, state: 'live')
+    FactoryGirl.create(:job_edition,
+      slug: artefact.slug, 
+      panopticon_id: artefact.id,
+      state: 'published')
+      
+    get "/#{artefact.slug}.json"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal "https://www.gov.uk/jobs/#{artefact.slug}", parsed_response['web_url']
+  end
+  
+  it "should return correct urls for an edition tag" do
+    FactoryGirl.create(:tag, :tag_id => "team", :tag_type => 'person', :title => "Team Member")
+    FactoryGirl.create(:tag, :tag_id => "technical", :tag_type => 'team', :title => "Tech Team")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', person: ['team'], team: ['technical'])
+    n = PersonEdition.create(:title         => "Person", 
+                             :panopticon_id => artefact.id,
+                             :slug          => artefact.slug,
+                             :state         => "published")
+        
+    get "/#{artefact.slug}.json"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal "https://www.gov.uk/team/#{artefact.slug}", parsed_response['web_url']
+  end
+
   it "should 404 if the role requested does not match the artefact's role" do
     FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "ODI")
     artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live', roles: ['odi'])

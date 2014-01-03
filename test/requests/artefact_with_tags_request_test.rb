@@ -459,5 +459,47 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     
     assert_equal "lunchtime-lecture", parsed_response["results"][0]["details"]["event_type"]
   end
+  
+  describe "whole body" do
+    
+    before :each do
+      @artefact = FactoryGirl.create(:my_non_publisher_artefact, :state => 'live')
+      FactoryGirl.create(:tag, tag_id: 'news', title: 'News', tag_type: "article")
+      article = FactoryGirl.create(:my_artefact, state: 'live', slug: 'here-is-some-news', name: "Here is some news", kind: "article", article: ['news'])
+ 
+      @content = "Bacon ipsum dolor sit amet tongue bacon jerky, salami turducken meatloaf prosciutto andouille rump corned beef short ribs shoulder doner. Hamburger meatball ball tip, flank beef venison shoulder ham hock brisket kielbasa. Ribeye turkey pastrami sirloin chicken, pancetta capicola spare ribs pork chop. Pork belly kielbasa pork chop ground round boudin meatball pastrami spare ribs.
+
+      Short ribs chuck leberkas pork belly frankfurter bacon doner, biltong turducken short loin. Brisket shankle tri-tip cow, turkey tongue kielbasa leberkas frankfurter. Filet mignon sirloin ground round shoulder, rump beef ribs ribeye pork belly pastrami ball tip kevin. Brisket rump salami frankfurter beef pancetta. Cow short loin landjaeger ground round kielbasa beef ribs strip steak leberkas chicken frankfurter pork belly. Bacon turducken ribeye pork chop meatball, tail hamburger doner short loin kevin boudin drumstick ham shank pancetta.
+
+      Turkey pancetta boudin ground round leberkas brisket bresaola spare ribs turducken kevin shoulder kielbasa chuck. Pig pancetta bacon drumstick capicola ribeye prosciutto frankfurter, brisket tail. Shoulder short ribs rump tongue leberkas pork loin pastrami hamburger. Bacon pancetta short loin ground round. Hamburger ball tip turkey pork loin. Pastrami bresaola short ribs rump strip steak doner tri-tip bacon brisket frankfurter jowl hamburger leberkas."
+
+ 
+      FactoryGirl.create(:article_edition,      
+        title: article.name,
+        slug: article.slug, 
+        panopticon_id: article.id,
+        content: @content,
+        state: 'published')
+    end
+  
+    it "should show when whole_body is set to true" do
+       get "/with_tag.json?article=news&whole_body=true"
+
+       parsed_response = JSON.parse(last_response.body)
+       assert_equal 200, last_response.status
+     
+       assert_equal Govspeak::Document.new(@content, auto_ids: false).to_html, parsed_response["results"][0]["details"]["body"] 
+    end
+    
+    it "should not show when whole_body is not set to true" do
+       get "/with_tag.json?article=news"
+
+       parsed_response = JSON.parse(last_response.body)
+       assert_equal 200, last_response.status
+       
+       assert_nil parsed_response["results"][0]["details"]["body"] 
+    end
+    
+  end
 
 end

@@ -10,6 +10,9 @@ child(:results => "results") do
       "description" => artefact.description,
       "excerpt" => artefact.excerpt,
     }
+    if params[:whole_body]
+      h["body"] = artefact.whole_body
+    end
     if artefact.author_edition
       h["author"] = {
         "name" => artefact.author_edition.title,

@@ -18,10 +18,17 @@ module ContentApiArtefactExtensions
     artefacts.uniq(&:slug)
   end
   
+  def whole_body
+    begin
+      Govspeak::Document.new(edition.whole_body, auto_ids: false).to_html
+    rescue
+      nil
+    end
+  end
+  
   def excerpt
     begin
-      html = Govspeak::Document.new(edition.whole_body, auto_ids: false).to_html
-      text = Nokogiri::HTML(html).inner_text
+      text = Nokogiri::HTML(whole_body).inner_text
       text.lines.first.chomp 
     rescue
       nil

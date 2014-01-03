@@ -6,16 +6,17 @@ class TagListRequestTest < GovUkContentApiTest
 
   describe "/tags.json" do
     it "should load list of tags" do
+      Tag.delete_all
       FactoryGirl.create_list(:tag, 2)
       get "/tags.json"
 
       assert last_response.ok?
       assert_status_field "ok", last_response
       response = JSON.parse(last_response.body)
-      assert_equal 3, response['results'].count
+      assert_equal 2, response['results'].count
 
       # Check pagination info
-      assert_has_values response, "total" => 3, "current_page" => 1,
+      assert_has_values response, "total" => 2, "current_page" => 1,
                                   "start_index" => 1, "pages" => 1
     end
 

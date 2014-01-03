@@ -10,10 +10,11 @@ class CourseInstanceRequest < GovUkContentApiTest
     before :each do
       @startdate = 5.days.from_now.to_time.utc
       @date_str = @startdate.strftime("%Y-%m-%d")
-      @artefact = FactoryGirl.create(:artefact, 
+      @artefact = FactoryGirl.create(:my_artefact, 
         kind: "course_instance",
         slug: "this-is-a-course-#{@date_str}",
-        state: "live")
+        state: "live",
+        roles: ['odi'])
       @edition1 = FactoryGirl.create(:course_instance_edition, 
         slug: "this-is-a-course-#{@date_str}",
         panopticon_id: @artefact.id,

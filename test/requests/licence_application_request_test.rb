@@ -36,7 +36,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
     }]
     licence_exists('123-2-1', {"isLocationSpecific" => false, "geographicalAvailability" => ["England","Wales"], "issuingAuthorities" => authorities})
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -75,7 +75,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
     }]
     licence_exists('123-2-1/41UH', {"isLocationSpecific" => true, "geographicalAvailability" => ["England","Wales"], "issuingAuthorities" => authorities})
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -100,7 +100,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
 
     licence_exists('123-2-1', {"isLocationSpecific" => true, "geographicalAvailability" => ["England","Wales"], "issuingAuthorities" => []})
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -120,7 +120,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
     stub_artefact = FactoryGirl.create(:artefact, slug: 'licence-artefact', state: 'live')
     stub_licence = FactoryGirl.build(:licence_edition, panopticon_id: stub_artefact.id, licence_identifier: nil, state: 'published')
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -136,7 +136,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
 
     licence_does_not_exist('blaaargh')
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -153,7 +153,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
 
     licence_does_not_exist('blaaargh/43UG')
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -170,7 +170,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
 
     licence_times_out('blaaargh/43UG')
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 
@@ -188,7 +188,7 @@ class LicenceApplicationRequestTest < GovUkContentApiTest
 
     licence_returns_error('blaaargh')
 
-    Artefact.stubs(:where).with(slug: 'licence-artefact').returns([stub_artefact])
+    Artefact.stubs(:where).with(slug: 'licence-artefact', tag_ids: 'odi').returns([stub_artefact])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id).returns([stub_licence])
     Edition.stubs(:where).with(panopticon_id: stub_artefact.id, state: 'published').returns([stub_licence])
 

@@ -57,7 +57,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
     it "should redirect to the typed URL with multiple results" do
       farmers = FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
-      FactoryGirl.create(:artefact, owning_app: "smart-answers", keywords: ['farmers'], state: 'live')
+      FactoryGirl.create(:my_artefact, owning_app: "smart-answers", keywords: ['farmers'], state: 'live')
 
       get "/with_tag.json?tag=farmers"
       assert_equal(
@@ -96,6 +96,16 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       )
     end
     
+    it "should preserve the specified role when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&role=odi"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&role=odi",
+        last_response.location
+      )
+    end
+
     it "should preserve the specified organization_name when redirecting" do
       batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
       get "/with_tag.json?tag=batman&organization_name=wayne-enterprises"
@@ -124,7 +134,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should return an array of results" do
-        artefact = FactoryGirl.create(:artefact, owning_app: "publisher", keywords: ['farmers'], state: 'live', description: "Artefact description", kind: "Article")
+        artefact = FactoryGirl.create(:my_artefact, owning_app: "publisher", keywords: ['farmers'], state: 'live', description: "Artefact description", kind: "Course")
         edition = ArticleEdition.create(panopticon_id: artefact.id, title: artefact.name, content: "A really long description\n\nWith line breaks.", state: "published", slug: artefact.slug)        
         
         get "/with_tag.json?keyword=farmers"
@@ -136,7 +146,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
         details = parsed_response["results"].first
         assert_equal artefact.name, details["title"]
-        assert_equal ["farmers"], details["tag_ids"]
+        assert details["tag_ids"].include?('farmers')
         assert_equal artefact.description, details["details"]["description"]
         assert_equal "A really long description", details["details"]["excerpt"]
       end
@@ -152,7 +162,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should not be broken by the foreign-travel-advice special handling" do
-        FactoryGirl.create(:artefact, slug: 'foreign-travel-advice', owning_app: "travel-advice-publisher", keywords: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice', owning_app: "travel-advice-publisher", keywords: ['farmers'], state: 'live')
 
         get "/with_tag.json?keyword=farmers"
 
@@ -161,9 +171,9 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should exclude artefacts which aren't live" do
-        draft    = FactoryGirl.create(:non_publisher_artefact, keywords: ['farmers'], state: 'draft')
-        live     = FactoryGirl.create(:non_publisher_artefact, keywords: ['farmers'], state: 'live')
-        archived = FactoryGirl.create(:non_publisher_artefact, keywords: ['farmers'], state: 'archived')
+        draft    = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'draft')
+        live     = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'live')
+        archived = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'archived')
 
         get "/with_tag.json?keyword=farmers"
 
@@ -174,7 +184,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should exclude unpublished publisher items" do
-        artefact = FactoryGirl.create(:artefact, owning_app: "publisher", sections: ['business'])
+        artefact = FactoryGirl.create(:my_artefact, owning_app: "publisher", sections: ['business'])
         FactoryGirl.create(:edition, panopticon_id: artefact.id, state: "ready")
 
         get "/with_tag.json?section=business"
@@ -184,8 +194,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
       
       it "should only return those artefacts with a particular node" do
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live')
         
         get "/with_tag.json?keyword=farmers&node=westward-ho!"
         
@@ -200,8 +210,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
       
       it "should only return those artefacts with a particular organization_name" do
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: ["mom-corp", "planet-express"])
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', organization_name: ["wayne-enterprises"])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: ["mom-corp", "planet-express"])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', organization_name: ["wayne-enterprises"])
         
         get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
         
@@ -216,11 +226,30 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should only return those artefacts with a particular author" do
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
-        FactoryGirl.create(:non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', author: "ian-mac-shane")
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', author: "ian-mac-shane")
         
         get "/with_tag.json?keyword=farmers&author=barry-scott"
         
+        assert_equal 200, last_response.status
+        assert_status_field "ok", last_response
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 1", parsed_response["results"][0]["title"]
+      end
+      
+      it "should only return those artefacts with a particular role" do
+        FactoryGirl.create(:tag, :tag_id => "foo", :tag_type => 'role', :title => "foo")
+        FactoryGirl.create(:tag, :tag_id => "bar", :tag_type => 'role', :title => "bar")
+        
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', roles: ['foo'])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', roles: ['bar'])
+        
+        get "/with_tag.json?keyword=farmers&role=foo"
+
         assert_equal 200, last_response.status
         assert_status_field "ok", last_response
 
@@ -244,7 +273,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
       it "should return a 404 if an unsupported sort order is requested" do
         batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
-        bat = FactoryGirl.create(:artefact, owning_app: 'publisher', sections: ['batman'], name: 'Bat', slug: 'batman')
+        bat = FactoryGirl.create(:my_artefact, owning_app: 'publisher', sections: ['batman'], name: 'Bat', slug: 'batman')
         bat_guide = FactoryGirl.create(:guide_edition, panopticon_id: bat.id, state: "published", slug: 'batman')
         get "/with_tag.json?section=batman&sort=bobbles"
 
@@ -267,7 +296,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     
     it "should return all artefacts of that specific type" do
       5.times do |n|
-        FactoryGirl.create(:non_publisher_artefact, kind: 'case_study', state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, kind: 'case_study', state: 'live')
       end
       
       get "with_tag.json?type=case_study"
@@ -278,7 +307,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     
     it "should return successfully if a plural type is requested" do
       5.times do |n|
-        FactoryGirl.create(:non_publisher_artefact, kind: 'job', state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, kind: 'job', state: 'live')
       end
       
       get "with_tag.json?type=jobs"
@@ -294,18 +323,37 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       assert_status_field "not found", last_response
     end
     
+    it "should only return those artefacts with a particular role" do
+      FactoryGirl.create(:tag, :tag_id => "foo", :tag_type => 'role', :title => "foo")
+      FactoryGirl.create(:tag, :tag_id => "bar", :tag_type => 'role', :title => "bar")
+      
+      FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', kind: 'job', state: 'live', roles: ['foo'])
+      FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', kind: 'job', state: 'live', roles: ['bar'])
+      
+      get "/with_tag.json?type=jobs&role=foo"
+
+      assert_equal 200, last_response.status
+      assert_status_field "ok", last_response
+
+      parsed_response = JSON.parse(last_response.body)
+
+      assert_equal 1, parsed_response["results"].count
+
+      assert_equal "Thing 1", parsed_response["results"][0]["title"]
+    end
+    
   end
 
   it "should include author details" do
-    barry = FactoryGirl.create(:artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
+    barry = FactoryGirl.create(:my_artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
     FactoryGirl.create(:person_edition,      
       title: barry.name,
       slug: barry.slug, 
       panopticon_id: barry.id,
       state: 'published')
-
+      
     FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
-    FactoryGirl.create(:non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
+    FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', author: "barry-scott")
 
     get "/with_tag.json?keyword=farmers&author=barry-scott"
     
@@ -319,11 +367,11 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     assert_equal "Thing 1", parsed_response["results"][0]["title"]
     assert_equal 'Barry Scott', parsed_response["results"][0]["details"]["author"]["name"]
     assert_equal 'barry-scott', parsed_response["results"][0]["details"]["author"]["slug"]
-    assert_equal ['writers'], parsed_response["results"][0]["details"]["author"]["tag_ids"]
+    assert parsed_response["results"][0]["details"]["author"]["tag_ids"].include?('writers')
   end
   
   it "should include node details" do
-    node = FactoryGirl.create(:artefact, state: 'live', slug: 'westward-ho', name: "Westward Ho!", kind: "node")
+    node = FactoryGirl.create(:my_artefact, state: 'live', slug: 'westward-ho', name: "Westward Ho!", kind: "node")
     FactoryGirl.create(:node_edition,      
       title: node.name,
       slug: node.slug, 
@@ -331,7 +379,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       level: "comms",
       beta: false,
       state: 'published')
-    node = FactoryGirl.create(:artefact, state: 'live', slug: 'crinkly-bottom', name: "Crinkly Bottom", kind: "node")
+    node = FactoryGirl.create(:my_artefact, state: 'live', slug: 'crinkly-bottom', name: "Crinkly Bottom", kind: "node")
     FactoryGirl.create(:node_edition,      
       title: node.name,
       slug: node.slug, 
@@ -342,7 +390,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
 
     FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
-    artefact = FactoryGirl.create(:artefact, keywords: ['farmers'], state: 'live', node: ['westward-ho', 'crinkly-bottom'])
+    artefact = FactoryGirl.create(:my_artefact, keywords: ['farmers'], state: 'live', node: ['westward-ho', 'crinkly-bottom'])
     FactoryGirl.create(:guide_edition,
       slug: artefact.slug, 
       panopticon_id: artefact.id,
@@ -364,13 +412,13 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
   it "should include organization details" do
     FactoryGirl.create(:tag, tag_id: 'start-up', title: 'Start Up', tag_type: "organization")
-    organization = FactoryGirl.create(:artefact, state: 'live', slug: 'mom-corp', name: "Mom Corp.", kind: "organization", organization: ['start-up'])
+    organization = FactoryGirl.create(:my_artefact, state: 'live', slug: 'mom-corp', name: "Mom Corp.", kind: "organization", organization: ['start-up'])
     FactoryGirl.create(:organization_edition,      
       title: organization.name,
       slug: organization.slug, 
       panopticon_id: organization.id,
       state: 'published')
-    organization = FactoryGirl.create(:artefact, state: 'live', slug: 'planet-express', name: "Planet Express", kind: "organization", organization: ['start-up'])
+    organization = FactoryGirl.create(:my_artefact, state: 'live', slug: 'planet-express', name: "Planet Express", kind: "organization", organization: ['start-up'])
     FactoryGirl.create(:organization_edition,      
       title: organization.name,
       slug: organization.slug, 
@@ -379,7 +427,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
 
     FactoryGirl.create(:tag, tag_id: 'farmers', title: 'Farmers', tag_type: 'keyword')
-    artefact = FactoryGirl.create(:artefact, keywords: ['farmers'], state: 'live', organization_name: ['mom-corp', 'planet-express'])
+    artefact = FactoryGirl.create(:my_artefact, keywords: ['farmers'], state: 'live', organization_name: ['mom-corp', 'planet-express'])
     FactoryGirl.create(:guide_edition,
       slug: artefact.slug, 
       panopticon_id: artefact.id,
@@ -393,6 +441,23 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     assert_equal 'mom-corp', parsed_response["results"][0]["details"]["organizations"][0]["slug"]
     assert_equal 'Planet Express', parsed_response["results"][0]["details"]["organizations"][1]["name"]
     assert_equal 'planet-express', parsed_response["results"][0]["details"]["organizations"][1]["slug"]
+  end
+  
+  it "should show the event type for events" do
+     FactoryGirl.create(:tag, tag_id: 'lunchtime-lecture', title: 'Lunchtime Lecture', tag_type: "event")
+     lecture = FactoryGirl.create(:my_artefact, state: 'live', slug: 'lunchtime-lecture', name: "Lunchtime Lecture", kind: "event", event: ['lunchtime-lecture'])
+     FactoryGirl.create(:event_edition,      
+       title: lecture.name,
+       slug: lecture.slug, 
+       panopticon_id: lecture.id,
+       state: 'published')
+       
+    get "/with_tag.json?type=event"
+    
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    
+    assert_equal "lunchtime-lecture", parsed_response["results"][0]["details"]["event_type"]
   end
 
 end

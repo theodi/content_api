@@ -26,6 +26,12 @@ class UpcomingRequestTest < GovUkContentApiTest
       get "/upcoming.json?type=event&order_by=foo"
       assert last_response.not_found?
     end
+
+    it "should include event type in details" do   
+      get "/upcoming.json?type=event&order_by=start_date"
+      assert_equal "lunchtime-lecture", JSON.parse(last_response.body)['details']['event_type']
+    end
+
   end  
   
 end

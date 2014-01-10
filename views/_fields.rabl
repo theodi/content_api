@@ -32,6 +32,9 @@ node(:course_title, :if => lambda { |artefact| artefact.edition.respond_to?("cou
   course.try(:title)
 end
 
+node(:event_type, :if => lambda { |artefact| artefact.edition.is_a?(EventEdition) }) do |artefact|
+  artefact.event.first.tag_id
+end
 
 node(:artist, :if => lambda { |artefact| artefact.edition.respond_to?(:artist) }) do |artefact|
   {

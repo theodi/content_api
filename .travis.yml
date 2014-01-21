@@ -5,9 +5,6 @@ after_success:
   --header "Content-Type:application/json" -u $GITHUB_USER:$GITHUB_PASSWORD "https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs"'
 env:
   global:
-  - BUNDLE_ARCHIVE="content_api"
-  - AWS_S3_BUCKET="theodi-travis-bundle-cache"
-  - AWS_S3_REGION="eu-west-1"
   - RAILS_ENV=test
   - GOVUK_APP_DOMAIN=dev.gov.uk
   - secure: AgvXTDZdkWlbZ+hXYz/vwzZijN3Ss3zk5v889GqAbQVKBJoBqB24PjU4rf6/nCczxXPAYeZf6Blx6hkmLE9Wl/kBH6EhEkJFbi56MAM2kmskO7+gtWaFRv6olkXe3RPHN6rfU2bEmF+D7U/XsjzVDYgPZLRfe8bpYyiLcakct1Y=
@@ -21,13 +18,7 @@ rvm:
 - 1.9.2
 services:
   - mongodb
-bundler_args: --without development --path=~/.bundle
-before_install:
-- 'echo ''gem: --no-ri --no-rdoc'' > ~/.gemrc'
-- gem install bundler bundle_cache
-- bundle_cache_install
-after_script:
-- bundle_cache
+bundler_args: --without development
 notifications:
   irc:
     channels:

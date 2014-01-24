@@ -372,6 +372,23 @@ class GovUkContentApi < Sinatra::Application
     end
   end
   
+  get "/section.json" do
+    if params[:id]
+      @section = Section.where(:tag_id => params[:id]).first
+      attach_non_artefact_asset(@section, :hero_image)
+      
+      custom_404 if @section.nil?
+      
+      @section.modules.map! do |m| 
+        section_module = SectionModule.find(m) 
+        attach_non_artefact_asset(section_module, :image)
+        section_module
+      end
+      
+      render :rabl, :section, format: "json"
+    end
+  end
+  
   get "/related.json" do
     kv = params.first
     type = kv[0]

@@ -19,6 +19,8 @@ require 'ostruct'
 # Note: the artefact patch needs to be included before the Kaminari patch,
 # otherwise it doesn't work. I haven't quite got to the bottom of why that is.
 require 'artefact'
+require 'section_extensions'
+
 require 'config/kaminari'
 require 'config/rabl'
 require 'country'

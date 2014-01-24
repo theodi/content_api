@@ -9,6 +9,8 @@ after_success:
 branches:
   except:
   - CURRENT
+services:
+  - mongodb
 notifications:
   irc:
     channels:

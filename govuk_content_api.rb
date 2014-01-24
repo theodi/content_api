@@ -19,6 +19,8 @@ require 'ostruct'
 # Note: the artefact patch needs to be included before the Kaminari patch,
 # otherwise it doesn't work. I haven't quite got to the bottom of why that is.
 require 'artefact'
+require 'section_extensions'
+
 require 'config/kaminari'
 require 'config/rabl'
 require 'country'
@@ -370,6 +372,23 @@ class GovUkContentApi < Sinatra::Application
     end
   end
   
+  get "/section.json" do
+    if params[:id]
+      @section = Section.where(:tag_id => params[:id]).first
+      attach_non_artefact_asset(@section, :hero_image)
+      
+      custom_404 if @section.nil?
+      
+      @section.modules.map! do |m| 
+        section_module = SectionModule.find(m) 
+        attach_non_artefact_asset(section_module, :image)
+        section_module
+      end
+      
+      render :rabl, :section, format: "json"
+    end
+  end
+  
   get "/related.json" do
     kv = params.first
     type = kv[0]
@@ -702,6 +721,18 @@ class GovUkContentApi < Sinatra::Application
         rescue GdsApi::BaseError => e
           logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
         end
+      end
+    end
+  end
+  
+  def attach_non_artefact_asset(obj, field)
+    obj.assets ||= {}
+    if asset_id = obj.send("#{field}_id")
+      begin
+        asset = asset_manager_api.asset(asset_id)
+        obj.assets[field] = asset if asset# and asset["state"] == "clean"
+      rescue GdsApi::BaseError => e
+        logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
       end
     end
   end

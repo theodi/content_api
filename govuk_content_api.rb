@@ -707,6 +707,18 @@ class GovUkContentApi < Sinatra::Application
       end
     end
   end
+  
+  def attach_non_artefact_asset(obj, field)
+    obj.assets ||= {}
+    if asset_id = obj.send("#{field}_id")
+      begin
+        asset = asset_manager_api.asset(asset_id)
+        obj.assets[field] = asset if asset# and asset["state"] == "clean"
+      rescue GdsApi::BaseError => e
+        logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
+      end
+    end
+  end
 
   def asset_manager_api
     options = Object::const_defined?(:API_CLIENT_CREDENTIALS) ? API_CLIENT_CREDENTIALS : {

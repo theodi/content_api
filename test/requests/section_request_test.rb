@@ -31,6 +31,18 @@ class SectionRequestTest < GovUkContentApiTest
       assert_equal "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat.jpg", json['hero']
     end
     
+    it "should not error if a hero image is not present" do
+      section = Section.create(:tag_id => "bar", :title => "Foo Bar", :link => "http://www.example.com", :description => "This is a description")
+      
+      get "/section.json?id=bar"
+      
+      assert last_response.ok?
+      
+      json = JSON.parse(last_response.body)
+            
+      assert_equal nil, json['hero']      
+    end
+    
     it "should load modules" do
       image = SectionModule.create(:title => "This is an image", :type => "Image", :link => "http://www.example.com", :image_id => "512c9019686c82191d000001")
       frame = SectionModule.create(:title => "This is a frame", :type => "Frame", :frame => "news")

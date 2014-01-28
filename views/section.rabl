@@ -5,7 +5,7 @@ end
 node(:title) { @section.title }
 node(:link) { @section.link }
 node(:description) { @section.description }
-node(:hero) { @section.assets[:hero_image].file_url }
+node(:hero) { @section.assets[:hero_image].file_url rescue nil }
 
 child(@section.modules => "modules") do
   node(:title) { |m| m.title }

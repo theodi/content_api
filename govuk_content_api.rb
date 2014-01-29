@@ -534,6 +534,7 @@ class GovUkContentApi < Sinatra::Application
           attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
           attach_assets(a, :file) if a.edition.is_a?(CreativeWorkEdition)
           attach_assets(a, :logo) if a.edition.is_a?(NodeEdition)
+          attach_assets(a, :report) if a.edition.is_a?(ReportEdition)
         end
         a
       end
@@ -646,6 +647,7 @@ class GovUkContentApi < Sinatra::Application
     attach_assets(@artefact, :thumbnail) if @artefact.edition.is_a?(CreativeWorkEdition)
     attach_assets(@artefact, :caption_file) if @artefact.edition.is_a?(VideoEdition)
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(NodeEdition)
+    attach_assets(@artefact, :report) if @artefact.edition.is_a?(ReportEdition)
   end
 
   def attach_place_data(artefact)

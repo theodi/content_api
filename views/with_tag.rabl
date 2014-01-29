@@ -56,6 +56,7 @@ child(:results => "results") do
     end
     if artefact.assets
       artefact.assets.each_with_object({}) do |(key, details), assets|
+        h["web_url"] = details['file_url']
         details["file_versions"].each do |version, url|
           h[version] = url
         end

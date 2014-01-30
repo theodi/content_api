@@ -51,6 +51,12 @@ child(:results => "results") do
       course = CourseEdition.where(:state => "published", :slug => artefact.edition.course).first
       h["course_title"] = course.try(:title)
     end
+    if artefact.edition.respond_to?(:affiliation) && !artefact.edition.affiliation.blank?
+      organisation = OrganizationEdition.where(:state => "published", :slug => artefact.edition.affiliation).first
+      h["organisation"] = {}
+      h["organisation"]["name"] = organisation.try(:title)
+      h["organisation"]["slug"] = artefact.edition.affiliation
+    end
     if artefact.kind == "event"
       h["event_type"] = artefact.event.first.tag_id
     end

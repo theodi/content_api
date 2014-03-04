@@ -16,7 +16,8 @@ gem 'dotenv'
 
 gem 'sinatra-cross_origin'
 
-gem "govuk_content_models", github: 'theodi/govuk_content_models', branch: 'feature-lambda-format-validator'
+gem 'govuk_content_models', '6.0.6'
+
 if ENV['CONTENT_MODELS_DEV']
   gem "odi_content_models", path: '../odi_content_models'
 else
@@ -25,7 +26,7 @@ end
 
 # Pinning mongo to prevent bundler downgrading it in order to upgrade bson
 # (as seen in 680d3e9ab7)
-gem 'mongo', '>= 1.6.2'
+gem 'mongo', '>= 1.7.1'
 
 gem 'gds-sso', '3.0.1'
 if ENV['API_DEV']

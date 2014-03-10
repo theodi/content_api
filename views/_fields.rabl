@@ -9,7 +9,7 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
     :video_summary, :video_url,
     :lgsl_code, :lgil_override, :minutes_to_complete, :place_type,
     :eligibility, :evaluation, :additional_information,
-    :business_support_identifier, :max_employees, :organiser, :summary, :alert_status,
+    :alert_status,
     :change_description, :reviewed_at, :honorific_prefix, :honorific_suffix, :role, 
     :description, :affiliation, :url, :telephone, :twitter, :linkedin, :github, 
     :email, :length, :outline, :outcomes, :audience, :prerequisites, 

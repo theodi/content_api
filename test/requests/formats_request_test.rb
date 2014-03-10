@@ -28,44 +28,6 @@ class FormatsRequestTest < GovUkContentApiTest
     assert_equal "<p>Important batman information</p>\n", fields["body"]
   end
 
-  it "should work with business_support_edition" do
-    artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
-    business_support = FactoryGirl.create(:business_support_edition, slug: artefact.slug,
-                                short_description: "No policeman is going to give the Batmobile a ticket",
-                                body: "batman body", eligibility: "batman eligibility", evaluation: "batman evaluation",
-                                additional_information: "batman additional_information",
-                                min_value: 100, max_value: 1000, panopticon_id: artefact.id, state: 'published',
-                                business_support_identifier: 'enterprise-finance-guarantee', max_employees: 10,
-                                organiser: "Someone", continuation_link: "http://www.example.com/scheme", will_continue_on: "Example site")
-    business_support.save!
-
-    get '/batman.json'
-    parsed_response = JSON.parse(last_response.body)
-
-    assert last_response.ok?
-    assert_base_artefact_fields(parsed_response)
-
-    fields = parsed_response["details"]
-    expected_fields = ['alternative_title', 'description', 'body',
-                        'short_description', 'min_value', 'max_value', 'eligibility', 'evaluation', 'additional_information',
-                        'business_support_identifier', 'max_employees', 'organiser', 'continuation_link', 'will_continue_on']
-    assert_has_expected_fields(fields, expected_fields)
-    assert_equal "No policeman is going to give the Batmobile a ticket", fields['short_description'].strip
-    assert_equal "enterprise-finance-guarantee", fields['business_support_identifier']
-    assert_equal "No policeman is going to give the Batmobile a ticket", fields['short_description']
-    assert_equal "<p>batman body</p>", fields['body'].strip
-    assert_equal "<p>batman eligibility</p>", fields['eligibility'].strip
-    assert_equal "<p>batman evaluation</p>", fields['evaluation'].strip
-    assert_equal "<p>batman additional_information</p>", fields['additional_information'].strip
-
-    assert_equal 100, fields["min_value"]
-    assert_equal 1000, fields["max_value"]
-    assert_equal 10, fields["max_employees"]
-    assert_equal "Someone", fields["organiser"]
-    assert_equal "Example site", fields["will_continue_on"]
-    assert_equal "http://www.example.com/scheme", fields["continuation_link"]
-  end
-
   it "should work with guide_edition" do
     artefact = FactoryGirl.create(:my_artefact, slug: 'batman', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
     guide_edition = FactoryGirl.create(:guide_edition_with_two_govspeak_parts, slug: artefact.slug,

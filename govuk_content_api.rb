@@ -416,19 +416,6 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  get "/business_support_schemes.json" do
-    identifiers = params[:identifiers].to_s.split(",")
-    statsd.time("request.business_support_schemes") do
-      editions = BusinessSupportEdition.published.in(:business_support_identifier => identifiers)
-      @results = editions.map do |ed|
-        artefact = Artefact.find(ed.panopticon_id)
-        artefact.edition = ed
-        artefact
-      end
-    end
-    render :rabl, :business_support_schemes, format: "json"
-  end
-
   get "/artefacts.json" do
     expires DEFAULT_CACHE_TIME
 

@@ -7,7 +7,7 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
 [:body, :alternative_title, :more_information, :min_value, :max_value,
     :short_description, :introduction, :will_continue_on, :continuation_link, :link, :alternate_methods,
     :video_summary, :video_url,
-    :minutes_to_complete, :place_type,
+    :minutes_to_complete,
     :eligibility, :evaluation, :additional_information,
     :alert_status,
     :change_description, :reviewed_at, :honorific_prefix, :honorific_suffix, :role, 
@@ -57,23 +57,6 @@ end
 
 node(:nodes, :if => lambda { |artefact| artefact.edition.is_a?(SimpleSmartAnswerEdition) }) do |artefact|
   partial("smart_answer_nodes", object: artefact)
-end
-
-node(:places, :if => lambda { |artefact| artefact.places }) do |artefact|
-  if artefact.places.first && artefact.places.first["error"]
-    [
-      { error: artefact.places.first["error"] }
-    ]
-  else
-    artefact.places.map do |place|
-      [:name, :address1, :address2, :town, :postcode, 
-          :email, :phone, :text_phone, :fax, 
-          :access_notes, :general_notes, :url,
-          :location].each_with_object({}) do |field_name, hash|
-        hash[field_name.to_s] = place[field_name.to_s]
-      end
-    end
-  end
 end
 
 node(:expectations, :if => lambda { |artefact| artefact.edition.respond_to?(:expectations) }) do |artefact|

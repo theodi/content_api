@@ -573,7 +573,6 @@ class GovUkContentApi < Sinatra::Application
       end
     end
 
-    attach_place_data(@artefact) if @artefact.edition.format == "Place" && params[:latitude] && params[:longitude]
     [PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(OrganizationEdition)
     attach_assets(@artefact, :file) if @artefact.edition.is_a?(CreativeWorkEdition)
@@ -582,17 +581,6 @@ class GovUkContentApi < Sinatra::Application
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(NodeEdition)
     attach_assets(@artefact, :report) if @artefact.edition.is_a?(ReportEdition)
   end
-
-  def attach_place_data(artefact)
-    statsd.time("#{@statsd_scope}.place") do
-      artefact.places = imminence_api.places(artefact.edition.place_type, params[:latitude], params[:longitude])
-    end
-  rescue GdsApi::TimedOutException
-    artefact.places = [{ "error" => "timed_out" }]
-  rescue GdsApi::HTTPErrorResponse
-    artefact.places = [{ "error" => "http_error" }]
-  end
-
   
   def attach_assets(artefact, *fields)
     artefact.assets ||= {}

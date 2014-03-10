@@ -15,6 +15,7 @@ $LOAD_PATH << File.expand_path('../../', __FILE__)
 $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
 require 'minitest/autorun'
+require 'turn/autorun'
 require 'rack/test'
 
 require 'database_cleaner'

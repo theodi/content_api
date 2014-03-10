@@ -161,15 +161,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert_equal [], parsed_response["results"]
       end
 
-      it "should not be broken by the foreign-travel-advice special handling" do
-        FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice', owning_app: "travel-advice-publisher", keywords: ['farmers'], state: 'live')
-
-        get "/with_tag.json?keyword=farmers"
-
-        assert last_response.ok?
-        assert_equal 1, JSON.parse(last_response.body)["results"].count
-      end
-
       it "should exclude artefacts which aren't live" do
         draft    = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'draft')
         live     = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'live')

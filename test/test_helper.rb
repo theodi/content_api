@@ -121,4 +121,3 @@ class GovUkContentApiTest < MiniTest::Spec
   end
 end
 
-Country.data_path = File.expand_path("../fixtures/data/countries.yml", __FILE__)

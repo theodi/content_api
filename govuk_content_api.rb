@@ -23,7 +23,6 @@ require 'section_extensions'
 
 require 'config/kaminari'
 require 'config/rabl'
-require 'country'
 
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
@@ -437,10 +436,6 @@ class GovUkContentApi < Sinatra::Application
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
-    elsif @artefact.slug == 'foreign-travel-advice'
-      load_travel_advice_countries
-    elsif @artefact.kind == 'travel-advice'
-      attach_travel_advice_country_and_edition(@artefact, params[:edition])
     end
 
     render :rabl, :artefact, format: "json"
@@ -598,39 +593,7 @@ class GovUkContentApi < Sinatra::Application
     artefact.places = [{ "error" => "http_error" }]
   end
 
-  def attach_travel_advice_country_and_edition(artefact, version_number = nil)
-    if artefact.slug =~ %r{\Aforeign-travel-advice/(.*)\z}
-      artefact.country = Country.find_by_slug($1)
-    end
-    custom_404 unless artefact.country
-
-    statsd.time("#{@statsd_scope}.edition") do
-      artefact.edition = if version_number
-        artefact.country.editions.where(:version_number => version_number).first
-      else
-        artefact.country.editions.published.first
-      end
-    end
-    custom_404 unless artefact.edition
-    attach_assets(artefact, :image, :document)
-
-    travel_index = Artefact.find_by_slug("foreign-travel-advice")
-    unless travel_index.nil?
-      artefact.extra_related_artefacts = travel_index.live_related_artefacts
-    end
-  end
-
-  def load_travel_advice_countries
-    statsd.time("#{@statsd_scope}.travel_advice_countries") do
-      editions = Hash[TravelAdviceEdition.published.all.map {|e| [e.country_slug, e] }]
-      @countries = Country.all.map do |country|
-        country.tap {|c| c.edition = editions[c.slug] }
-      end.reject do |country|
-        country.edition.nil?
-      end
-    end
-  end
-
+  
   def attach_assets(artefact, *fields)
     artefact.assets ||= {}
     fields.each do |key|

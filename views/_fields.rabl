@@ -97,24 +97,3 @@ node(nil, :if => lambda { |artefact| artefact.assets }) do |artefact|
     }
   end
 end
-
-node(:country, :if => lambda { |artefact| artefact.country.is_a?(Country) }) do |artefact|
-  {
-    "name" => artefact.country.name,
-    "slug" => artefact.country.slug,
-  }
-end
-
-node(:countries, :if => lambda { |artefact| @countries and artefact.slug == 'foreign-travel-advice' }) do |artefact|
-  @countries.map do |c|
-    {
-      :id => country_url(c),
-      :name => c.name,
-      :identifier => c.slug,
-      :web_url => country_web_url(c),
-      :updated_at => (c.edition.published_at || c.edition.updated_at).iso8601,
-      :change_description => c.edition.change_description,
-      :synonyms => c.edition.synonyms,
-    }
-  end
-end

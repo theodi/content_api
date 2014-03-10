@@ -626,32 +626,6 @@ class FormatsRequestTest < GovUkContentApiTest
     end
   end
 
-  it "should work with local_transaction_edition" do
-    service = FactoryGirl.create(:local_service, lgsl_code: 42)
-    expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
-    local_transaction_edition = FactoryGirl.create(:local_transaction_edition, slug: artefact.slug, lgsl_code: 42, lgil_override: 3345,
-                                expectation_ids: [expectation.id], minutes_to_complete: 3,
-                                introduction: "batman introduction", more_information: "batman more_information",
-                                panopticon_id: artefact.id, state: 'published')
-    get '/batman-transaction.json'
-    parsed_response = JSON.parse(last_response.body)
-
-    assert last_response.ok?
-    assert_base_artefact_fields(parsed_response)
-
-    fields = parsed_response["details"]
-    expected_fields = ['alternative_title', 'lgsl_code', 'lgil_override', 'introduction', 'more_information',
-                        'minutes_to_complete', 'expectations']
-
-    assert_has_expected_fields(fields, expected_fields)
-    assert_equal "<p>batman introduction</p>", fields["introduction"].strip
-    assert_equal "<p>batman more_information</p>", fields["more_information"].strip
-    assert_equal "3", fields["minutes_to_complete"]
-    assert_equal 42, fields["lgsl_code"]
-    assert_equal 3345, fields["lgil_override"]
-  end
-
   it "should work with transaction_edition" do
     expectation = FactoryGirl.create(:expectation)
     artefact = FactoryGirl.create(:my_artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')

@@ -54,44 +54,6 @@ class GovUkContentApi < Sinatra::Application
     @role = params[:role] || ENV['CONTENTAPI_DEFAULT_ROLE']
   end
 
-  get "/local_authorities.json" do
-    search_param = params[:snac] || params[:name]
-    @statsd_scope = "request.local_authorities"
-
-    if params[:name]
-      name = Regexp.escape(params[:name])
-      statsd.time(@statsd_scope) do
-        @local_authorities = LocalAuthority.where(name: /^#{name}/i).to_a
-      end
-    elsif params[:snac]
-      snac = Regexp.escape(params[:snac])
-      statsd.time(@statsd_scope) do
-        @local_authorities = LocalAuthority.where(snac: /^#{snac}/i).to_a
-      end
-    else
-      custom_404
-    end
-
-    @result_set = FakePaginatedResultSet.new(@local_authorities)
-
-    render :rabl, :local_authorities, format: "json"
-  end
-
-  get "/local_authorities/:snac.json" do
-    @statsd_scope = "request.local_authority"
-    if params[:snac]
-      statsd.time(@statsd_scope) do
-        @local_authority = LocalAuthority.find_by_snac(params[:snac])
-      end
-    end
-
-    if @local_authority
-      render :rabl, :local_authority, format: "json"
-    else
-      custom_404
-    end
-  end
-
   get "/search.json" do
     begin
       @statsd_scope = "request.search"

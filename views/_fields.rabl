@@ -6,7 +6,7 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
 
 [:body, :alternative_title, :more_information, :min_value, :max_value,
     :short_description, :introduction, :will_continue_on, :continuation_link, :link, :alternate_methods,
-    :video_summary, :video_url, :licence_identifier, :licence_short_description, :licence_overview,
+    :video_summary, :video_url,
     :lgsl_code, :lgil_override, :minutes_to_complete, :place_type,
     :eligibility, :evaluation, :additional_information,
     :business_support_identifier, :max_employees, :organiser, :summary, :alert_status,
@@ -57,10 +57,6 @@ end
 
 node(:nodes, :if => lambda { |artefact| artefact.edition.is_a?(SimpleSmartAnswerEdition) }) do |artefact|
   partial("smart_answer_nodes", object: artefact)
-end
-
-node(:licence, :if => lambda { |artefact| artefact.licence }) do |artefact|
-  partial("licence", object: artefact)
 end
 
 node(:places, :if => lambda { |artefact| artefact.places }) do |artefact|

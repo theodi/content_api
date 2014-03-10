@@ -416,20 +416,6 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  get "/licences.json" do
-    licence_ids = (params[:ids] || '').split(',')
-    if licence_ids.any?
-      licences = LicenceEdition.published.in(:licence_identifier => licence_ids)
-      @results = map_editions_with_artefacts(licences)
-    else
-      @results = []
-    end
-
-    @result_set = FakePaginatedResultSet.new(@results)
-
-    render :rabl, :licences, format: "json"
-  end
-
   get "/business_support_schemes.json" do
     identifiers = params[:identifiers].to_s.split(",")
     statsd.time("request.business_support_schemes") do
@@ -644,7 +630,6 @@ class GovUkContentApi < Sinatra::Application
     end
 
     attach_place_data(@artefact) if @artefact.edition.format == "Place" && params[:latitude] && params[:longitude]
-    attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
     [PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(OrganizationEdition)
     attach_assets(@artefact, :file) if @artefact.edition.is_a?(CreativeWorkEdition)
@@ -662,26 +647,6 @@ class GovUkContentApi < Sinatra::Application
     artefact.places = [{ "error" => "timed_out" }]
   rescue GdsApi::HTTPErrorResponse
     artefact.places = [{ "error" => "http_error" }]
-  end
-
-  def attach_license_data(artefact)
-    statsd.time("#{@statsd_scope}.licence") do
-      licence_api_response = licence_application_api.details_for_licence(artefact.edition.licence_identifier, params[:snac])
-      artefact.licence = licence_api_response.nil? ? nil : licence_api_response.to_hash
-    end
-
-    if artefact.licence and artefact.edition.licence_identifier
-      statsd.time("#{@statsd_scope}.licence.local_service") do
-        licence_lgsl_code = @artefact.edition.licence_identifier.split('-').first
-        artefact.licence['local_service'] = LocalService.where(:lgsl_code => licence_lgsl_code).first
-      end
-    end
-  rescue GdsApi::TimedOutException
-    statsd.increment("#{@statsd_scope}.license_request_error.timed_out")
-    artefact.licence = { "error" => "timed_out" }
-  rescue GdsApi::HTTPErrorResponse
-    statsd.increment("#{@statsd_scope}.license_request_error.http")
-    artefact.licence = { "error" => "http_error" }
   end
 
   def attach_travel_advice_country_and_edition(artefact, version_number = nil)

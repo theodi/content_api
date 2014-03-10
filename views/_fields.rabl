@@ -7,7 +7,7 @@ node(:need_extended_font) { |artefact| artefact.need_extended_font }
 [:body, :alternative_title, :more_information, :min_value, :max_value,
     :short_description, :introduction, :will_continue_on, :continuation_link, :link, :alternate_methods,
     :video_summary, :video_url,
-    :lgsl_code, :lgil_override, :minutes_to_complete, :place_type,
+    :minutes_to_complete, :place_type,
     :eligibility, :evaluation, :additional_information,
     :alert_status,
     :change_description, :reviewed_at, :honorific_prefix, :honorific_suffix, :role, 

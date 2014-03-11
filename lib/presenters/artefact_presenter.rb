@@ -60,7 +60,7 @@ class ArtefactPresenter
 
     presented["tags"] = present_with(@artefact.tags, TagPresenter)
     presented["related"] = present_with(
-      @artefact.live_tagged_related_artefacts,
+      @artefact.live_related_artefacts,
       BasicArtefactPresenter
     )
 

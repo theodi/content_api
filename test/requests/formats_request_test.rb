@@ -625,34 +625,6 @@ class FormatsRequestTest < GovUkContentApiTest
       end
     end
   end
-
-  it "should work with transaction_edition" do
-    expectation = FactoryGirl.create(:expectation)
-    artefact = FactoryGirl.create(:my_artefact, slug: 'batman-transaction', owning_app: 'publisher', sections: [@tag1.tag_id], state: 'live')
-    transaction_edition = FactoryGirl.create(:transaction_edition, slug: artefact.slug,
-                                expectation_ids: [expectation.id], minutes_to_complete: 3,
-                                introduction: "batman introduction", more_information: "batman more_information",
-                                alternate_methods: "batman alternate_methods",
-                                will_continue_on: "A Site", link: "http://www.example.com/foo",
-                                panopticon_id: artefact.id, state: 'published')
-    get '/batman-transaction.json'
-    parsed_response = JSON.parse(last_response.body)
-
-    assert last_response.ok?
-    assert_base_artefact_fields(parsed_response)
-
-    fields = parsed_response["details"]
-    expected_fields = ['alternate_methods', 'will_continue_on', 'link', 'introduction', 'more_information',
-                        'expectations']
-
-    assert_has_expected_fields(fields, expected_fields)
-    assert_equal "<p>batman introduction</p>", fields["introduction"].strip
-    assert_equal "<p>batman more_information</p>", fields["more_information"].strip
-    assert_equal "<p>batman alternate_methods</p>", fields["alternate_methods"].strip
-    assert_equal "3", fields["minutes_to_complete"]
-    assert_equal "A Site", fields["will_continue_on"]
-    assert_equal "http://www.example.com/foo", fields["link"]
-  end
   
   it "should work with simple smart-answers" do
     artefact = FactoryGirl.create(:my_artefact, :slug => 'the-bridge-of-death', :owning_app => 'publisher', :state => 'live')

@@ -18,6 +18,7 @@ require 'ostruct'
 
 require "url_helper"
 require "presenters/result_set_presenter"
+require "presenters/single_result_presenter"
 require "presenters/search_result_presenter"
 require "presenters/tag_presenter"
 require "presenters/basic_artefact_presenter"

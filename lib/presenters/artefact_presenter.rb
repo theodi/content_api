@@ -58,7 +58,7 @@ class ArtefactPresenter
   def present
     presented = BasicArtefactPresenter.new(@artefact, @url_helper).present
 
-    presented["tags"] = present_with(@artefact.combined_tags, TagPresenter)
+    presented["tags"] = present_with(@artefact.tags, TagPresenter)
     presented["related"] = present_with(
       @artefact.live_tagged_related_artefacts,
       BasicArtefactPresenter

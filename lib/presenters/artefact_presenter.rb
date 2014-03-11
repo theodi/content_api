@@ -1,6 +1,10 @@
 require "presenters/basic_artefact_presenter"
 require "presenters/tag_presenter"
 require "presenters/artefact_part_presenter"
+require "presenters/artefact_author_presenter"
+require "presenters/artefact_node_presenter"
+require "presenters/artefact_organization_presenter"
+
 
 class ArtefactPresenter
 
@@ -52,10 +56,14 @@ class ArtefactPresenter
       base_fields,
       optional_fields,
       parts,
-      nodes,
+      smart_answer_nodes,
       expectations,
       assets
     ].inject(&:merge)
+
+    presented["author"] = author
+    presented["nodes"] = nodes
+    presented["organizations"] = organizations
 
     presented["related_external_links"] = @artefact.external_links.map do |l|
       {
@@ -87,6 +95,41 @@ private
     end]
   end
 
+  def author
+    return {} unless @artefact.author_edition
+    {"author" => ArtefactAuthorPresenter.new(
+        @artefact,
+        @url_helper
+      ).present
+    }
+  end
+
+  def nodes
+    return {} unless @artefact.node_editions
+
+    presented_nodes = @artefact.node_editions.map do |node|
+      ArtefactNodePresenter.new(
+        node,
+        @url_helper
+      ).present
+    end
+
+    {"nodes" => presented_nodes}
+  end
+
+  def organizations
+    return {} unless @artefact.organization_editions
+
+    presented_organizations = @artefact.organization_editions.map do |org|
+      ArtefactOrganizationPresenter.new(
+        org,
+        @url_helper
+      ).present
+    end
+
+    {"organizations" => presented_organizations}
+  end
+
   def parts
     return {} unless @artefact.edition.respond_to?(:order_parts)
 
@@ -102,7 +145,7 @@ private
     {"parts" => presented_parts}
   end
 
-  def nodes
+  def smart_answer_nodes
     return {} unless @artefact.edition.is_a?(SimpleSmartAnswerEdition)
 
     presented_nodes = @artefact.edition.nodes.map do |n|

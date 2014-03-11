@@ -17,7 +17,8 @@ class TagPresenter
       },
       "content_with_tag" => {
         "id" => @url_helper.with_tag_url(@tag),
-        "web_url" => @url_helper.with_tag_web_url(@tag)
+        "web_url" => @url_helper.with_tag_web_url(@tag),
+        "slug" => @tag.tag_id
       }
     }
 

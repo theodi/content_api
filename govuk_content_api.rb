@@ -355,7 +355,8 @@ class GovUkContentApi < Sinatra::Application
       # Check the field we want to query exists
       custom_404 unless type.constantize.fields.keys.include? params[:order_by]
       
-      edition = type.constantize.where(:state => "published", params[:order_by].to_sym => {:$gte => Date.today.to_time.utc}).order_by(params[:order_by].to_sym.asc).first
+      editions = type.constantize.where(:state => "published", params[:order_by].to_sym => {:$gte => Date.today.to_time.utc}).order_by(params[:order_by].to_sym.asc)
+      edition = editions.to_a.find {|e| e.artefact.tag_ids.include? @role }
       get_artefact(edition.slug, params)
     end
   end

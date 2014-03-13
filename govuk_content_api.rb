@@ -21,6 +21,8 @@ require "presenters/tag_type_presenter"
 require "presenters/basic_artefact_presenter"
 require "presenters/minimal_artefact_presenter"
 require "presenters/artefact_presenter"
+require "presenters/section_presenter"
+require "presenters/module_presenter"
 require "govspeak_formatter"
 
 # Note: the artefact patch needs to be included before the Kaminari patch,
@@ -414,7 +416,11 @@ class GovUkContentApi < Sinatra::Application
         section_module
       end
       
-      render :rabl, :section, format: "json"
+      presenter = SingleResultPresenter.new(
+        SectionPresenter.new(@section, url_helper)
+      )
+
+      presenter.present.to_json
     end
   end
   

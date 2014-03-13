@@ -6,10 +6,11 @@ class ArtefactNodePresenter
 
   def present
     {
-      name: @author.title,
-      slug: @author.slug,
-      web_url: artefact_web_url(@author.artefact),
-      tag_ids: @author.artefact.tag_ids
+      name: @node.title,
+      slug: @node.slug,
+      level: @node.level,
+      beta: @node.beta,
+      web_url: @url_helper.artefact_web_url(@node.artefact)
     }
   end
 end

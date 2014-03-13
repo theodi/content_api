@@ -8,7 +8,7 @@ class ArtefactOrganizationPresenter
     {
       name: @organization.title,
       slug: @organization.slug,
-      web_url: artefact_web_url(@organization.artefact)
+      web_url: @url_helper.artefact_web_url(@organization.artefact)
     }
   end
 end

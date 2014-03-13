@@ -497,15 +497,10 @@ class GovUkContentApi < Sinatra::Application
     custom_404 unless @artefact
     handle_unpublished_artefact(@artefact) unless params[:edition]
     
-    @author = @artefact.author_edition
-    @nodes = @artefact.node_editions
-    @organizations = @artefact.organization_editions
-
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
     end
 
-    # MAZZ: may need to knock out govspeak_formatter from here
     presenter = SingleResultPresenter.new(
       ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter)
     )

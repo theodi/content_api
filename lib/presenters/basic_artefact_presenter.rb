@@ -9,8 +9,16 @@ class BasicArtefactPresenter
   def present
     presented = MinimalArtefactPresenter.new(@artefact, @url_helper).present
     presented["updated_at"] = presented_updated_date.iso8601
-    presented["group"] = @artefact.group if @artefact.group.present?
+    presented["created_at"] = presented_created_date.iso8601
+    presented["tag_ids"] = tag_ids
     presented
+  end
+
+  def tag_ids
+    return {} unless @artefact.tag_ids.count > 0
+    @artefact.tags.map do |tag|
+      {"tag_id" => tag.id}
+    end
   end
 
 private
@@ -20,5 +28,10 @@ private
     updated_options = [@artefact.updated_at]
     updated_options << @artefact.edition.updated_at if @artefact.edition
     updated_options.compact.max
+  end
+
+    # Returns the created date that should be presented to the user
+  def presented_created_date
+    @artefact.created_at
   end
 end

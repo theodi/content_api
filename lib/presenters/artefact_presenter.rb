@@ -30,6 +30,56 @@ class ArtefactPresenter
     video_url
   ).map(&:to_sym)
 
+  ODI_FIELDS = %w(
+    honorific_prefix
+    honorific_suffix
+    role
+    description
+    affiliation
+    url
+    telephone
+    twitter
+    linkedin
+    github
+    email
+    length
+    outline
+    outcomes
+    audience
+    prerequisites
+    requirements
+    materials
+    subtitle
+    content
+    end_date
+    media_enquiries_name
+    media_enquiries_email
+    media_enquiries_telephone
+    location
+    salary
+    closing_date
+    joined_at
+    tagline
+    involvement
+    want_to_meet
+    case_study
+    date_published
+    course
+    date
+    price
+    trainers
+    start_date
+    booking_url
+    hashtag
+    level
+    region
+    end_date
+    beta
+    join_date
+    area
+    host
+  ).map(&:to_sym)
+
   def initialize(artefact, url_helper, govspeak_formatter)
     @artefact = artefact
     @url_helper = url_helper
@@ -58,7 +108,10 @@ class ArtefactPresenter
       parts,
       smart_answer_nodes,
       expectations,
-      assets
+      assets,
+      organisation,
+      course_title,
+      event_type
     ].inject(&:merge)
 
     presented["author"] = author
@@ -83,7 +136,8 @@ private
   end
 
   def optional_fields
-    fields = OPTIONAL_FIELDS.select { |f| @artefact.edition.respond_to?(f) }
+    all_optional_fields = ODI_FIELDS + OPTIONAL_FIELDS
+    fields = all_optional_fields.select { |f| @artefact.edition.respond_to?(f) }
     Hash[fields.map do |field|
       field_value = @artefact.edition.send(field)
 
@@ -95,13 +149,38 @@ private
     end]
   end
 
+  def organisation
+    return {} unless @artefact.edition.respond_to?(:affiliation) && !@artefact.edition.affiliation.blank?
+     organisation = OrganizationEdition.where(
+        :state => "published", :slug => @artefact.edition.affiliation
+      ).first
+    {
+      "organisation" => {
+        name: organisation.try(:title),
+        slug: @artefact.edition.affiliation
+      }
+    }
+  end
+
+  def course_title
+    return {} unless @artefact.edition.respond_to?("course")
+    course = CourseEdition.where(
+        :state => "published", :slug => @artefact.edition.course
+      ).first
+    {"course_title" => course.try(:title)}
+  end
+
+  def event_type
+  return {} unless @artefact.edition.is_a?(EventEdition)
+    {"event_type" => @artefact.event.first.tag_id}
+  end
+
   def author
     return {} unless @artefact.author_edition
-    {"author" => ArtefactAuthorPresenter.new(
-        @artefact,
-        @url_helper
-      ).present
-    }
+    ArtefactAuthorPresenter.new(
+      @artefact.author_edition,
+      @url_helper
+    ).present
   end
 
   def nodes
@@ -113,8 +192,6 @@ private
         @url_helper
       ).present
     end
-
-    {"nodes" => presented_nodes}
   end
 
   def organizations
@@ -126,8 +203,6 @@ private
         @url_helper
       ).present
     end
-
-    {"organizations" => presented_organizations}
   end
 
   def parts
@@ -181,7 +256,16 @@ private
     @artefact.assets.each_with_object({}) do |(key, details), assets|
       assets[key] = {
         "web_url" => details["file_url"],
+        "versions"     => details["file_versions"],
         "content_type" => details["content_type"],
+        "title"        => details["title"],
+        "source"       => details["source"],
+        "description"  => details["description"],
+        "creator"      => details["creator"],
+        "attribution"  => details["attribution"],
+        "subject"      => details["subject"],
+        "license"      => details["license"],
+        "spatial"      => details["spatial"]
       }
     end
   end

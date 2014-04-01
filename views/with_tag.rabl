@@ -31,7 +31,7 @@ child(:results => "results") do
       end
     end
     unless artefact.organization_editions.empty?
-      h["organizations"] = artefact.organization_editions.map do |org| 
+      h["organizations"] = artefact.organization_editions.map do |org|
         {
           "name" => org.title,
           "slug" => org.slug,

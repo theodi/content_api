@@ -21,7 +21,7 @@ child(:results => "results") do
       }
     end
     unless artefact.node_editions.empty?
-      h["nodes"] = artefact.node_editions.map do |node| 
+      h["nodes"] = artefact.node_editions.map do |node|
         {
           "name" => node.title,
           "slug" => node.slug,
@@ -31,7 +31,7 @@ child(:results => "results") do
       end
     end
     unless artefact.organization_editions.empty?
-      h["organizations"] = artefact.organization_editions.map do |org| 
+      h["organizations"] = artefact.organization_editions.map do |org|
         {
           "name" => org.title,
           "slug" => org.slug,
@@ -44,7 +44,7 @@ child(:results => "results") do
         "slug" => artefact.edition.send(:artist)
       }
     end
-    [:role, :course, :date, :url, :start_date, :end_date, :level, :beta, :region].each do |field|
+    [:role, :course, :date, :url, :start_date, :end_date, :level, :beta, :region, :location].each do |field|
       h[field] = artefact.edition.send(field) if artefact.edition.respond_to?(field)
     end
     if artefact.edition.respond_to?(:course)

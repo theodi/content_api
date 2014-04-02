@@ -1,6 +1,8 @@
 require_relative '../test_helper'
+require "gds_api/test_helpers/asset_manager"
 
 class ArtefactWithTagsRequestTest < GovUkContentApiTest
+  include GdsApi::TestHelpers::AssetManager
 
   describe "handling requests with a tag= parameter" do
     it "should return 404 if no tag is provided" do
@@ -520,6 +522,36 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       assert_equal 200, last_response.status
 
       assert_equal "Over the hills and far away", parsed_response["results"][0]["details"]["location"]
+    end
+
+  end
+
+  describe "module image" do
+
+    it "should show the module image if present" do
+      FactoryGirl.create(:tag, tag_id: 'news', title: 'News', tag_type: "article")
+      article = FactoryGirl.create(:my_artefact, state: 'live', slug: 'here-is-some-news', name: "Here is some news", kind: "article", article: ['news'], module_image_id: "512c9019686c82191d000001")
+
+      asset_manager_has_an_asset("512c9019686c82191d000001", {
+        "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
+        "name" => "captions-file.xml",
+        "content_type" => "application/xml",
+        "file_url" => "http://example.com/images/image.png",
+        "state" => "clean",
+      })
+
+      FactoryGirl.create(:article_edition,
+        title: article.name,
+        slug: article.slug,
+        panopticon_id: article.id,
+        content: "Foo Bar Baz",
+        state: 'published')
+
+      get "/with_tag.json?article=news"
+      parsed_response = JSON.parse(last_response.body)
+      assert_equal 200, last_response.status
+
+      assert_equal "http://example.com/images/image.png", parsed_response["results"][0]["details"]["module_image"]
     end
 
   end

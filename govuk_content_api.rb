@@ -27,7 +27,7 @@ require 'country'
 
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
-  
+
   configure do
     enable :cross_origin
   end
@@ -279,8 +279,8 @@ class GovUkContentApi < Sinatra::Application
         custom_404
       end
     end
-    
-    if params[:type].blank?    
+
+    if params[:type].blank?
       requested_tags = known_tag_types.each_with_object([]) do |tag_type, req|
         unless params[tag_type.singular].blank?
           req << Tag.by_tag_id(params[tag_type.singular], tag_type.singular)
@@ -292,7 +292,7 @@ class GovUkContentApi < Sinatra::Application
 
       # For now, we only support retrieving by a single tag
       custom_404 unless requested_tags.size == 1
-      
+
       if params[:sort]
         custom_404 unless ["curated", "alphabetical", "date"].include?(params[:sort])
       end
@@ -311,104 +311,104 @@ class GovUkContentApi < Sinatra::Application
       type = params[:type].singularize
       @description = "All content with the #{type} type"
       artefacts = Artefact.where(:kind => type, :tag_ids => @role)
-      
+
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)
       end
-      
+
       # If there are no artefacts for this content type, return 404
       custom_404 if artefacts.count == 0
     end
-    
+
     results = map_artefacts_and_add_editions(artefacts)
     @result_set = FakePaginatedResultSet.new(results)
 
     render :rabl, :with_tag, format: "json"
   end
-  
+
   # Get the newest artefact by tag or type
   get "/latest.json" do
     if params[:type]
       # Check the type exists
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
-      custom_404 unless content_types.include? params[:type].singularize 
-      
+      custom_404 unless content_types.include? params[:type].singularize
+
       artefact = Artefact.live.where(kind: params[:type]).order_by(:created_at.desc).first
     elsif params[:tag]
       # Check the tag exists
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       custom_404 if possible_tags.count == 0
-      
+
       artefact = Artefact.live.where(tag_ids: params[:tag]).order_by(:created_at.desc).first
     end
     get_artefact(artefact.slug, params)
   end
-  
+
   # Get the next upcoming artefact (such as an event or course_instance) by type
   get "/upcoming.json" do
     if params[:order_by] && params[:type]
       type = "#{params[:type].camelize}Edition"
-      
+
       # Check the type exists
       custom_404 unless Object.const_defined?(type)
-      
+
       # Check the field we want to query exists
       custom_404 unless type.constantize.fields.keys.include? params[:order_by]
-      
+
       editions = type.constantize.where(:state => "published", params[:order_by].to_sym => {:$gte => Date.today.to_time.utc}).order_by(params[:order_by].to_sym.asc)
       edition = editions.to_a.find {|e| e.artefact.tag_ids.include? @role }
       get_artefact(edition.slug, params)
     end
   end
-  
-  get "/course-instance.json" do    
-    if params[:course] && params[:date]          
+
+  get "/course-instance.json" do
+    if params[:course] && params[:date]
       instance = CourseInstanceEdition.where(:course => params[:course], :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
-      
+
       custom_404 if instance.count == 0
-      
+
       get_artefact(instance.first.slug, { edition: params[:edition] })
     else
       custom_404
     end
   end
-  
+
   get "/section.json" do
     if params[:id]
       @section = Section.where(:tag_id => params[:id]).first
       attach_non_artefact_asset(@section, :hero_image)
-      
+
       custom_404 if @section.nil?
-      
-      @section.modules.map! do |m| 
-        section_module = SectionModule.find(m) 
+
+      @section.modules.map! do |m|
+        section_module = SectionModule.find(m)
         attach_non_artefact_asset(section_module, :image)
         section_module
       end
-      
+
       render :rabl, :section, format: "json"
     end
   end
-  
+
   get "/related.json" do
     kv = params.first
     type = kv[0]
     item = kv[1]
-    
+
     allowed_types = ['course']
-    
+
     unless allowed_types.include?(type)
       custom_404
-    else    
+    else
       editions = Edition.where(type => item, :state => 'published')
-    
+
       custom_404 if editions.count == 0
-    
+
       @description = "All items with #{type} #{item}"
-    
+
       @results = map_editions_with_artefacts(editions)
       @result_set = FakePaginatedResultSet.new(@results)
-    
+
       render :rabl, :with_tag, format: "json"
     end
   end
@@ -475,7 +475,7 @@ class GovUkContentApi < Sinatra::Application
   end
 
   protected
-  
+
   def get_artefact(id, params)
     # The edition param is for accessing unpublished editions in order for
     # editors to preview them. These can change frequently and so shouldn't be
@@ -492,7 +492,7 @@ class GovUkContentApi < Sinatra::Application
 
     custom_404 unless @artefact
     handle_unpublished_artefact(@artefact) unless params[:edition]
-    
+
     @author = @artefact.author_edition
     @nodes = @artefact.node_editions
     @organizations = @artefact.organization_editions
@@ -532,6 +532,7 @@ class GovUkContentApi < Sinatra::Application
           a = artefact
         end
         unless a.nil?
+          attach_non_artefact_asset(a, :module_image)
           attach_assets(a, :image) if a.edition.is_a?(PersonEdition)
           attach_assets(a, :file) if a.edition.is_a?(CreativeWorkEdition)
           attach_assets(a, :logo) if a.edition.is_a?(NodeEdition)
@@ -545,9 +546,9 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
-    statsd.time("#{@statsd_scope}.#{tag_id}") do    
+    statsd.time("#{@statsd_scope}.#{tag_id}") do
       artefacts = Artefact.live.where(filter).all(tag_ids: [tag_id, @role])
-      
+
       if sort == "date"
         artefacts = artefacts.order_by(:created_at.desc)
       else
@@ -576,7 +577,7 @@ class GovUkContentApi < Sinatra::Application
 
         if sort == "curated"
           curated_list = CuratedList.where(tag_ids: [tag_id]).first
-          first_ids = curated_list ? curated_list.artefact_ids : []        
+          first_ids = curated_list ? curated_list.artefact_ids : []
         else
           # Just fall back on alphabetical order
           first_ids = []
@@ -619,7 +620,7 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def attach_publisher_edition(artefact, version_number = nil)    
+  def attach_publisher_edition(artefact, version_number = nil)
     statsd.time("#{@statsd_scope}.edition") do
       artefact.edition = if version_number
         Edition.where(panopticon_id: artefact.id, version_number: version_number).first
@@ -727,7 +728,7 @@ class GovUkContentApi < Sinatra::Application
       end
     end
   end
-  
+
   def attach_non_artefact_asset(obj, field)
     obj.assets ||= {}
     if asset_id = obj.send("#{field}_id")
@@ -789,5 +790,5 @@ class GovUkContentApi < Sinatra::Application
 
     custom_error(401, "Edition parameter requires authentication")
   end
-  
+
 end

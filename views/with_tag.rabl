@@ -60,6 +60,10 @@ child(:results => "results") do
     if artefact.kind == "event"
       h["event_type"] = artefact.event.first.tag_id
     end
+    if artefact.assets[:module_image]
+      h["module_image"] = artefact.assets[:module_image]["file_url"]
+      artefact.assets.delete(:module_image)
+    end
     if artefact.assets
       artefact.assets.each_with_object({}) do |(key, details), assets|
         h["web_url"] = details['file_url']

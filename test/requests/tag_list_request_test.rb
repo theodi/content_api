@@ -34,9 +34,14 @@ class TagListRequestTest < GovUkContentApiTest
       get "/tags.json"
       expected_id = "http://example.org/tags/sections/crime.json"
       expected_url = "#{public_web_url}/browse/crime"
-      assert_equal expected_id, JSON.parse(last_response.body)['results'].last['id']
-      assert_equal nil, JSON.parse(last_response.body)['results'].last['web_url']
-      assert_equal expected_url, JSON.parse(last_response.body)['results'].last["content_with_tag"]["web_url"]
+
+      JSON.parse(last_response.body)['results'].map do |result|
+        if result["slug"] == "crime"
+          assert_equal expected_id, result['id']
+          assert_equal nil, result['web_url']
+          assert_equal expected_url, result["content_with_tag"]["web_url"]
+        end
+      end
     end
 
     it "provides a public API URL when requested through that route" do
@@ -44,9 +49,12 @@ class TagListRequestTest < GovUkContentApiTest
       # environment variable, set by the internal proxy
       tag = FactoryGirl.create(:tag, tag_id: 'crime')
       get '/tags.json', {}, {'HTTP_API_PREFIX' => 'api'}
-
-      expected_id = "#{public_web_url}/api/tags/sections/crime.json"
-      assert_equal expected_id, JSON.parse(last_response.body)['results'].last['id']
+      JSON.parse(last_response.body)['results'].each do |result|
+        if result['slug'] == "crime"
+          expected_id = "#{public_web_url}/api/tags/sections/crime.json"
+          assert_equal expected_id, result['id']
+        end
+      end
     end
 
     describe "with pagination" do

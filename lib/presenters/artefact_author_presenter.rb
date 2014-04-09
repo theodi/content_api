@@ -9,7 +9,7 @@ class ArtefactAuthorPresenter
       name: @author.title,
       slug: @author.slug,
       web_url: @url_helper.artefact_web_url(@author.artefact),
-      tag_ids: @author.artefact.tag_ids
+      tag_ids: @author.artefact.scoped_tag_ids
     }
   end
 end

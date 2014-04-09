@@ -13,6 +13,7 @@ class ResultSetPresenter
     @url_helper = url_helper
     @result_presenter_class = result_presenter_class
     @description = options[:description]
+    @options = options
   end
 
   def present
@@ -30,7 +31,11 @@ class ResultSetPresenter
     end
 
     presented["results"] = @result_set.results.map do |result|
-      @result_presenter_class.new(result, @url_helper).present
+      if @result_presenter_class == TaggedArtefactPresenter
+        @result_presenter_class.new(result, @url_helper, @options).present
+      else
+        @result_presenter_class.new(result, @url_helper).present
+      end
     end
 
     presented

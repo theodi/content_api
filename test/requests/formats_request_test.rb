@@ -654,10 +654,10 @@ class FormatsRequestTest < GovUkContentApiTest
     assert_base_artefact_fields(parsed_response)
     details = parsed_response["details"]
 
-    assert_has_expected_fields(details, %w(body nodes))
+    assert_has_expected_fields(details, %w(body smart_answer_nodes))
     assert_equal "<h2>STOP!</h2>\n\n<p>He who would cross the Bridge of Death<br />\nMust answer me<br />\nThese questions three<br />\nEre the other side he see.</p>", details["body"].strip
 
-    nodes = details["nodes"]
+    nodes = details["smart_answer_nodes"]["nodes"]
 
     assert_equal ["What is your name?", "What is the capital of Assyria?", "What is your favorite colour?", "Right, off you go.", "AAAAARRRRRRRRRRRRRRRRGGGGGHHH!!!!!!!" ], nodes.map {|n| n["title"]}
 

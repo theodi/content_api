@@ -18,3 +18,4 @@ class GovspeakFormatter
       formatted = govspeak_string
     end
   end
+end

@@ -14,15 +14,8 @@ class BasicArtefactPresenter
     presented = MinimalArtefactPresenter.new(@artefact, @url_helper).present
     presented["updated_at"] = presented_updated_date.iso8601
     presented["created_at"] = presented_created_date.iso8601
-    presented["tag_ids"] = tag_ids
+    presented["tag_ids"] = @artefact.scoped_tag_ids
     presented
-  end
-
-  def tag_ids
-    return {} unless @artefact.tag_ids.count > 0
-    @artefact.tags.map do |tag|
-      {"tag_id" => tag.id}
-    end
   end
 
 private

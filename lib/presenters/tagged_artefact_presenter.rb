@@ -1,17 +1,19 @@
-require "presenters/basic_artefact_presenter"
+require "presenters/artefact_presenter"
 
 class TaggedArtefactPresenter
-  def initialize(artefact, url_helper)
+  def initialize(artefact, url_helper, options={})
     @artefact = artefact
     @url_helper = url_helper
+    @govspeak_formatter = options[:govspeak_formatter]
+    @options = options
   end
 
   def present
-    base_presenter = BasicArtefactPresenter.new(@artefact, @url_helper)
-    base_presenter.present.merge({
-      "details" => {
-        "description" => @artefact.description
-      }
-    })
+    presented = ArtefactPresenter.new(@artefact, @url_helper, GovspeakFormatter.new(:html, nil)).present
+    if @options["whole_body"]
+      presented["details"]["body"] = @artefact.whole_body
+    end
+
+    presented
   end
 end

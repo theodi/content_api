@@ -12,7 +12,6 @@ class TagRequestTest < GovUkContentApiTest
 
       get "/tags/sections/good-tag.json"
       assert last_response.ok?
-      assert_status_field "ok", last_response
       response = JSON.parse(last_response.body)
       assert_equal "Lots to say for myself", response["details"]["description"]
       assert_equal "http://example.org/tags/sections/good-tag.json", response["id"]
@@ -59,7 +58,6 @@ class TagRequestTest < GovUkContentApiTest
 
       get "/tags/sections/crime%2Fbatman.json"
       assert last_response.ok?
-      assert_status_field "ok", last_response
       assert_equal(
         "http://example.org/tags/sections/crime%2Fbatman.json",
         JSON.parse(last_response.body)["id"]

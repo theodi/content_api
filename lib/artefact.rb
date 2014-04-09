@@ -80,6 +80,13 @@ module ContentApiArtefactExtensions
     end.compact
   end
 
+  def scoped_tag_ids
+    scoped_tags = tags.reject {|t| t.tag_type == 'role'}
+    scoped_tags.map do |tag|
+      tag.tag_id
+    end
+  end
+
 end
 
 class Artefact

@@ -11,7 +11,6 @@ class TagListRequestTest < GovUkContentApiTest
       get "/tags.json"
 
       assert last_response.ok?
-      assert_status_field "ok", last_response
       response = JSON.parse(last_response.body)
       assert_equal 2, response['results'].count
 
@@ -25,7 +24,6 @@ class TagListRequestTest < GovUkContentApiTest
       FactoryGirl.create(:tag, tag_type: "keyword")
       get "/tags.json?type=section"
       assert last_response.ok?
-      assert_status_field "ok", last_response
       assert_equal 1, JSON.parse(last_response.body)['results'].count
     end
 
@@ -226,7 +224,6 @@ class TagListRequestTest < GovUkContentApiTest
 
       get "/tags/sections.json"
       assert last_response.ok?
-      assert_status_field "ok", last_response
       response = JSON.parse(last_response.body)
       assert_equal 3, response["results"].length
     end

@@ -19,7 +19,6 @@ class ResultSetPresenter
   def present
     presented = {
       "_response_info" => {
-        "status" => "ok",
         "links" => links
       }
     }

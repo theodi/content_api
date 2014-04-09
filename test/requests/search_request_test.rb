@@ -39,7 +39,6 @@ class SearchRequestTest < GovUkContentApiTest
     parsed_response = JSON.parse(last_response.body)
 
     assert last_response.ok?
-    assert_status_field "ok", last_response
     assert_equal 2, parsed_response["total"]
     assert_equal 2, parsed_response["results"].count
     assert_equal 'Nick Harvey MP (Minister of State (Minister for the Armed Forces), Ministry of Defence)',
@@ -53,7 +52,6 @@ class SearchRequestTest < GovUkContentApiTest
     parsed_response = JSON.parse(last_response.body)
 
     assert last_response.ok?
-    assert_status_field "ok", last_response
     assert_equal 0, parsed_response["total"]
   end
 
@@ -83,7 +81,6 @@ class SearchRequestTest < GovUkContentApiTest
     get "/search.json?q=government+info"
 
     assert last_response.ok?
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
     first_response = parsed_response['results'][0]

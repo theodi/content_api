@@ -580,7 +580,6 @@ class FormatsRequestTest < GovUkContentApiTest
 
         get "/batman.json"
         assert last_response.ok?
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
         caption_file_info = {

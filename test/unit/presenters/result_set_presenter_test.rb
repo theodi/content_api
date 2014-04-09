@@ -33,7 +33,7 @@ describe ResultSetPresenter do
     presented = ResultSetPresenter.new(result_set, nil, DummyResultPresenter).present
 
     assert_equal(
-      { "status" => "ok", "links" => [] },
+      { "links" => [] },
       presented["_response_info"]
     )
     assert_equal 5, presented["total"]

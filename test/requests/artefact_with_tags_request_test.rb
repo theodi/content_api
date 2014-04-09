@@ -140,7 +140,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers"
         
         assert last_response.ok?
-        assert_status_field "ok", last_response
         parsed_response = JSON.parse(last_response.body)
         assert_equal 1, parsed_response["results"].count
 
@@ -156,7 +155,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         parsed_response = JSON.parse(last_response.body)
 
         assert last_response.ok?
-        assert_status_field "ok", last_response
         assert_equal 0, parsed_response["total"]
         assert_equal [], parsed_response["results"]
       end
@@ -191,7 +189,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&node=westward-ho!"
         
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -207,7 +204,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
         
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -223,7 +219,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&author=barry-scott"
         
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -242,7 +237,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&role=foo"
 
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -324,7 +318,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       get "/with_tag.json?type=jobs&role=foo"
 
       assert_equal 200, last_response.status
-      assert_status_field "ok", last_response
 
       parsed_response = JSON.parse(last_response.body)
 
@@ -349,7 +342,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     get "/with_tag.json?keyword=farmers&author=barry-scott"
     
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 

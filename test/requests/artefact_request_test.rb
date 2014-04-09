@@ -47,7 +47,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal 2, parsed_response["related"].length
   
       related_artefacts.zip(parsed_response["related"]).each do |response_artefact, related_info|
@@ -85,7 +84,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal 1, parsed_response["related"].length
   
       assert_equal "http://example.org/#{live.slug}.json", parsed_response['related'][0]["id"]
@@ -99,7 +97,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal [], parsed_response["related"]
     end
   end
@@ -137,7 +134,6 @@ class ArtefactRequestTest < GovUkContentApiTest
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
     refute JSON.parse(last_response.body)["details"].has_key?('overview')
   end
   
@@ -147,7 +143,6 @@ class ArtefactRequestTest < GovUkContentApiTest
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
     assert_equal [], JSON.parse(last_response.body)["tags"]
   end
   
@@ -166,7 +161,6 @@ class ArtefactRequestTest < GovUkContentApiTest
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
     parsed_artefact = JSON.parse(last_response.body)
     
     parsed_artefact["tags"].reject! { |h| h["title"] == "ODI" }
@@ -364,7 +358,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal "http://example.org/#{artefact.slug}.json", parsed_response["id"]
       assert_equal "#{public_web_url}/#{artefact.slug}", parsed_response["web_url"]
       assert_equal "<h1>Important information</h1>\n", parsed_response["details"]["body"]

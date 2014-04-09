@@ -6,7 +6,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json"
 
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
     assert_equal 0, parsed_response["total"]
@@ -21,7 +20,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json"
 
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -37,7 +35,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json"
 
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -51,7 +48,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json"
 
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -73,7 +69,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json?node=westward-ho!"
     
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -89,7 +84,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json?author=barry-scott"
     
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -105,7 +99,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json?organization_name=mom-corp"
     
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
@@ -124,7 +117,6 @@ class ArtefactsRequestTest < GovUkContentApiTest
     get "/artefacts.json?role=foo"
     
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 

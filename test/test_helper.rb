@@ -54,7 +54,6 @@ module ResponseTestMethods
   end
 
   def assert_base_artefact_fields(parsed_response)
-    assert_equal 'ok', parsed_response["_response_info"]["status"]
     assert_has_expected_fields(parsed_response, ['title', 'id', 'tags'])
   end
 

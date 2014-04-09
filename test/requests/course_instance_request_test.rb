@@ -34,11 +34,12 @@ class CourseInstanceRequest < GovUkContentApiTest
     
     it "should give correct course instance" do    
       get "/course-instance.json?date=#{@date_str}&course=this-is-a-course"
+
       assert last_response.ok?
       json = JSON.parse(last_response.body)
       assert_equal "this-is-a-course", json['details']['course']
       assert_includes json['details']['description'], "old description"
-      assert_equal @startdate.to_datetime.to_s, DateTime.parse(json['details']['date']).to_s
+      assert_equal @startdate.to_datetime.to_s, DateTime.parse(json['details']['date']).utc.to_s
     end
     
     it "should handle edition param for unpublished items" do

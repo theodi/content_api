@@ -32,6 +32,7 @@ describe GovspeakFormatter do
     end
 
     it "should interpolate fact values into content when requested as govspeak" do
+      skip("fact cave is a coupled api that is not used and a pain")
       fact_cave_has_a_fact('vat-rate', '20%')
       formatter = GovspeakFormatter.new(:govspeak, fact_cave_api)
       assert_equal(
@@ -41,6 +42,7 @@ describe GovspeakFormatter do
     end
 
     it "should interpolate fact values into content and format govspeak" do
+      skip("fact cave is a coupled api that is not used and a pain")
       fact_cave_has_a_fact('vat-rate', '20%')
       fact_cave_has_a_fact('pi-2-decimal-places', '3.14')
 
@@ -52,6 +54,7 @@ describe GovspeakFormatter do
     end
 
     it "should replace fact content markers with an empty string where no value exists" do
+      skip("fact cave is a coupled api that is not used and a pain")
       fact_cave_does_not_have_a_fact('foo')
       formatter = GovspeakFormatter.new(:html, fact_cave_api)
       assert_equal(

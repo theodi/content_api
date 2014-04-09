@@ -141,14 +141,14 @@ class ArtefactRequestTest < GovUkContentApiTest
     refute JSON.parse(last_response.body)["details"].has_key?('overview')
   end
   
-  it "should only list the role when there are no tags" do
+  it "should return an empty list when there are no tags" do
     artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live')
   
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
     assert_status_field "ok", last_response
-    assert_equal [{"title"=>"ODI", "id"=>"http://example.org/tags/roles/odi.json", "web_url"=>nil, "details"=>{"description"=>nil, "short_description"=>nil, "type"=>"role"}, "content_with_tag"=>{"id"=>"http://example.org/with_tag.json?role=odi", "web_url"=>"https://www.gov.uk/browse/odi", "slug"=>"odi"}, "parent"=>nil}], JSON.parse(last_response.body)["tags"]
+    assert_equal [], JSON.parse(last_response.body)["tags"]
   end
   
   it "should list section information" do
@@ -409,6 +409,7 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       describe "interpolating fact values" do
         it "should interploate fact values from the fact cave into the bodies" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_has_a_fact('vat-rate', '20')
   
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
@@ -427,6 +428,7 @@ class ArtefactRequestTest < GovUkContentApiTest
         end
   
         it "should still interpolate fact values when govspeak requested" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_has_a_fact('vat-rate', '20')
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
           FactoryGirl.create(:guide_edition,
@@ -444,6 +446,7 @@ class ArtefactRequestTest < GovUkContentApiTest
         end
   
         it "should use a blank value if the fact cave 404's for a fact" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_does_not_have_a_fact('vat-rate')
   
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
@@ -504,7 +507,6 @@ class ArtefactRequestTest < GovUkContentApiTest
       state: 'published')
   
     get "/#{artefact.slug}.json"
-  
     parsed_response = JSON.parse(last_response.body)
     assert_equal 200, last_response.status
     assert_equal 'Barry Scott', parsed_response["author"]["name"]
@@ -538,7 +540,7 @@ class ArtefactRequestTest < GovUkContentApiTest
       state: 'published')
   
     get "/#{artefact.slug}.json"
-  
+
     parsed_response = JSON.parse(last_response.body)
     assert_equal 200, last_response.status
     assert_equal 'Westward Ho!', parsed_response["nodes"][0]["name"]

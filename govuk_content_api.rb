@@ -14,7 +14,6 @@ require 'ostruct'
 
 require "url_helper"
 require "presenters/result_set_presenter"
-require "presenters/single_result_presenter"
 require "presenters/search_result_presenter"
 require "presenters/tag_presenter"
 require "presenters/tag_type_presenter"
@@ -23,6 +22,7 @@ require "presenters/minimal_artefact_presenter"
 require "presenters/artefact_presenter"
 require "presenters/section_presenter"
 require "presenters/module_presenter"
+require "presenters/tagged_artefact_presenter"
 require "govspeak_formatter"
 
 # Note: the artefact patch needs to be included before the Kaminari patch,
@@ -262,8 +262,7 @@ class GovUkContentApi < Sinatra::Application
 
     @tag = Tag.by_tag_id(params[:tag_id], tag_type.singular)
     if @tag
-      tag_presenter = TagPresenter.new(@tag, url_helper)
-      SingleResultPresenter.new(tag_presenter).present.to_json
+      TagPresenter.new(@tag, url_helper).present.to_json
     else
       custom_404
     end
@@ -295,7 +294,7 @@ class GovUkContentApi < Sinatra::Application
       modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
-        redirect with_tag_url(possible_tags, modifier_params)
+        redirect url_helper.with_tag_url(possible_tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
         redirect url_helper.with_type_url(params[:tag], modifier_params)
@@ -304,13 +303,12 @@ class GovUkContentApi < Sinatra::Application
       end
     end
     
-    if params[:type].blank?    
+    if params[:type].blank?
       requested_tags = known_tag_types.each_with_object([]) do |tag_type, req|
         unless params[tag_type.singular].blank?
           req << Tag.by_tag_id(params[tag_type.singular], tag_type.singular)
         end
       end
-
       # If any of the tags weren't found, that's enough to 404
       custom_404 if requested_tags.any? &:nil?
 
@@ -335,7 +333,6 @@ class GovUkContentApi < Sinatra::Application
       type = params[:type].singularize
       @description = "All content with the #{type} type"
       artefacts = Artefact.where(:kind => type, :tag_ids => @role)
-      
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)
       end
@@ -346,12 +343,20 @@ class GovUkContentApi < Sinatra::Application
     
     results = map_artefacts_and_add_editions(artefacts)
     @result_set = FakePaginatedResultSet.new(results)
+    options = {
+      govspeak_formatter: govspeak_formatter,
+      description: @description
+    }
+
+    if params[:whole_body]
+      options["whole_body"] = params[:whole_body]
+    end
 
     presenter = ResultSetPresenter.new(
       @result_set,
       url_helper,
       TaggedArtefactPresenter,
-      description: @description
+      options
     )
 
     presenter.present.to_json
@@ -416,11 +421,7 @@ class GovUkContentApi < Sinatra::Application
         section_module
       end
       
-      presenter = SingleResultPresenter.new(
-        SectionPresenter.new(@section, url_helper)
-      )
-
-      presenter.present.to_json
+      SectionPresenter.new(@section, url_helper).present.to_json
     end
   end
   
@@ -511,11 +512,7 @@ class GovUkContentApi < Sinatra::Application
       attach_publisher_edition(@artefact, params[:edition])
     end
 
-    presenter = SingleResultPresenter.new(
-      ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter)
-    )
-
-    presenter.present.to_json
+    ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter).present.to_json
   end
 
   def map_editions_with_artefacts(editions)
@@ -534,7 +531,6 @@ class GovUkContentApi < Sinatra::Application
     statsd.time("#{@statsd_scope}.map_results") do
       # Preload to avoid hundreds of individual queries
       editions_by_slug = published_editions_for_artefacts(artefacts)
-
       results = artefacts.map do |artefact|
         if artefact.owning_app == 'publisher'
           a = artefact_with_edition(artefact, editions_by_slug)
@@ -557,7 +553,6 @@ class GovUkContentApi < Sinatra::Application
   def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
     statsd.time("#{@statsd_scope}.#{tag_id}") do    
       artefacts = Artefact.live.where(filter).all(tag_ids: [tag_id, @role])
-      
       if sort == "date"
         artefacts = artefacts.order_by(:created_at.desc)
       else

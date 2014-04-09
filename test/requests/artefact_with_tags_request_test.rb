@@ -147,7 +147,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         details = parsed_response["results"].first
         assert_equal artefact.name, details["title"]
         assert details["tag_ids"].include?('farmers')
-        assert_equal artefact.description, details["details"]["description"]
+        assert_equal "Artefact description", details["details"]["description"]
         assert_equal "A really long description", details["details"]["excerpt"]
       end
 
@@ -354,7 +354,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     parsed_response = JSON.parse(last_response.body)
 
     assert_equal 1, parsed_response["results"].count
-
     assert_equal "Thing 1", parsed_response["results"][0]["title"]
     assert_equal 'Barry Scott', parsed_response["results"][0]["details"]["author"]["name"]
     assert_equal 'barry-scott', parsed_response["results"][0]["details"]["author"]["slug"]
@@ -478,17 +477,15 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
        parsed_response = JSON.parse(last_response.body)
        assert_equal 200, last_response.status
-     
        assert_equal Govspeak::Document.new(@content, auto_ids: false).to_html, parsed_response["results"][0]["details"]["body"] 
     end
     
     it "should not show when whole_body is not set to true" do
-       get "/with_tag.json?article=news"
+      get "/with_tag.json?article=news"
 
-       parsed_response = JSON.parse(last_response.body)
-       assert_equal 200, last_response.status
-       
-       assert_nil parsed_response["results"][0]["details"]["body"] 
+      parsed_response = JSON.parse(last_response.body)
+      assert_equal 200, last_response.status
+      assert_nil parsed_response["results"][0]["details"]["body"]
     end
     
   end

@@ -4,8 +4,6 @@ require "presenters/artefact_part_presenter"
 require "presenters/artefact_author_presenter"
 require "presenters/artefact_node_presenter"
 require "presenters/artefact_organization_presenter"
-
-
 # Full presenter for artefacts.
 #
 # This presenter handles all relevant fields for the various different types of
@@ -14,7 +12,7 @@ require "presenters/artefact_organization_presenter"
 class ArtefactPresenter
 
   BASE_FIELDS = %w(
-    need_id business_proposition description language need_extended_font
+    need_id business_proposition description excerpt language need_extended_font
   ).map(&:to_sym)
 
   OPTIONAL_FIELDS = %w(
@@ -99,8 +97,8 @@ class ArtefactPresenter
 
   def present
     presented = BasicArtefactPresenter.new(@artefact, @url_helper).present
-
-    presented["tags"] = present_with(@artefact.tags, TagPresenter)
+    scoped_tags = @artefact.tags.reject {|t| t.tag_type == 'role'}
+    presented["tags"] = present_with(scoped_tags, TagPresenter)
     presented["related"] = present_with(
       @artefact.live_related_artefacts,
       BasicArtefactPresenter
@@ -116,11 +114,19 @@ class ArtefactPresenter
       assets,
       organisation,
       course_title,
-      event_type
+      event_type,
     ].inject(&:merge)
 
+    # TODO:there is duplication in representing this data, I don't know why
+    # check in frontend which one is actually used so we can come back and clean this up
+    presented["details"]["organizations"] = organizations
+
+    presented["details"]["author"] = author
     presented["author"] = author
+
     presented["nodes"] = nodes
+    presented["details"]["nodes"] = nodes
+
     presented["organizations"] = organizations
 
     presented["related_external_links"] = @artefact.external_links.map do |l|
@@ -182,14 +188,14 @@ private
 
   def author
     return {} unless @artefact.author_edition
-    ArtefactAuthorPresenter.new(
+    presenter = ArtefactAuthorPresenter.new(
       @artefact.author_edition,
       @url_helper
     ).present
   end
 
   def nodes
-    return {} unless @artefact.node_editions
+    return {} if @artefact.node_editions.empty?
 
     presented_nodes = @artefact.node_editions.map do |node|
       ArtefactNodePresenter.new(
@@ -244,7 +250,7 @@ private
       }
     end
 
-    {"nodes" => presented_nodes}
+    {"smart_answer_nodes" => {"nodes" => presented_nodes}}
   end
 
   def expectations

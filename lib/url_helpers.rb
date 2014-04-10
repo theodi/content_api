@@ -104,18 +104,6 @@ module URLHelpers
     end
   end
 
-  def local_authority_url(authority)
-    api_url("/local_authorities/#{CGI.escape(authority.snac)}.json")
-  end
-
-  def country_url(country)
-    api_url("/" + CGI.escape("foreign-travel-advice/#{country.slug}.json") )
-  end
-
-  def country_web_url(country)
-    public_web_url "/foreign-travel-advice/#{country.slug}"
-  end
-
 private
 
   def plural_tag_type(tag_type)

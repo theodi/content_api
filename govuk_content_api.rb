@@ -23,7 +23,6 @@ require 'section_extensions'
 
 require 'config/kaminari'
 require 'config/rabl'
-require 'country'
 
 class GovUkContentApi < Sinatra::Application
   helpers URLHelpers, GdsApi::Helpers, ContentFormatHelpers, TimestampHelpers
@@ -54,44 +53,6 @@ class GovUkContentApi < Sinatra::Application
     @role = params[:role] || ENV['CONTENTAPI_DEFAULT_ROLE']
   end
 
-  get "/local_authorities.json" do
-    search_param = params[:snac] || params[:name]
-    @statsd_scope = "request.local_authorities"
-
-    if params[:name]
-      name = Regexp.escape(params[:name])
-      statsd.time(@statsd_scope) do
-        @local_authorities = LocalAuthority.where(name: /^#{name}/i).to_a
-      end
-    elsif params[:snac]
-      snac = Regexp.escape(params[:snac])
-      statsd.time(@statsd_scope) do
-        @local_authorities = LocalAuthority.where(snac: /^#{snac}/i).to_a
-      end
-    else
-      custom_404
-    end
-
-    @result_set = FakePaginatedResultSet.new(@local_authorities)
-
-    render :rabl, :local_authorities, format: "json"
-  end
-
-  get "/local_authorities/:snac.json" do
-    @statsd_scope = "request.local_authority"
-    if params[:snac]
-      statsd.time(@statsd_scope) do
-        @local_authority = LocalAuthority.find_by_snac(params[:snac])
-      end
-    end
-
-    if @local_authority
-      render :rabl, :local_authority, format: "json"
-    else
-      custom_404
-    end
-  end
-
   get "/search.json" do
     begin
       @statsd_scope = "request.search"
@@ -101,10 +62,14 @@ class GovUkContentApi < Sinatra::Application
         custom_404
       end
 
+      if params[:q].nil? || params[:q].strip.empty?
+        custom_error(422, "Non-empty querystring is required in the 'q' parameter")
+      end
+
       statsd.time(@statsd_scope) do
         search_uri = Plek.current.find('search') + "/#{search_index}"
         client = GdsApi::Rummager.new(search_uri)
-        @results = client.search(params[:q])
+        @results = client.search(params[:q])["results"]
       end
 
       render :rabl, :search, format: "json"
@@ -413,33 +378,6 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  get "/licences.json" do
-    licence_ids = (params[:ids] || '').split(',')
-    if licence_ids.any?
-      licences = LicenceEdition.published.in(:licence_identifier => licence_ids)
-      @results = map_editions_with_artefacts(licences)
-    else
-      @results = []
-    end
-
-    @result_set = FakePaginatedResultSet.new(@results)
-
-    render :rabl, :licences, format: "json"
-  end
-
-  get "/business_support_schemes.json" do
-    identifiers = params[:identifiers].to_s.split(",")
-    statsd.time("request.business_support_schemes") do
-      editions = BusinessSupportEdition.published.in(:business_support_identifier => identifiers)
-      @results = editions.map do |ed|
-        artefact = Artefact.find(ed.panopticon_id)
-        artefact.edition = ed
-        artefact
-      end
-    end
-    render :rabl, :business_support_schemes, format: "json"
-  end
-
   get "/artefacts.json" do
     expires DEFAULT_CACHE_TIME
 
@@ -499,10 +437,6 @@ class GovUkContentApi < Sinatra::Application
 
     if @artefact.owning_app == 'publisher'
       attach_publisher_edition(@artefact, params[:edition])
-    elsif @artefact.slug == 'foreign-travel-advice'
-      load_travel_advice_countries
-    elsif @artefact.kind == 'travel-advice'
-      attach_travel_advice_country_and_edition(@artefact, params[:edition])
     end
 
     render :rabl, :artefact, format: "json"
@@ -641,8 +575,6 @@ class GovUkContentApi < Sinatra::Application
       end
     end
 
-    attach_place_data(@artefact) if @artefact.edition.format == "Place" && params[:latitude] && params[:longitude]
-    attach_license_data(@artefact) if @artefact.edition.format == 'Licence'
     [PersonEdition].each { |type| attach_assets(@artefact, :image) if @artefact.edition.is_a?(type) }
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(OrganizationEdition)
     attach_assets(@artefact, :file) if @artefact.edition.is_a?(CreativeWorkEdition)
@@ -651,70 +583,7 @@ class GovUkContentApi < Sinatra::Application
     attach_assets(@artefact, :logo) if @artefact.edition.is_a?(NodeEdition)
     attach_assets(@artefact, :report) if @artefact.edition.is_a?(ReportEdition)
   end
-
-  def attach_place_data(artefact)
-    statsd.time("#{@statsd_scope}.place") do
-      artefact.places = imminence_api.places(artefact.edition.place_type, params[:latitude], params[:longitude])
-    end
-  rescue GdsApi::TimedOutException
-    artefact.places = [{ "error" => "timed_out" }]
-  rescue GdsApi::HTTPErrorResponse
-    artefact.places = [{ "error" => "http_error" }]
-  end
-
-  def attach_license_data(artefact)
-    statsd.time("#{@statsd_scope}.licence") do
-      licence_api_response = licence_application_api.details_for_licence(artefact.edition.licence_identifier, params[:snac])
-      artefact.licence = licence_api_response.nil? ? nil : licence_api_response.to_hash
-    end
-
-    if artefact.licence and artefact.edition.licence_identifier
-      statsd.time("#{@statsd_scope}.licence.local_service") do
-        licence_lgsl_code = @artefact.edition.licence_identifier.split('-').first
-        artefact.licence['local_service'] = LocalService.where(:lgsl_code => licence_lgsl_code).first
-      end
-    end
-  rescue GdsApi::TimedOutException
-    statsd.increment("#{@statsd_scope}.license_request_error.timed_out")
-    artefact.licence = { "error" => "timed_out" }
-  rescue GdsApi::HTTPErrorResponse
-    statsd.increment("#{@statsd_scope}.license_request_error.http")
-    artefact.licence = { "error" => "http_error" }
-  end
-
-  def attach_travel_advice_country_and_edition(artefact, version_number = nil)
-    if artefact.slug =~ %r{\Aforeign-travel-advice/(.*)\z}
-      artefact.country = Country.find_by_slug($1)
-    end
-    custom_404 unless artefact.country
-
-    statsd.time("#{@statsd_scope}.edition") do
-      artefact.edition = if version_number
-        artefact.country.editions.where(:version_number => version_number).first
-      else
-        artefact.country.editions.published.first
-      end
-    end
-    custom_404 unless artefact.edition
-    attach_assets(artefact, :image, :document)
-
-    travel_index = Artefact.find_by_slug("foreign-travel-advice")
-    unless travel_index.nil?
-      artefact.extra_related_artefacts = travel_index.live_related_artefacts
-    end
-  end
-
-  def load_travel_advice_countries
-    statsd.time("#{@statsd_scope}.travel_advice_countries") do
-      editions = Hash[TravelAdviceEdition.published.all.map {|e| [e.country_slug, e] }]
-      @countries = Country.all.map do |country|
-        country.tap {|c| c.edition = editions[c.slug] }
-      end.reject do |country|
-        country.edition.nil?
-      end
-    end
-  end
-
+  
   def attach_assets(artefact, *fields)
     artefact.assets ||= {}
     fields.each do |key|

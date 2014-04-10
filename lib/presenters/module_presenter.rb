@@ -23,11 +23,19 @@ private
       }
     elsif @module.type == "Image"
       {
-        "image" => @module.assets[:image].file_url,
+        "image" => image_file_url,
         "link" => @module.link
       }
     elsif @module.type == "Frame"
       {"frame" => @module.frame}
+    end
+  end
+
+  def image_file_url
+    begin
+      @module.assets[:image].file_url
+    rescue NoMethodError
+      nil
     end
   end
 end

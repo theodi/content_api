@@ -195,7 +195,7 @@ private
   end
 
   def nodes
-    return {} if @artefact.node_editions.empty?
+    return [] if @artefact.node_editions.empty?
 
     presented_nodes = @artefact.node_editions.map do |node|
       ArtefactNodePresenter.new(

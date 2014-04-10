@@ -545,6 +545,16 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 'city', parsed_response["nodes"][1]["level"]
     assert_equal true, parsed_response["nodes"][1]["beta"]
   end
+
+  it "should return an empty list when there are no nodes" do
+    artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live')
+  
+    get "/#{artefact.slug}.json"
+  
+    assert_equal 200, last_response.status
+    assert_equal [], JSON.parse(last_response.body)["nodes"]
+  end
+
   
   it "should include organization details" do
     FactoryGirl.create(:tag, tag_id: 'start-up', title: 'Start Up', tag_type: "organization")

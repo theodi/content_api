@@ -13,6 +13,7 @@ class MinimalArtefactPresenter
     {
       "id" => @url_helper.artefact_url(@artefact),
       "web_url" => @url_helper.artefact_web_url(@artefact),
+      "slug" => @artefact.slug,
       "title" => edition_or_artefact_title,
       "format" => edition_or_artefact_format,
     }

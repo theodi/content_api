@@ -54,7 +54,7 @@ module ResponseTestMethods
   end
 
   def assert_base_artefact_fields(parsed_response)
-    assert_has_expected_fields(parsed_response, ['title', 'id', 'tags'])
+    assert_has_expected_fields(parsed_response, ['slug', 'title', 'id', 'tags'])
   end
 
   def assert_has_expected_fields(parsed_response, fields)

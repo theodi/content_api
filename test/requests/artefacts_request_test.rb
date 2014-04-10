@@ -55,9 +55,10 @@ class ArtefactsRequestTest < GovUkContentApiTest
 
     result = parsed_response["results"].first
 
-    assert_equal %w(id web_url title format).sort, result.keys.sort
+    assert_equal %w(id web_url slug title format).sort, result.keys.sort
     assert_equal "Bravo", result["title"]
     assert_equal "guide", result["format"]
+    assert_equal "bravo", result["slug"]
     assert_equal "#{public_web_url}/bravo", result["web_url"]
     assert_equal "http://example.org/bravo.json", result["id"]
   end

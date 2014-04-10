@@ -115,6 +115,7 @@ class ArtefactPresenter
       organisation,
       course_title,
       event_type,
+      artist,
     ].inject(&:merge)
 
     # TODO:there is duplication in representing this data, I don't know why
@@ -281,4 +282,13 @@ private
     end
   end
 
+  def artist
+    return {} unless @artefact.edition.respond_to?(:artist)
+    {
+      "artist" => {
+        "name" => @artefact.artist_name,
+        "slug" => @artefact.edition.send(:artist)
+      }
+    }
+  end
 end

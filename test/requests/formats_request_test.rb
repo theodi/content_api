@@ -371,6 +371,29 @@ class FormatsRequestTest < GovUkContentApiTest
       assert_equal "<p>The Mona Lisa - what did you expect?</p>\n", fields["description"]
       assert_equal date_published.to_s, fields["date_published"].to_s       
     end
+
+    it "should contain artist information" do
+      artist = FactoryGirl.create(:my_artefact, slug: 'banksy', kind: 'person', owning_app: 'publisher', state: 'live', name: 'Mr Banksy', person: ['writers'])
+      person = FactoryGirl.create(:person_edition,
+        title: artist.name,
+        slug: artist.slug,
+        panopticon_id: artist.id,
+        state: 'published'
+      )
+      creative_work_edition = FactoryGirl.create(:creative_work_edition, title: 'Stencil Mona List',
+                                            panopticon_id: @artefact.id, slug: @artefact.slug,
+                                            description: "Banksy vs Mona", date_published: 1.month.ago.to_date,
+                                            artist: "banksy", state: 'published')
+
+      get '/mona-lisa.json'
+      parsed_response = JSON.parse(last_response.body)
+
+      assert last_response.ok?
+
+      fields = parsed_response["details"]
+      assert_equal fields["artist"]["name"], "Mr Banksy"
+      assert_equal fields["artist"]["slug"], "banksy"
+    end
   end
   
   describe "course editions" do

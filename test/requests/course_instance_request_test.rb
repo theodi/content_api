@@ -34,6 +34,7 @@ class CourseInstanceRequest < GovUkContentApiTest
 
     it "should give correct course instance" do
       get "/course-instance.json?date=#{@date_str}&course=this-is-a-course"
+
       assert last_response.ok?
       json = JSON.parse(last_response.body)
       assert_equal "this-is-a-course", json['details']['course']

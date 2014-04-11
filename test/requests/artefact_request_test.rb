@@ -47,7 +47,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal 2, parsed_response["related"].length
   
       related_artefacts.zip(parsed_response["related"]).each do |response_artefact, related_info|
@@ -85,7 +84,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal 1, parsed_response["related"].length
   
       assert_equal "http://example.org/#{live.slug}.json", parsed_response['related'][0]["id"]
@@ -99,7 +97,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal [], parsed_response["related"]
     end
   end
@@ -137,18 +134,16 @@ class ArtefactRequestTest < GovUkContentApiTest
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
     refute JSON.parse(last_response.body)["details"].has_key?('overview')
   end
   
-  it "should only list the role when there are no tags" do
+  it "should return an empty list when there are no tags" do
     artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live')
   
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
-    assert_equal [{"title"=>"ODI", "id"=>"http://example.org/tags/roles/odi.json", "web_url"=>nil, "details"=>{"description"=>nil, "short_description"=>nil, "type"=>"role"}, "content_with_tag"=>{"id"=>"http://example.org/with_tag.json?role=odi", "web_url"=>"https://www.gov.uk/browse/odi", "slug"=>"odi"}, "parent"=>nil}], JSON.parse(last_response.body)["tags"]
+    assert_equal [], JSON.parse(last_response.body)["tags"]
   end
   
   it "should list section information" do
@@ -166,7 +161,6 @@ class ArtefactRequestTest < GovUkContentApiTest
     get "/#{artefact.slug}.json"
   
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
     parsed_artefact = JSON.parse(last_response.body)
     
     parsed_artefact["tags"].reject! { |h| h["title"] == "ODI" }
@@ -248,77 +242,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
   describe "publisher artefacts" do
   
-    describe "with local transactions" do
-  
-      describe "with snac code provided" do
-  
-        before do
-          @service = FactoryGirl.create(:local_service)
-          @local_transaction_edition = FactoryGirl.create(:local_transaction_edition,
-            lgsl_code: @service.lgsl_code, state: 'published')
-  
-          @local_transaction_edition.artefact.update_attribute(:state, 'live')
-          @local_transaction_edition.artefact.update_attribute(:tag_ids, ['odi'])
-        end
-  
-        it "should return local service, local authority and local interaction details" do
-          authority = FactoryGirl.create(:local_authority)
-          interaction = FactoryGirl.create(:local_interaction, lgsl_code: @service.lgsl_code,
-            local_authority: authority)
-  
-          get "/#{@local_transaction_edition.artefact.slug}.json?snac=#{authority.snac}"
-          assert last_response.ok?
-          response = JSON.parse(last_response.body)
-  
-          assert_equal @service.lgsl_code, response['details']['local_service']['lgsl_code']
-          assert_equal @service.providing_tier, response['details']['local_service']['providing_tier']
-          assert_equal authority.name, response['details']['local_authority']['name']
-          assert_equal interaction.url, response['details']['local_interaction']['url']
-        end
-  
-        it "should return nil local_interaction when no interaction available" do
-          authority = FactoryGirl.create(:local_authority)
-  
-          get "/#{@local_transaction_edition.artefact.slug}.json?snac=#{authority.snac}"
-          assert last_response.ok?
-          response = JSON.parse(last_response.body)
-  
-          assert_equal @service.lgsl_code, response['details']['local_service']['lgsl_code']
-          assert_equal authority.name, response['details']['local_authority']['name']
-          assert_nil response['details']['local_interaction']
-        end
-  
-        it "should return nil local_interaction and local_authority when no authority available" do
-  
-          get "/#{@local_transaction_edition.artefact.slug}.json?snac=00PT"
-          assert last_response.ok?
-          response = JSON.parse(last_response.body)
-  
-          assert_equal @service.lgsl_code, response['details']['local_service']['lgsl_code']
-          assert_nil response['details']['local_authority']
-          assert_nil response['details']['local_interaction']
-        end
-  
-      end
-  
-      it "should return local_service details for local transactions without snac code" do
-        service = FactoryGirl.create(:local_service)
-        local_transaction_edition = FactoryGirl.create(:local_transaction_edition,
-          lgsl_code: service.lgsl_code, state: 'published')
-          
-        local_transaction_edition.artefact.update_attribute(:state, 'live')
-        local_transaction_edition.artefact.update_attribute(:tag_ids, ['odi'])
-          
-        get "/#{local_transaction_edition.artefact.slug}.json"
-        assert last_response.ok?
-        response = JSON.parse(last_response.body)
-  
-        assert_equal service.lgsl_code, response['details']['local_service']['lgsl_code']
-        assert_equal service.providing_tier, response['details']['local_service']['providing_tier']
-      end
-  
-    end
-  
     it "should return 404 if artefact is publication but never published" do
       edition = FactoryGirl.create(:edition)
   
@@ -369,7 +292,8 @@ class ArtefactRequestTest < GovUkContentApiTest
       it "should return 401 if using edition parameter, not authenticated" do
         get "/#{@artefact.slug}.json?edition=anything"
         assert_equal 401, last_response.status
-        assert_status_field "Edition parameter requires authentication", last_response
+        assert_status_field "unauthorised", last_response
+        assert_status_message "Edition parameter requires authentication", last_response
       end
   
       it "should return 403 if using edition parameter, authenticated but lacking permission" do
@@ -377,7 +301,8 @@ class ArtefactRequestTest < GovUkContentApiTest
         Warden::Proxy.any_instance.expects(:user).returns(ReadOnlyUser.new("permissions" => []))
         get "/#{@artefact.slug}.json?edition=2", {}, bearer_token_for_user_without_permission
         assert_equal 403, last_response.status
-        assert_status_field "You must be authorized to use the edition parameter", last_response
+        assert_status_field "forbidden", last_response
+        assert_status_message "You must be authorized to use the edition parameter", last_response
       end
   
       describe "user has permission" do
@@ -433,7 +358,6 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       assert_equal 200, last_response.status
   
-      assert_status_field "ok", last_response
       assert_equal "http://example.org/#{artefact.slug}.json", parsed_response["id"]
       assert_equal "#{public_web_url}/#{artefact.slug}", parsed_response["web_url"]
       assert_equal "<h1>Important information</h1>\n", parsed_response["details"]["body"]
@@ -441,27 +365,6 @@ class ArtefactRequestTest < GovUkContentApiTest
       assert_equal edition.updated_at.iso8601, parsed_response["updated_at"]
       # Temporarily included for legacy GA support. Will be replaced with "proposition" Tags
       assert_equal true, parsed_response["details"]["business_proposition"]
-    end
-  
-    it "should set the format from the edition, not the artefact in case the Artefact is out of date" do
-      artefact = FactoryGirl.create(:my_artefact, kind: "answer", state: 'live')
-      FactoryGirl.create(:local_transaction_edition, panopticon_id: artefact.id,
-            lgsl_code: FactoryGirl.create(:local_service).lgsl_code, state: 'published')
-  
-      get "/#{artefact.slug}.json"
-      parsed_response = JSON.parse(last_response.body)
-      assert_equal "local_transaction", parsed_response["format"]
-    end
-  
-    it "should set the title from the edition, not the artefact in case the Artefact is out of date" do
-      artefact = FactoryGirl.create(:my_artefact, kind: "answer",
-                                    state: 'live', name: "artefact title")
-      FactoryGirl.create(:local_transaction_edition, title: "edition title", panopticon_id: artefact.id,
-        lgsl_code: FactoryGirl.create(:local_service).lgsl_code,
-        state: 'published')
-      get "/#{artefact.slug}.json"
-      parsed_response = JSON.parse(last_response.body)
-      assert_equal "edition title", parsed_response["title"]
     end
   
     describe "processing content" do
@@ -499,6 +402,7 @@ class ArtefactRequestTest < GovUkContentApiTest
   
       describe "interpolating fact values" do
         it "should interploate fact values from the fact cave into the bodies" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_has_a_fact('vat-rate', '20')
   
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
@@ -517,6 +421,7 @@ class ArtefactRequestTest < GovUkContentApiTest
         end
   
         it "should still interpolate fact values when govspeak requested" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_has_a_fact('vat-rate', '20')
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
           FactoryGirl.create(:guide_edition,
@@ -534,6 +439,7 @@ class ArtefactRequestTest < GovUkContentApiTest
         end
   
         it "should use a blank value if the fact cave 404's for a fact" do
+          skip("fact cave is a coupled api that is not used and a pain")
           fact_cave_does_not_have_a_fact('vat-rate')
   
           artefact = FactoryGirl.create(:my_artefact, slug: "vat", state: 'live')
@@ -594,7 +500,6 @@ class ArtefactRequestTest < GovUkContentApiTest
       state: 'published')
   
     get "/#{artefact.slug}.json"
-  
     parsed_response = JSON.parse(last_response.body)
     assert_equal 200, last_response.status
     assert_equal 'Barry Scott', parsed_response["author"]["name"]
@@ -628,7 +533,7 @@ class ArtefactRequestTest < GovUkContentApiTest
       state: 'published')
   
     get "/#{artefact.slug}.json"
-  
+
     parsed_response = JSON.parse(last_response.body)
     assert_equal 200, last_response.status
     assert_equal 'Westward Ho!', parsed_response["nodes"][0]["name"]
@@ -640,6 +545,16 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 'city', parsed_response["nodes"][1]["level"]
     assert_equal true, parsed_response["nodes"][1]["beta"]
   end
+
+  it "should return an empty list when there are no nodes" do
+    artefact = FactoryGirl.create(:my_non_publisher_artefact, state: 'live')
+  
+    get "/#{artefact.slug}.json"
+  
+    assert_equal 200, last_response.status
+    assert_equal [], JSON.parse(last_response.body)["nodes"]
+  end
+
   
   it "should include organization details" do
     FactoryGirl.create(:tag, tag_id: 'start-up', title: 'Start Up', tag_type: "organization")

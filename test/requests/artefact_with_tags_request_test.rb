@@ -142,14 +142,13 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers"
 
         assert last_response.ok?
-        assert_status_field "ok", last_response
         parsed_response = JSON.parse(last_response.body)
         assert_equal 1, parsed_response["results"].count
 
         details = parsed_response["results"].first
         assert_equal artefact.name, details["title"]
         assert details["tag_ids"].include?('farmers')
-        assert_equal artefact.description, details["details"]["description"]
+        assert_equal "Artefact description", details["details"]["description"]
         assert_equal "A really long description", details["details"]["excerpt"]
       end
 
@@ -158,18 +157,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         parsed_response = JSON.parse(last_response.body)
 
         assert last_response.ok?
-        assert_status_field "ok", last_response
         assert_equal 0, parsed_response["total"]
         assert_equal [], parsed_response["results"]
-      end
-
-      it "should not be broken by the foreign-travel-advice special handling" do
-        FactoryGirl.create(:my_artefact, slug: 'foreign-travel-advice', owning_app: "travel-advice-publisher", keywords: ['farmers'], state: 'live')
-
-        get "/with_tag.json?keyword=farmers"
-
-        assert last_response.ok?
-        assert_equal 1, JSON.parse(last_response.body)["results"].count
       end
 
       it "should exclude artefacts which aren't live" do
@@ -202,7 +191,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&node=westward-ho!"
 
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -218,7 +206,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&organization_name=mom-corp"
 
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -234,7 +221,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&author=barry-scott"
 
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -253,7 +239,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         get "/with_tag.json?keyword=farmers&role=foo"
 
         assert_equal 200, last_response.status
-        assert_status_field "ok", last_response
 
         parsed_response = JSON.parse(last_response.body)
 
@@ -335,7 +320,6 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       get "/with_tag.json?type=jobs&role=foo"
 
       assert_equal 200, last_response.status
-      assert_status_field "ok", last_response
 
       parsed_response = JSON.parse(last_response.body)
 
@@ -360,12 +344,10 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
     get "/with_tag.json?keyword=farmers&author=barry-scott"
 
     assert_equal 200, last_response.status
-    assert_status_field "ok", last_response
 
     parsed_response = JSON.parse(last_response.body)
 
     assert_equal 1, parsed_response["results"].count
-
     assert_equal "Thing 1", parsed_response["results"][0]["title"]
     assert_equal 'Barry Scott', parsed_response["results"][0]["details"]["author"]["name"]
     assert_equal 'barry-scott', parsed_response["results"][0]["details"]["author"]["slug"]
@@ -489,69 +471,15 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
        parsed_response = JSON.parse(last_response.body)
        assert_equal 200, last_response.status
-
        assert_equal Govspeak::Document.new(@content, auto_ids: false).to_html, parsed_response["results"][0]["details"]["body"]
     end
 
     it "should not show when whole_body is not set to true" do
-       get "/with_tag.json?article=news"
-
-       parsed_response = JSON.parse(last_response.body)
-       assert_equal 200, last_response.status
-
-       assert_nil parsed_response["results"][0]["details"]["body"]
-    end
-
-  end
-
-  describe "extra fields" do
-
-    it "should show location if present" do
-      article = FactoryGirl.create(:my_artefact, state: 'live', slug: 'here-is-a-course-instance', name: "Here is a course instance", kind: "course_instance", roles: ['odi'])
-
-      FactoryGirl.create(:course_instance_edition,
-        title: article.name,
-        slug: article.slug,
-        panopticon_id: article.id,
-        date: 5.days.from_now.to_time.utc,
-        location: "Over the hills and far away",
-        state: 'published')
-
-      get "/with_tag.json?type=course_instance"
-      parsed_response = JSON.parse(last_response.body)
-      assert_equal 200, last_response.status
-
-      assert_equal "Over the hills and far away", parsed_response["results"][0]["details"]["location"]
-    end
-
-  end
-
-  describe "module image" do
-
-    it "should show the module image if present" do
-      FactoryGirl.create(:tag, tag_id: 'news', title: 'News', tag_type: "article")
-      article = FactoryGirl.create(:my_artefact, state: 'live', slug: 'here-is-some-news', name: "Here is some news", kind: "article", article: ['news'], module_image_id: "512c9019686c82191d000001")
-
-      asset_manager_has_an_asset("512c9019686c82191d000001", {
-        "id" => "http://asset-manager.#{ENV["GOVUK_APP_DOMAIN"]}/assets/512c9019686c82191d000001",
-        "name" => "captions-file.xml",
-        "content_type" => "application/xml",
-        "file_url" => "http://example.com/images/image.png",
-        "state" => "clean",
-      })
-
-      FactoryGirl.create(:article_edition,
-        title: article.name,
-        slug: article.slug,
-        panopticon_id: article.id,
-        content: "Foo Bar Baz",
-        state: 'published')
-
       get "/with_tag.json?article=news"
+
       parsed_response = JSON.parse(last_response.body)
       assert_equal 200, last_response.status
-
-      assert_equal "http://example.com/images/image.png", parsed_response["results"][0]["details"]["module_image"]
+      assert_nil parsed_response["results"][0]["details"]["body"]
     end
 
   end

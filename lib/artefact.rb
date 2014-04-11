@@ -8,7 +8,7 @@ module ContentApiArtefactExtensions
   extend ActiveSupport::Concern
   
   included do
-    attr_accessor :edition, :licence, :places, :assets, :country, :extra_related_artefacts
+    attr_accessor :edition, :assets, :extra_related_artefacts
     scope :live, where(state: 'live')
   end
 
@@ -78,6 +78,13 @@ module ContentApiArtefactExtensions
         []
       end
     end.compact
+  end
+
+  def scoped_tag_ids
+    scoped_tags = tags.reject {|t| t.tag_type == 'role'}
+    scoped_tags.map do |tag|
+      tag.tag_id
+    end
   end
 
 end

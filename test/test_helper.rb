@@ -15,6 +15,7 @@ $LOAD_PATH << File.expand_path('../../', __FILE__)
 $LOAD_PATH << File.expand_path('../../lib', __FILE__)
 
 require 'minitest/autorun'
+require 'turn/autorun'
 require 'rack/test'
 
 require 'database_cleaner'
@@ -48,9 +49,12 @@ module ResponseTestMethods
     assert_equal expected, JSON.parse(response.body)["_response_info"]["status"]
   end
 
+  def assert_status_message(expected, response)
+    assert_equal expected, JSON.parse(response.body)["_response_info"]["status_message"]
+  end
+
   def assert_base_artefact_fields(parsed_response)
-    assert_equal 'ok', parsed_response["_response_info"]["status"]
-    assert_has_expected_fields(parsed_response, ['title', 'id', 'tags'])
+    assert_has_expected_fields(parsed_response, ['slug', 'title', 'id', 'tags'])
   end
 
   def assert_has_expected_fields(parsed_response, fields)
@@ -120,4 +124,3 @@ class GovUkContentApiTest < MiniTest::Spec
   end
 end
 
-Country.data_path = File.expand_path("../fixtures/data/countries.yml", __FILE__)

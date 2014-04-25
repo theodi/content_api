@@ -34,7 +34,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return an array of results" do
-    GdsApi::Rummager.any_instance.stubs(:search).returns("results" => sample_results)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => sample_results)
     get "/search.json?q=government+info"
     parsed_response = JSON.parse(last_response.body)
 
@@ -46,7 +46,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return the standard response even if zero results" do
-    GdsApi::Rummager.any_instance.stubs(:search).returns("results" => [])
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => [])
 
     get "/search.json?q=empty+result+set"
     parsed_response = JSON.parse(last_response.body)
@@ -56,7 +56,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return a semantic error if missing query" do
-    GdsApi::Rummager.any_instance.expects(:search).never
+    GdsApi::Rummager.any_instance.expects(:unified_search).never
 
     get "/search.json?q=++"
     parsed_response = JSON.parse(last_response.body)
@@ -69,15 +69,8 @@ class SearchRequestTest < GovUkContentApiTest
     )
   end
 
-  it "should default to the mainstream index" do
-    search_stub = stub(search: { "results" => sample_results })
-    GdsApi::Rummager.expects(:new).with { |u| u.match /mainstream/ }.returns(search_stub)
-    get "/search.json?q=something"
-    assert last_response.ok?
-  end
-
   it "should include proper URLs for each response" do
-    GdsApi::Rummager.any_instance.stubs(:search).returns("results" => sample_results)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => sample_results)
     get "/search.json?q=government+info"
 
     assert last_response.ok?
@@ -92,7 +85,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return 503 if connection times out" do
-    GdsApi::Rummager.any_instance.stubs(:search).raises(GdsApi::TimedOutException)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).raises(GdsApi::TimedOutException)
     get "/search.json?q=government"
 
     assert_equal 503, last_response.status
@@ -113,7 +106,7 @@ class SearchRequestTest < GovUkContentApiTest
           "humanized_format" => "Recommended links"}
       ]
     }
-    GdsApi::Rummager.any_instance.stubs(:search).returns(rummager_response)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
     get "/search.json?q=ehic"
 
     parsed_response = JSON.parse(last_response.body)
@@ -135,7 +128,7 @@ class SearchRequestTest < GovUkContentApiTest
           "humanized_format" => "Recommended links"}
       ]
     }
-    GdsApi::Rummager.any_instance.stubs(:search).returns(rummager_response)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
     get "/search.json?q=ehic"
 
     parsed_response = JSON.parse(last_response.body)

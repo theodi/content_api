@@ -93,22 +93,19 @@ class GovUkContentApi < Sinatra::Application
 
   get "/search.json" do
     begin
-      @statsd_scope = "request.search"
-      search_index = params[:index] || 'mainstream'
+      search_index = 'dapaas'
 
-      unless ['mainstream', 'detailed', 'government'].include?(search_index)
-        custom_404
-      end
+      # unless ['dapaas', 'odi'].include?(search_index)
+      #   custom_404
+      # end
 
       if params[:q].nil? || params[:q].strip.empty?
         custom_error(422, "Non-empty querystring is required in the 'q' parameter")
       end
 
-      statsd.time(@statsd_scope) do
-        search_uri = Plek.current.find('search') + "/#{search_index}"
-        client = GdsApi::Rummager.new(search_uri)
-        @results = client.search(params[:q])["results"]
-      end
+      search_uri = Plek.current.find('search')
+      client = GdsApi::Rummager.new(search_uri)
+      @results = client.unified_search({q: params[:q]})["results"]
 
       presenter = ResultSetPresenter.new(
         FakePaginatedResultSet.new(@results),

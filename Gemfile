@@ -28,11 +28,8 @@ end
 gem 'mongo', '>= 1.7.1'
 
 gem 'gds-sso', '3.0.1'
-if ENV['API_DEV']
-  gem 'gds-api-adapters', :path => '../gds-api-adapters'
-else
-  gem 'gds-api-adapters', '7.2.0'
-end
+
+gem 'gds-api-adapters', :github => 'theodi/gds-api-adapters'
 
 if ENV['ODIDOWN_DEV']
   gem 'odidown', path: '../odidown'

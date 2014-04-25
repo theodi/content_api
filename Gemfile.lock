@@ -1,4 +1,16 @@
 GIT
+  remote: git://github.com/theodi/gds-api-adapters.git
+  revision: fe9a4730ea6bcc16cf3bbcf9e24d86628475ae8f
+  specs:
+    gds-api-adapters (7.25.0)
+      activesupport
+      link_header
+      lrucache (~> 0.1.1)
+      null_logger
+      plek
+      rest-client (~> 1.6.3)
+
+GIT
   remote: git://github.com/theodi/odi_content_models.git
   revision: 2b482d28b420879351d61a3c935fa3adbe50227f
   specs:
@@ -74,12 +86,6 @@ GEM
     foreman (0.63.0)
       dotenv (>= 0.7)
       thor (>= 0.13.6)
-    gds-api-adapters (7.2.0)
-      link_header
-      lrucache (~> 0.1.1)
-      null_logger
-      plek
-      rest-client (~> 1.6.3)
     gds-sso (3.0.1)
       rack-accept (~> 0.4.4)
       rails (>= 3.0.0)
@@ -251,7 +257,7 @@ DEPENDENCIES
   dotenv
   factory_girl (= 3.6.1)
   foreman
-  gds-api-adapters (= 7.2.0)
+  gds-api-adapters!
   gds-sso (= 3.0.1)
   govuk_content_models (= 6.0.6)
   kaminari (= 0.14.1)

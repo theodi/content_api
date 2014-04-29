@@ -361,6 +361,8 @@ class GovUkContentApi < Sinatra::Application
 
   # Get the newest artefact by tag or type
   get "/latest.json" do
+    expires DEFAULT_CACHE_TIME
+
     if params[:type]
       # Check the type exists
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
@@ -379,6 +381,8 @@ class GovUkContentApi < Sinatra::Application
 
   # Get the next upcoming artefact (such as an event or course_instance) by type
   get "/upcoming.json" do
+    expires DEFAULT_CACHE_TIME
+
     if params[:order_by] && params[:type]
       type = "#{params[:type].camelize}Edition"
 
@@ -395,6 +399,8 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/course-instance.json" do
+    expires DEFAULT_CACHE_TIME
+
     if params[:course] && params[:date]
       instance = CourseInstanceEdition.where(:course => params[:course], :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
 
@@ -407,6 +413,8 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/section.json" do
+    expires DEFAULT_CACHE_TIME
+
     if params[:id]
       @section = Section.where(:tag_id => params[:id]).first
       attach_non_artefact_asset(@section, :hero_image)
@@ -423,6 +431,8 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/related.json" do
+    expires DEFAULT_CACHE_TIME
+
     kv = params.first
     type = kv[0]
     item = kv[1]

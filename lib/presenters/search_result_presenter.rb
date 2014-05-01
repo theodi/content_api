@@ -11,7 +11,8 @@ class SearchResultPresenter
       "web_url" => search_result_web_url(@result),
       "title" => @result["title"],
       "details" => {
-        "description" => @result["description"]
+        "description" => @result["description"],
+        "created_at" => @result["artefact"].created_at
       }
     }
   end

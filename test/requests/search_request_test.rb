@@ -136,4 +136,25 @@ class SearchRequestTest < GovUkContentApiTest
     parsed_response = JSON.parse(last_response.body)
     assert_equal nil, parsed_response["results"].first['id']
   end
+
+  it "should include created at date" do
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data')
+    edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
+    rummager_response = {
+      "results" =>  [
+          'title' => "Treating content as data",
+          'format' => "article",
+          'link' => "/treating-content-as-data",
+          'index' => "dapaas",
+          'es_score' => "0.00087927346",
+          '_id' => "/treating-content-as-data"
+      ]
+    }
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
+    get "/search.json?q=treating"
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal artefact.created_at, parsed_response["results"].first['details']['created_at']
+  end
+
 end

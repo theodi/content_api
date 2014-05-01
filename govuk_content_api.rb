@@ -94,6 +94,7 @@ class GovUkContentApi < Sinatra::Application
   get "/search.json" do
     begin
       search_index = 'dapaas'
+      @role = search_index
 
       # unless ['dapaas', 'odi'].include?(search_index)
       #   custom_404

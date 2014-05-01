@@ -19,6 +19,8 @@ class SearchResultPresenter
 
   def add_artefact_details(result)
     if @result["artefact"]
+      result["details"]["tag_ids"] = @result["artefact"].tag_ids
+      result["details"]["format"] = @result["artefact"].kind
       result["details"]["created_at"] = @result["artefact"].created_at
     end
     result

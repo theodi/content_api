@@ -525,12 +525,14 @@ class GovUkContentApi < Sinatra::Application
 
   def add_artefact_to_results!(results)
     results.each do |r|
-      slug = r['_id'].split("/").last
-      @artefact = Artefact.find_by_slug_and_tag_ids(slug, @role)
-      if @artefact.owning_app == 'publisher'
-        attach_publisher_edition(@artefact, nil)
+      unless r['_id'].nil?
+        slug = r['_id'].split("/").last
+        @artefact = Artefact.find_by_slug_and_tag_ids(slug, @role)
+        if @artefact.owning_app == 'publisher'
+          attach_publisher_edition(@artefact, nil)
+        end
+        r['artefact'] = @artefact
       end
-      r['artefact'] = @artefact
     end
     results
   end

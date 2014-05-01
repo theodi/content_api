@@ -6,14 +6,22 @@ class SearchResultPresenter
   end
 
   def present
-    {
+    result = {
       "id" => search_result_url(@result),
       "web_url" => search_result_web_url(@result),
       "title" => @result["title"],
       "details" => {
-        "description" => @result["description"]
+        "description" => @result["description"],
       }
     }
+    add_artefact_details(result)
+  end
+
+  def add_artefact_details(result)
+    if @result["artefact"]
+      result["details"]["created_at"] = @result["artefact"].created_at
+    end
+    result
   end
 
 private

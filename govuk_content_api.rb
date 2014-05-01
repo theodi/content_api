@@ -106,6 +106,7 @@ class GovUkContentApi < Sinatra::Application
       search_uri = Plek.current.find('search')
       client = GdsApi::Rummager.new(search_uri)
       @results = client.unified_search({q: params[:q]})["results"]
+      add_artefact_to_results!(@results)
 
       presenter = ResultSetPresenter.new(
         FakePaginatedResultSet.new(@results),
@@ -520,6 +521,18 @@ class GovUkContentApi < Sinatra::Application
     end
 
     ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter).present.to_json
+  end
+
+  def add_artefact_to_results!(results)
+    results.each do |r|
+      slug = r['_id'].split("/").last
+      @artefact = Artefact.find_by_slug_and_tag_ids(slug, @role)
+      if @artefact.owning_app == 'publisher'
+        attach_publisher_edition(@artefact, nil)
+      end
+      r['artefact'] = @artefact
+    end
+    results
   end
 
   def map_editions_with_artefacts(editions)

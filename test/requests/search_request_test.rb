@@ -138,7 +138,8 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include created at date" do
-    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data')
+    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
     edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
     rummager_response = {
       "results" =>  [
@@ -155,6 +156,48 @@ class SearchRequestTest < GovUkContentApiTest
     parsed_response = JSON.parse(last_response.body)
 
     assert_equal artefact.created_at, parsed_response["results"].first['details']['created_at']
+  end
+
+  it "should include tag ids" do
+    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
+    rummager_response = {
+      "results" =>  [
+          'title' => "Treating content as data",
+          'format' => "article",
+          'link' => "/treating-content-as-data",
+          'index' => "dapaas",
+          'es_score' => "0.00087927346",
+          '_id' => "/treating-content-as-data"
+      ]
+    }
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
+    get "/search.json?q=treating"
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal artefact.tag_ids, parsed_response["results"].first['details']['tag_ids']
+  end
+
+  it "should include the artefact's format" do
+    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
+    rummager_response = {
+      "results" =>  [
+          'title' => "Treating content as data",
+          'format' => "article",
+          'link' => "/treating-content-as-data",
+          'index' => "dapaas",
+          'es_score' => "0.00087927346",
+          '_id' => "/treating-content-as-data"
+      ]
+    }
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
+    get "/search.json?q=treating"
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal artefact.kind, parsed_response["results"].first['details']['format']
   end
 
 end

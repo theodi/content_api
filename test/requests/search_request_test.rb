@@ -180,9 +180,18 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include the artefact's format" do
-    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
-    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    FactoryGirl.create(:tag, tag_id: "dapaas", tag_type: 'role', title: "dapaas")
+    FactoryGirl.create(:tag, tag_id: "blog", tag_type: 'article', title: "blog")
+
+    artefact = FactoryGirl.create(:my_artefact,
+                                  state: 'live',
+                                  slug: 'treating-content-as-data',
+                                  roles: ['dapaas'],
+                                  kind: 'article',
+                                  article: ['blog']
+                                )
     edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
+
     rummager_response = {
       "results" =>  [
           'title' => "Treating content as data",
@@ -193,11 +202,12 @@ class SearchRequestTest < GovUkContentApiTest
           '_id' => "/treating-content-as-data"
       ]
     }
+
     GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
     get "/search.json?q=treating"
     parsed_response = JSON.parse(last_response.body)
 
-    assert_equal artefact.kind, parsed_response["results"].first['details']['format']
+    assert_equal 'blog', parsed_response["results"].first['details']['format']
   end
 
   it "should include the artefact's slug" do

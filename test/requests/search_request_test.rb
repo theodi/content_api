@@ -200,4 +200,25 @@ class SearchRequestTest < GovUkContentApiTest
     assert_equal artefact.kind, parsed_response["results"].first['details']['format']
   end
 
+  it "should include the artefact's slug" do
+    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
+    rummager_response = {
+      "results" =>  [
+          'title' => "Treating content as data",
+          'format' => "article",
+          'link' => "/treating-content-as-data",
+          'index' => "dapaas",
+          'es_score' => "0.00087927346",
+          '_id' => "/treating-content-as-data"
+      ]
+    }
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
+    get "/search.json?q=treating"
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal artefact.slug, parsed_response["results"].first['details']['slug']
+  end
+
 end

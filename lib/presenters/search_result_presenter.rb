@@ -11,7 +11,7 @@ class SearchResultPresenter
       "web_url" => search_result_web_url(@result),
       "title" => @result["title"],
       "details" => {
-        "description" => @result["description"],
+        "description" => description,
       }
     }
     add_artefact_details(result)
@@ -53,6 +53,14 @@ private
       @result["artefact"].kind
     else
       t.first
+    end
+  end
+
+  def description
+    if @result["artefact"] && @result["description"].nil?
+      Govspeak::Document.new(@result["artefact"].edition.whole_body).to_text
+    else
+      @result["description"]
     end
   end
 end

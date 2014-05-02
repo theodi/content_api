@@ -57,7 +57,7 @@ private
   end
 
   def description
-    if @result["artefact"] && @result["description"].nil?
+    if @result["artefact"]
       Govspeak::Document.new(@result["artefact"].edition.whole_body).to_text
     else
       @result["description"]

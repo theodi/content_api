@@ -11,7 +11,7 @@ class SearchResultPresenter
       "web_url" => search_result_web_url(@result),
       "title" => @result["title"],
       "details" => {
-        "description" => @result["description"],
+        "description" => description,
       }
     }
     add_artefact_details(result)
@@ -19,8 +19,9 @@ class SearchResultPresenter
 
   def add_artefact_details(result)
     if @result["artefact"]
+      result["details"]["slug"] = @result["artefact"].slug
       result["details"]["tag_ids"] = @result["artefact"].tag_ids
-      result["details"]["format"] = @result["artefact"].kind
+      result["details"]["format"] = format
       result["details"]["created_at"] = @result["artefact"].created_at
     end
     result
@@ -40,6 +41,26 @@ private
       result['link']
     else
       @url_helper.public_web_url(result['link'])
+    end
+  end
+
+  def format
+    t = @result["artefact"].tag_ids.select do |t|
+      Tag.where(tag_id: t, tag_type: @result["artefact"].kind).count > 0
+    end
+
+    if t.count == 0
+      @result["artefact"].kind
+    else
+      t.first
+    end
+  end
+
+  def description
+    if @result["artefact"]
+      Govspeak::Document.new(@result["artefact"].edition.whole_body).to_text
+    else
+      @result["description"]
     end
   end
 end

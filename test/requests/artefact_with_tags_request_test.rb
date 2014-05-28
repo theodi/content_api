@@ -286,6 +286,38 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert_equal "All content with the 'crime,business' section", parsed_response["description"]
         assert_equal 2, parsed_response["results"].count
       end
+
+        it "should return paginated artefacts of that specific tag" do
+          FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')
+
+          35.times do |n|
+            FactoryGirl.create(:my_non_publisher_artefact, sections: ['crime'], state: 'live')
+          end
+
+          get "with_tag.json?section=crime&page=1"
+          response = JSON.parse(last_response.body)
+          assert last_response.ok?
+
+          assert_equal 30, response["results"].count
+          assert_equal 35, response["total"]
+          assert_equal 1, response["start_index"]
+          assert_equal 30, response["page_size"]
+          assert_equal 1, response["current_page"]
+          assert_equal 2, response["pages"]
+        end
+
+        it "should return a second page" do
+          FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')
+
+          35.times do |n|
+            FactoryGirl.create(:my_non_publisher_artefact, sections: ['crime'], state: 'live')
+          end
+
+          get "with_tag.json?section=crime&page=2"
+          response = JSON.parse(last_response.body)
+          assert last_response.ok?
+        end
+
     end
   end
 
@@ -300,6 +332,23 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       response = JSON.parse(last_response.body)
       assert last_response.ok?
       assert_equal 5, response["results"].count
+    end
+
+    it "should return paginated artefacts of that specific type" do
+      35.times do |n|
+        FactoryGirl.create(:my_non_publisher_artefact, kind: 'case_study', state: 'live')
+      end
+
+      get "with_tag.json?type=case_study&page=1"
+      response = JSON.parse(last_response.body)
+      assert last_response.ok?
+
+      assert_equal 30, response["results"].count
+      assert_equal 35, response["total"]
+      assert_equal 1, response["start_index"]
+      assert_equal 30, response["page_size"]
+      assert_equal 1, response["current_page"]
+      assert_equal 2, response["pages"]
     end
 
     it "should return successfully if a plural type is requested" do

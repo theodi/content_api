@@ -347,8 +347,22 @@ class GovUkContentApi < Sinatra::Application
       custom_404 if artefacts.count == 0
     end
 
-    results = map_artefacts_and_add_editions(artefacts)
-    @result_set = FakePaginatedResultSet.new(results)
+    if params[:page]
+      results = map_artefacts_and_add_editions(artefacts)
+
+      begin
+        paginated_artefacts = paginated(results, params[:page])
+      rescue InvalidPage
+        statsd.increment('request.tags.bad_page')
+        custom_404
+      end
+
+      @result_set = PaginatedResultSet.new(paginated_artefacts)
+    else
+      results = map_artefacts_and_add_editions(artefacts)
+      @result_set = FakePaginatedResultSet.new(results)
+    end
+
     options = {
       govspeak_formatter: govspeak_formatter,
       description: @description
@@ -623,7 +637,7 @@ class GovUkContentApi < Sinatra::Application
           first_ids = []
         end
 
-        return artefacts.to_a.sort_by { |artefact|
+        return artefacts.sort_by { |artefact|
           [
             first_ids.find_index(artefact._id) || first_ids.length,
             artefact.name

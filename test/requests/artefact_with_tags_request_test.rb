@@ -118,13 +118,16 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       )
     end
 
-    it "should not allow filtering by multiple tags" do
+    it "should allow filtering by multiple tags" do
       farmers = FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')
       business = FactoryGirl.create(:tag, tag_id: 'business', title: 'Business', tag_type: 'section')
 
       get "/with_tag.json?tag=crime,business"
-      assert last_response.not_found?
-      assert_status_field "not found", last_response
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=crime%2Cbusiness",
+        last_response.location
+      )
     end
   end
 
@@ -268,13 +271,20 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert_status_field "not found", last_response
       end
 
-      it "should not allow filtering by multiple typed tags" do
+      it "should allow filtering by multiple typed tags" do
         farmers = FactoryGirl.create(:tag, tag_id: 'crime', title: 'Crime', tag_type: 'section')
         business = FactoryGirl.create(:tag, tag_id: 'business', title: 'Business', tag_type: 'section')
 
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', sections: ['crime'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', sections: ['business'], state: 'live')
+
         get "/with_tag.json?section=crime,business"
-        assert last_response.not_found?
-        assert_status_field "not found", last_response
+
+        assert_equal 200, last_response.status
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal "All content with the 'crime,business' section", parsed_response["description"]
+        assert_equal 2, parsed_response["results"].count
       end
     end
   end

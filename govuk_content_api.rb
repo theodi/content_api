@@ -284,16 +284,20 @@ class GovUkContentApi < Sinatra::Application
       # Old-style tag URLs without types specified
 
       # If comma-separated tags given, we've stopped supporting that for now
-      if params[:tag].include? ","
-        custom_404
-      end
+      # if params[:tag].include? ","
+      #   custom_404
+      # end
 
-      possible_tags = Tag.where(tag_id: params[:tag]).to_a
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
+
+      tags = params[:tag].split(",").map { |tag| Tag.where(tag_id: tag).to_a }.flatten
+
+      possible_tags = tags.uniq { |t| t.tag_type }
+
       modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
-        redirect url_helper.with_tag_url(possible_tags, modifier_params)
+        redirect url_helper.with_tag_url(tags, modifier_params)
       # If the tag is a content type, redirect to the type's URL
       elsif content_types.include? params[:tag].singularize
         redirect url_helper.with_type_url(params[:tag], modifier_params)
@@ -305,25 +309,28 @@ class GovUkContentApi < Sinatra::Application
     if params[:type].blank?
       requested_tags = known_tag_types.each_with_object([]) do |tag_type, req|
         unless params[tag_type.singular].blank?
-          req << Tag.by_tag_id(params[tag_type.singular], tag_type.singular)
+          params[tag_type.singular].split(",").each do |tag|
+            req << Tag.by_tag_id(tag, tag_type.singular)
+          end
         end
       end
+
       # If any of the tags weren't found, that's enough to 404
       custom_404 if requested_tags.any? &:nil?
-
-      # For now, we only support retrieving by a single tag
-      custom_404 unless requested_tags.size == 1
 
       if params[:sort]
         custom_404 unless ["curated", "alphabetical", "date"].include?(params[:sort])
       end
 
-      tag_id = requested_tags.first.tag_id
-      tag_type = requested_tags.first.tag_type
-      @description = "All content with the '#{tag_id}' #{tag_type}"
+      custom_404 if requested_tags.count == 0
 
-      artefacts = sorted_artefacts_for_tag_id(
-        tag_id,
+      tag_ids = requested_tags.map { |t| t.tag_id }.join(",")
+      tag_type = requested_tags.first.tag_type
+
+      @description = "All content with the '#{tag_ids}' #{tag_type}"
+
+      artefacts = sorted_artefacts_for_tag_ids(
+        tag_ids,
         params[:sort],
         params.slice('author', 'node', 'organization_name')
       )
@@ -574,9 +581,13 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
-  def sorted_artefacts_for_tag_id(tag_id, sort, filter = {})
-    statsd.time("#{@statsd_scope}.#{tag_id}") do
-      artefacts = Artefact.live.where(filter).all(tag_ids: [tag_id, @role])
+  def sorted_artefacts_for_tag_ids(tag_ids, sort, filter = {})
+    statsd.time("#{@statsd_scope}.#{tag_ids}") do
+      tag_ids = tag_ids.split(",")
+
+      artefacts = Artefact.live.where(filter)
+                                    .in(tag_ids: tag_ids)
+                                    .all(tag_ids: [@role])
 
       if sort == "date"
         artefacts = artefacts.order_by(:created_at.desc)
@@ -605,7 +616,7 @@ class GovUkContentApi < Sinatra::Application
         # list is empty
 
         if sort == "curated"
-          curated_list = CuratedList.where(tag_ids: [tag_id]).first
+          curated_list = CuratedList.where(tag_ids: tag_ids).first
           first_ids = curated_list ? curated_list.artefact_ids : []
         else
           # Just fall back on alphabetical order

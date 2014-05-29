@@ -1,6 +1,5 @@
 require "kaminari"
 require "kaminari/models/mongoid_extension"
-require "kaminari/models/array_extension"
 require "govuk_content_models/require_all"
 
 # The default number of items on a single page is based on the maximum number

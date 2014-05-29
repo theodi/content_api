@@ -61,17 +61,14 @@ describe URLHelper do
       )
     end
 
-    it "supports multiple tags of the same type" do
+    it "doesn't support multiple tags of the same type" do
       # Well, not yet, at least
       tags = [
         DummyTag.new("crime", "section"),
         DummyTag.new("batman", "section"),
       ]
       helper = URLHelper.new(MockApp, "http://example.com", nil)
-      assert_equal(
-        "/with_tag.json?section=crime%2Cbatman",
-        helper.with_tag_url(tags)
-      )
+      assert_raises ArgumentError do helper.with_tag_url(tags) end
     end
 
     it "accepts parameters" do

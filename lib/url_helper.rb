@@ -42,10 +42,13 @@ class URLHelper
   def with_tag_url(tag_or_tags, params = {})
     tags = tag_or_tags.is_a?(Array) ? tag_or_tags : [tag_or_tags]
     tags_by_type = tags.group_by &:tag_type
+    if tags_by_type.values.any? { |t| t.count > 1 }
+      raise ArgumentError, "Cannot search by multiple tags of one type"
+    end
 
     # e.g. {"section" => "crime", "keyword" => "robbery"}
     tag_query = Hash[tags_by_type.map { |tag_type, tags_of_type|
-      [tag_type, tags_of_type.map { |t| t.tag_id }.join(",")]
+      [tag_type, tags_of_type.first.tag_id]
     }]
 
     tag_query = Hash[tag_query.sort].merge(Hash[params.sort])

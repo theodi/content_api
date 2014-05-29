@@ -298,6 +298,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
           response = JSON.parse(last_response.body)
           assert last_response.ok?
 
+          assert_equal "<http://example.org/with_tag.json?section=crime&page=2>; rel=\"next\"", last_response.headers["Link"]
           assert_equal 30, response["results"].count
           assert_equal 35, response["total"]
           assert_equal 1, response["start_index"]
@@ -316,6 +317,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
           get "with_tag.json?section=crime&page=2"
           response = JSON.parse(last_response.body)
           assert last_response.ok?
+
+          assert_equal "<http://example.org/with_tag.json?section=crime&page=1>; rel=\"previous\"", last_response.headers["Link"]
         end
 
     end

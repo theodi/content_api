@@ -27,11 +27,15 @@ module Pagination
 
     raise InvalidPage, "Page number #{page_number} < 1" if page_number < 1
 
-    paginated_scope = scope.page(page_number)
+    if scope.class == Array
+      paginated_scope = Kaminari.paginate_array(scope).page(page_number)
+    else
+      paginated_scope = scope.page(page_number)
+    end
 
     # Raise an exception if we've shot off the end of the results
     # (unless, of course, we're on the first page and there are no results)
-    if page_number > 1 && paginated_scope.offset >= paginated_scope.count
+    if page_number > 1 && paginated_scope.offset_value >= scope.count
       raise InvalidPage, "Page number #{page_number} too high"
     end
 
@@ -69,7 +73,11 @@ module Pagination
     end
 
     def start_index
-      @scope.offset + 1
+      if @scope.class == Kaminari::PaginatableArray
+        @scope.offset_value + 1
+      else
+        @scope.offset + 1
+      end
     end
 
     def links

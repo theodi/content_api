@@ -360,7 +360,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         FactoryGirl.create(:my_non_publisher_artefact, kind: 'case_study', state: 'live')
       end
 
-      get "with_tag.json?type=case_study&page=1"
+      get "with_tag.json?type=case_study&page=2"
       assert last_response.ok?
 
       assert_equal "<http://example.org/with_tag.json?type=case_study&page=1>; rel=\"previous\"", last_response.headers["Link"]

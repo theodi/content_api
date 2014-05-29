@@ -359,7 +359,11 @@ class GovUkContentApi < Sinatra::Application
 
       @result_set = PaginatedResultSet.new(paginated_artefacts)
       @result_set.populate_page_links { |page_number|
-        url_helper.with_tag_url(requested_tags, page: page_number)
+        if requested_tags.nil?
+          url_helper.with_type_url(type, page: page_number)
+        else
+          url_helper.with_tag_url(requested_tags, page: page_number)
+        end
       }
 
       headers "Link" => LinkHeader.new(@result_set.links).to_s

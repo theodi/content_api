@@ -346,12 +346,24 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       response = JSON.parse(last_response.body)
       assert last_response.ok?
 
+      assert_equal "<http://example.org/with_tag.json?type=case_study&page=2>; rel=\"next\"", last_response.headers["Link"]
       assert_equal 30, response["results"].count
       assert_equal 35, response["total"]
       assert_equal 1, response["start_index"]
       assert_equal 30, response["page_size"]
       assert_equal 1, response["current_page"]
       assert_equal 2, response["pages"]
+    end
+
+    it "should return a second page of paginated artefacts of that specific type" do
+      35.times do |n|
+        FactoryGirl.create(:my_non_publisher_artefact, kind: 'case_study', state: 'live')
+      end
+
+      get "with_tag.json?type=case_study&page=1"
+      assert last_response.ok?
+
+      assert_equal "<http://example.org/with_tag.json?type=case_study&page=1>; rel=\"previous\"", last_response.headers["Link"]
     end
 
     it "should return successfully if a plural type is requested" do

@@ -62,6 +62,7 @@ class ArtefactPresenter
     salary
     closing_date
     joined_at
+    graduated
     tagline
     involvement
     want_to_meet
@@ -258,7 +259,7 @@ private
     return {} unless @artefact.edition.respond_to?(:expectations)
 
     {
-      "expectations" => @artefact.edition.expectations.map(&:text) 
+      "expectations" => @artefact.edition.expectations.map(&:text)
     }
   end
 

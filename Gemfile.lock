@@ -12,10 +12,10 @@ GIT
 
 GIT
   remote: git://github.com/theodi/odi_content_models.git
-  revision: 2b482d28b420879351d61a3c935fa3adbe50227f
+  revision: eb77465417c09ca1a2fa1b918a78f713aef99fc8
   specs:
     odi_content_models (0.0.1)
-      govuk_content_models (= 6.0.6)
+      govuk_content_models (= 6.1.0)
       mongoid_spacial
 
 GIT

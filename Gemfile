@@ -9,13 +9,13 @@ gem 'foreman'
 gem 'rake', '0.9.2.2'
 gem 'sinatra', '1.3.2'
 gem 'statsd-ruby', '1.0.0'
-gem 'omniauth-gds', '0.0.3' #rubygems doesn't seem to pull this in transitively
+gem 'omniauth-gds', '3.0.0' #rubygems doesn't seem to pull this in transitively
 
 gem 'dotenv'
 
 gem 'sinatra-cross_origin'
 
-gem 'govuk_content_models', '6.0.6'
+gem 'govuk_content_models', '6.1.0'
 
 if ENV['CONTENT_MODELS_DEV']
   gem "odi_content_models", path: '../odi_content_models'
@@ -27,7 +27,7 @@ end
 # (as seen in 680d3e9ab7)
 gem 'mongo', '>= 1.7.1'
 
-gem 'gds-sso', '3.0.1'
+gem 'gds-sso', '9.2.3'
 
 gem 'gds-api-adapters', :github => 'theodi/gds-api-adapters'
 

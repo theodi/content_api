@@ -202,6 +202,21 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert_equal "Thing 1", parsed_response["results"][0]["title"]
       end
 
+      it "should only return those artefacts without a node if no node is specified" do
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', node: [''])
+
+        get "/with_tag.json?keyword=farmers&node="
+
+        assert_equal 200, last_response.status
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 2", parsed_response["results"][0]["title"]
+      end
+
       it "should only return those artefacts with a particular organization_name" do
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', organization_name: ["mom-corp", "planet-express"])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', organization_name: ["wayne-enterprises"])

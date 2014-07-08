@@ -168,6 +168,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         draft    = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'draft')
         live     = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'live')
         archived = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'archived')
+        awaiting = FactoryGirl.create(:my_non_publisher_artefact, keywords: ['farmers'], state: 'live', live_at: DateTime.now + 4.day)
 
         get "/with_tag.json?keyword=farmers"
 

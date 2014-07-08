@@ -162,9 +162,6 @@ GEM
       coderay (~> 1.0.5)
       method_source (~> 0.8)
       slop (~> 3.4)
-    pry-remote (0.1.8)
-      pry (~> 0.9)
-      slop (~> 3.0)
     rack (1.4.5)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -272,7 +269,6 @@ DEPENDENCIES
   odidown!
   plek (= 1.4.0)
   pry
-  pry-remote
   rack-cache (= 1.2)
   rake (= 0.9.2.2)
   redis-rack-cache (= 1.2.1)

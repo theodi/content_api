@@ -6,10 +6,10 @@ require "govspeak"
 
 module ContentApiArtefactExtensions
   extend ActiveSupport::Concern
-  
+
   included do
     attr_accessor :edition, :assets, :extra_related_artefacts
-    scope :live, where(state: 'live')
+    scope :live, where(state: 'live', 'live_at' => {:$lte => DateTime.now.to_time })
   end
 
   def live_related_artefacts
@@ -17,7 +17,7 @@ module ContentApiArtefactExtensions
     artefacts += @extra_related_artefacts.to_a if @extra_related_artefacts
     artefacts.uniq(&:slug)
   end
-  
+
   def whole_body
     begin
       Govspeak::Document.new(edition.whole_body, auto_ids: false).to_html
@@ -25,11 +25,11 @@ module ContentApiArtefactExtensions
       nil
     end
   end
-  
+
   def excerpt
     begin
       text = Nokogiri::HTML(whole_body).inner_text
-      text.lines.first.chomp 
+      text.lines.first.chomp
     rescue
       nil
     end
@@ -91,7 +91,7 @@ end
 
 class Artefact
   include ContentApiArtefactExtensions
-  
+
   class << self
     def find_by_slug_and_tag_ids(slug, tag_id)
       where(:slug => slug, :tag_ids => tag_id).first

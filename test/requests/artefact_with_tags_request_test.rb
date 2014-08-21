@@ -380,7 +380,7 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
     it "should return zero-length result list if no artefacts for that type" do
       get "with_tag.json?type=article"
-
+      response = JSON.parse(last_response.body)
       assert last_response.ok?
       assert_equal 0, response["results"].count
     end

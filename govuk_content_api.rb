@@ -93,24 +93,31 @@ class GovUkContentApi < Sinatra::Application
 
   get "/search.json" do
     begin
-      search_index = 'dapaas'
-      @role = search_index
+      search_index = @role
 
-      # unless ['dapaas', 'odi'].include?(search_index)
-      #   custom_404
-      # end
+      unless ['dapaas', 'odi'].include?(search_index)
+        custom_404
+      end
 
       if params[:q].nil? || params[:q].strip.empty?
         custom_error(422, "Non-empty querystring is required in the 'q' parameter")
       end
 
+      if params[:page]
+        start = (params[:page].to_i - 1) * 10
+      else
+        start = 0
+      end
+
       search_uri = Plek.current.find('search')
       client = GdsApi::Rummager.new(search_uri)
-      @results = client.unified_search({q: params[:q]})["results"]
-      add_artefact_to_results!(@results)
+
+      @results = client.unified_search({q: params[:q], index: search_index, start: start.to_s})
+
+      add_artefact_to_results!(@results["results"])
 
       presenter = ResultSetPresenter.new(
-        FakePaginatedResultSet.new(@results),
+        PaginatedSearchResultSet.new(@results),
         url_helper,
         SearchResultPresenter
       )
@@ -334,6 +341,7 @@ class GovUkContentApi < Sinatra::Application
         params[:sort],
         params.slice('author', 'node', 'organization_name')
       )
+
     else
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
       type = params[:type].singularize
@@ -552,6 +560,7 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def add_artefact_to_results!(results)
+
     results.each do |r|
       unless r['_id'].nil?
         slug = r['_id'].split("/").last

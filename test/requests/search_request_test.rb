@@ -1,10 +1,9 @@
 require 'test_helper'
 
 class SearchRequestTest < GovUkContentApiTest
+
   it "should 404 when asked for a bad index" do
-    skip("WARNING: the index is hard coded in rummager atm,
-      once that is no longer true, this should be re-instated")
-    get "/search.json?q=government&index=fake"
+    get "/search.json?q=government&role=fake"
     assert last_response.not_found?
   end
 
@@ -49,7 +48,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return an array of results" do
-    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => sample_results)
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => sample_results, "total" => 2)
     get "/search.json?q=government+info"
     parsed_response = JSON.parse(last_response.body)
 
@@ -61,7 +60,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should return the standard response even if zero results" do
-    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => [])
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns("results" => [], "total" => 0)
 
     get "/search.json?q=empty+result+set"
     parsed_response = JSON.parse(last_response.body)
@@ -151,8 +150,8 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include created at date" do
-    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
-    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "odi")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['odi'])
     edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
 
     GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
@@ -163,8 +162,8 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include tag ids" do
-    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
-    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "odi")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['odi'])
     edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
 
     GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
@@ -175,13 +174,13 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include the artefact's format" do
-    FactoryGirl.create(:tag, tag_id: "dapaas", tag_type: 'role', title: "dapaas")
+    FactoryGirl.create(:tag, tag_id: "odi", tag_type: 'role', title: "odi")
     FactoryGirl.create(:tag, tag_id: "blog", tag_type: 'article', title: "blog")
 
     artefact = FactoryGirl.create(:my_artefact,
                                   state: 'live',
                                   slug: 'treating-content-as-data',
-                                  roles: ['dapaas'],
+                                  roles: ['odi'],
                                   kind: 'article',
                                   article: ['blog']
                                 )
@@ -195,8 +194,8 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include the artefact's slug" do
-    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
-    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['dapaas'])
+    FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "odi")
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', slug: 'treating-content-as-data', roles: ['odi'])
     edition = FactoryGirl.create(:edition, panopticon_id: artefact.id, state: 'published')
 
     GdsApi::Rummager.any_instance.stubs(:unified_search).returns(rummager_response)
@@ -207,7 +206,7 @@ class SearchRequestTest < GovUkContentApiTest
   end
 
   it "should include the artefact's whole body" do
-    FactoryGirl.create(:tag, :tag_id => "dapaas", :tag_type => 'role', :title => "dapaas")
+    FactoryGirl.create(:tag, :tag_id => "odi", :tag_type => 'role', :title => "odi")
     FactoryGirl.create(:tag, tag_id: "blog", tag_type: 'article', title: "blog")
 
     artefact = FactoryGirl.create(:my_artefact,
@@ -215,7 +214,7 @@ class SearchRequestTest < GovUkContentApiTest
                                   slug: 'treating-content-as-data',
                                   kind: 'article',
                                   article: ['blog'],
-                                  roles: ['dapaas']
+                                  roles: ['odi']
                                 )
     edition = FactoryGirl.create(:article_edition,
                                  panopticon_id: artefact.id,

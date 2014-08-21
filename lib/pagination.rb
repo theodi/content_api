@@ -153,4 +153,48 @@ module Pagination
       [].freeze
     end
   end
+
+  class PaginatedSearchResultSet
+
+    def initialize(scope)
+      @scope = scope
+    end
+
+    def results
+      @scope["results"]
+    end
+
+    def start_index
+      @scope["start"]
+    end
+
+    def total
+      @scope["total"]
+    end
+
+    def pages
+      (@scope["total"].to_f / page_size.to_f).ceil
+    end
+
+    def page_size
+      10
+    end
+
+    def current_page
+      (@scope["start"].to_f / page_size).ceil + 1
+    end
+
+    def first_page?
+      @scope["start"] == 0
+    end
+
+    def last_page?
+      current_page == pages
+    end
+
+    def links
+      [].freeze
+    end
+
+  end
 end

@@ -414,7 +414,7 @@ class GovUkContentApi < Sinatra::Application
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       custom_404 if possible_tags.count == 0
 
-      artefact = Artefact.live.where(tag_ids: params[:tag]).order_by(:created_at.desc).first
+      artefact = Artefact.live.where(tag_ids: [@role, params[:tag]]).order_by(:created_at.desc).first
     end
     get_artefact(artefact.slug, params)
   end

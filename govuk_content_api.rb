@@ -93,12 +93,11 @@ class GovUkContentApi < Sinatra::Application
 
   get "/search.json" do
     begin
-      search_index = 'dapaas'
-      @role = search_index
+      search_index = @role
 
-      # unless ['dapaas', 'odi'].include?(search_index)
-      #   custom_404
-      # end
+      unless ['dapaas', 'odi'].include?(search_index)
+        custom_404
+      end
 
       if params[:q].nil? || params[:q].strip.empty?
         custom_error(422, "Non-empty querystring is required in the 'q' parameter")

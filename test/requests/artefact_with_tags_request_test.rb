@@ -378,11 +378,11 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       assert_equal 5, response["results"].count
     end
 
-    it "should return 404 if no artefacts for that type" do
+    it "should return zero-length result list if no artefacts for that type" do
       get "with_tag.json?type=article"
 
-      assert last_response.not_found?
-      assert_status_field "not found", last_response
+      assert last_response.ok?
+      assert_equal 0, response["results"].count
     end
 
     it "should only return those artefacts with a particular role" do

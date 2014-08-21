@@ -342,9 +342,6 @@ class GovUkContentApi < Sinatra::Application
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)
       end
-
-      # If there are no artefacts for this content type, return 404
-      custom_404 if artefacts.count == 0
     end
 
     if params[:page]

@@ -23,6 +23,10 @@ class SearchResultPresenter
       result["details"]["tag_ids"] = @result["artefact"].tag_ids
       result["details"]["format"] = format
       result["details"]["created_at"] = @result["artefact"].created_at
+      if format == "course_instance"
+        result["details"]["date"] = @result["artefact"].edition.date.strftime("%Y-%m-%d")
+        result["details"]["course"] = @result["artefact"].edition.course
+      end
     end
     result
   end

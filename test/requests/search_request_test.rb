@@ -230,4 +230,37 @@ class SearchRequestTest < GovUkContentApiTest
     assert_equal "foo bar baz a link", parsed_response["results"].first['details']['description']
   end
 
+  it "should include course details for course instances" do
+    FactoryGirl.create(:tag, tag_id: "odi", tag_type: 'role', title: "odi")
+
+    artefact = FactoryGirl.create(:my_artefact,
+                                  state: 'live',
+                                  slug: 'open-data-in-a-day-11-february-2014',
+                                  roles: ['odi'],
+                                  kind: 'course_instance',
+                                )
+    edition = FactoryGirl.create(:course_instance_edition,
+                                  panopticon_id: artefact.id,
+                                  state: 'published',
+                                  date: DateTime.new(2014, 02, 11),
+                                  course: 'open-data-in-a-day'
+                                )
+
+    GdsApi::Rummager.any_instance.stubs(:unified_search).returns({
+      "results" =>  [
+          'title' => "Open Data in a Day, 11 February, 2014",
+          'format' => "course_instance",
+          'link' => "/open-data-in-a-day-11-february-2014",
+          'index' => "odi",
+          'es_score' => "0.00087927346",
+          '_id' => "/open-data-in-a-day-11-february-2014"
+      ]
+    })
+    get "/search.json?q=open+data+in+a+daye"
+    parsed_response = JSON.parse(last_response.body)
+
+    assert_equal DateTime.new(2014, 02, 11), parsed_response["results"].first['details']['date']
+    assert_equal 'open-data-in-a-day', parsed_response["results"].first['details']['course']
+  end
+
 end

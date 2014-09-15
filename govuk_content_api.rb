@@ -614,6 +614,9 @@ class GovUkContentApi < Sinatra::Application
     statsd.time("#{@statsd_scope}.#{tag_ids}") do
       tag_ids = tag_ids.split(",")
 
+      # Check if filter is set to 'all' for anything
+      filter = Hash[filter.map {|k, v| v == "all" ? [k.to_sym.nin, [[""], nil]] : [k,v] }]
+
       artefacts = Artefact.live.where(filter)
                                     .in(tag_ids: tag_ids)
                                     .all(tag_ids: [@role])

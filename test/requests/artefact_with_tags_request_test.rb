@@ -207,6 +207,8 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!'])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', node: ['john-o-groats'])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 3', keywords: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 3', keywords: ['farmers'], state: 'live', node: [''])
+
 
         get "/with_tag.json?keyword=farmers&node=all"
 

@@ -615,7 +615,7 @@ class GovUkContentApi < Sinatra::Application
       tag_ids = tag_ids.split(",")
 
       # Check if filter is set to 'all' for anything
-      filter = Hash[filter.map {|k, v| v == "all" ? [k.to_sym.ne, nil] : [k,v] }]
+      filter = Hash[filter.map {|k, v| v == "all" ? [k.to_sym.nin, [[""], nil]] : [k,v] }]
 
       artefacts = Artefact.live.where(filter)
                                     .in(tag_ids: tag_ids)

@@ -284,7 +284,7 @@ class GovUkContentApi < Sinatra::Application
   #    - all artefacts in the Crime section, with any curated ones first
   get "/with_tag.json" do
     expires DEFAULT_CACHE_TIME
-
+    
     @statsd_scope = 'request.with_tag'
 
     unless params[:tag].blank?
@@ -298,6 +298,7 @@ class GovUkContentApi < Sinatra::Application
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
 
       tags = params[:tag].split(",").map { |tag| Tag.where(tag_id: tag).to_a }.flatten
+      tags.reject! { |t| t.tag_type == "keyword" }
 
       possible_tags = tags.uniq { |t| t.tag_type }
 

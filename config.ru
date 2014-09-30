@@ -35,7 +35,8 @@ if ! in_development || ENV["API_CACHE"]
     File.dirname(__FILE__)
   )
   if File.exists? cache_config_file_path
-    use Rack::Cache, YAML.load_file(cache_config_file_path).symbolize_keys
+    template = ERB.new(File.read(cache_config_file_path)).result
+    use Rack::Cache, YAML.load(template).symbolize_keys
   else
     raise "Cache config file does not exist: #{cache_config_file_path}"
   end

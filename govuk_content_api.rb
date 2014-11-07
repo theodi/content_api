@@ -284,7 +284,7 @@ class GovUkContentApi < Sinatra::Application
   #    - all artefacts in the Crime section, with any curated ones first
   get "/with_tag.json" do
     expires DEFAULT_CACHE_TIME
-    
+
     @statsd_scope = 'request.with_tag'
 
     unless params[:tag].blank?
@@ -412,7 +412,7 @@ class GovUkContentApi < Sinatra::Application
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       custom_404 if possible_tags.count == 0
 
-      artefact = Artefact.live.where(tag_ids: [@role, params[:tag]]).order_by(:created_at.desc).first
+      artefact = Artefact.live.where(tag_ids: { "$all" => [@role, params[:tag]] }).order_by(:created_at.desc).first
     end
     get_artefact(artefact.slug, params)
   end

@@ -11,8 +11,6 @@ gem 'sinatra', '1.3.2'
 gem 'statsd-ruby', '1.0.0'
 gem 'dotenv'
 
-gem 'sinatra-cross_origin'
-
 gem 'govuk_content_models', '6.1.0'
 
 if ENV['CONTENT_MODELS_DEV']

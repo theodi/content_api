@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'sinatra/cross_origin'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
@@ -35,10 +34,6 @@ require 'config/kaminari'
 class GovUkContentApi < Sinatra::Application
   helpers GdsApi::Helpers
 
-  configure do
-    enable :cross_origin
-  end
-
   include Pagination
 
   DEFAULT_CACHE_TIME = 15.minutes.to_i
@@ -55,6 +50,10 @@ class GovUkContentApi < Sinatra::Application
 
   set :views, File.expand_path('views', File.dirname(__FILE__))
   set :show_exceptions, false
+
+  before do
+    response.headers['Access-Control-Allow-Origin'] = "*"
+  end
 
   def url_helper
     parameters = [self, Plek.current.website_root, env['HTTP_API_PREFIX']]

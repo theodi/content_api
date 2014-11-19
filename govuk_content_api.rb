@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'sinatra/cross_origin'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
@@ -34,10 +33,6 @@ require 'config/kaminari'
 
 class GovUkContentApi < Sinatra::Application
   helpers GdsApi::Helpers
-
-  configure do
-    enable :cross_origin
-  end
 
   include Pagination
 

@@ -5,7 +5,7 @@ source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 #ruby-gemset=quirkafleeg-content_api
 
 gem 'thin'
-gem 'foreman'
+gem 'foreman', '< 0.65.0'
 gem 'rake', '0.9.2.2'
 gem 'sinatra', '1.3.2'
 gem 'statsd-ruby', '1.0.0'

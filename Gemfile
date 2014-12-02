@@ -7,6 +7,7 @@ source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 gem 'thin'
 gem 'foreman', '< 0.65.0'
 gem 'rake', '0.9.2.2'
+gem 'rack-protection', "< 1.5.1" # pinned due to slash-encoding change
 gem 'sinatra', '1.3.2'
 gem 'statsd-ruby', '1.0.0'
 gem 'dotenv'

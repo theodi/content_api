@@ -301,7 +301,7 @@ class GovUkContentApi < Sinatra::Application
 
       possible_tags = tags.uniq { |t| t.tag_type }
 
-      modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body', 'page')
+      modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body', 'page', 'order_by')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
         redirect url_helper.with_tag_url(tags, modifier_params)

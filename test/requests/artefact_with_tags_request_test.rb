@@ -93,6 +93,16 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       )
     end
 
+    it "should preserve the specified order by when redirecting" do
+      batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
+      get "/with_tag.json?tag=batman&order_by=bobbles"
+      assert last_response.redirect?
+      assert_equal(
+        "http://example.org/with_tag.json?section=batman&order_by=bobbles",
+        last_response.location
+      )
+    end
+
     it "should preserve the specified node when redirecting" do
       batman = FactoryGirl.create(:tag, tag_id: 'batman', title: 'Batman', tag_type: 'section')
       get "/with_tag.json?tag=batman&node=thing"
@@ -235,6 +245,23 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
 
         assert_equal "Thing 1", parsed_response["results"][0]["title"]
         assert_equal "Thing 2", parsed_response["results"][1]["title"]
+      end
+
+      it "should order by a field" do
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'd', article: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'c', article: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'a', article: ['farmers'], state: 'live')
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'b', article: ['farmers'], state: 'live')
+
+
+        get "/with_tag.json?article=farmers&order_by=name"
+
+        assert_equal 200, last_response.status
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal "a", parsed_response["results"].first["title"]
+        assert_equal "d", parsed_response["results"].last["title"]
       end
 
       it "should only return those artefacts with a particular organization_name" do

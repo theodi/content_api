@@ -229,10 +229,10 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
       end
 
       it "should only return those artefacts without a node if no node is specified" do
-        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', keywords: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
-        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', keywords: ['farmers'], state: 'live', node: [''])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', article: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', article: ['farmers'], state: 'live', node: [''])
 
-        get "/with_tag.json?keyword=farmers&node="
+        get "/with_tag.json?article=farmers&node="
 
         assert_equal 200, last_response.status
 

@@ -1,5 +1,4 @@
 require 'sinatra'
-require 'sinatra/cross_origin'
 require 'mongoid'
 require 'govspeak'
 require 'plek'
@@ -35,10 +34,6 @@ require 'config/kaminari'
 class GovUkContentApi < Sinatra::Application
   helpers GdsApi::Helpers
 
-  configure do
-    enable :cross_origin
-  end
-
   include Pagination
 
   DEFAULT_CACHE_TIME = 15.minutes.to_i
@@ -55,6 +50,10 @@ class GovUkContentApi < Sinatra::Application
 
   set :views, File.expand_path('views', File.dirname(__FILE__))
   set :show_exceptions, false
+
+  before do
+    response.headers['Access-Control-Allow-Origin'] = "*"
+  end
 
   def url_helper
     parameters = [self, Plek.current.website_root, env['HTTP_API_PREFIX']]
@@ -93,24 +92,31 @@ class GovUkContentApi < Sinatra::Application
 
   get "/search.json" do
     begin
-      search_index = 'dapaas'
-      @role = search_index
+      search_index = @role
 
-      # unless ['dapaas', 'odi'].include?(search_index)
-      #   custom_404
-      # end
+      unless ['dapaas', 'odi'].include?(search_index)
+        custom_404
+      end
 
       if params[:q].nil? || params[:q].strip.empty?
         custom_error(422, "Non-empty querystring is required in the 'q' parameter")
       end
 
+      if params[:page]
+        start = (params[:page].to_i - 1) * 10
+      else
+        start = 0
+      end
+
       search_uri = Plek.current.find('search')
       client = GdsApi::Rummager.new(search_uri)
-      @results = client.unified_search({q: params[:q]})["results"]
-      add_artefact_to_results!(@results)
+
+      @results = client.unified_search({q: params[:q], index: search_index, start: start.to_s})
+
+      add_artefact_to_results!(@results["results"])
 
       presenter = ResultSetPresenter.new(
-        FakePaginatedResultSet.new(@results),
+        PaginatedSearchResultSet.new(@results),
         url_helper,
         SearchResultPresenter
       )
@@ -291,10 +297,11 @@ class GovUkContentApi < Sinatra::Application
       content_types = Artefact::FORMATS_BY_DEFAULT_OWNING_APP["publisher"]
 
       tags = params[:tag].split(",").map { |tag| Tag.where(tag_id: tag).to_a }.flatten
+      tags.reject! { |t| t.tag_type == "keyword" }
 
       possible_tags = tags.uniq { |t| t.tag_type }
 
-      modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body', 'page')
+      modifier_params = params.slice('sort', 'author', 'node', 'organization_name', 'role', 'whole_body', 'page', 'order_by')
       # If we can unambiguously determine the tag, redirect to its correct URL
       if possible_tags.count == 1
         redirect url_helper.with_tag_url(tags, modifier_params)
@@ -334,17 +341,15 @@ class GovUkContentApi < Sinatra::Application
         params[:sort],
         params.slice('author', 'node', 'organization_name')
       )
+
     else
       # Singularize type here, so we can request for types like "/jobs", rather than "/job" in frontend app
       type = params[:type].singularize
       @description = "All content with the #{type} type"
-      artefacts = Artefact.where(:kind => type, :tag_ids => @role)
+      artefacts = Artefact.live.where(:kind => type, :tag_ids => @role)
       if params[:sort] == "date"
         artefacts.order_by(:created_at.desc)
       end
-
-      # If there are no artefacts for this content type, return 404
-      custom_404 if artefacts.count == 0
     end
 
     if params[:page]
@@ -406,7 +411,7 @@ class GovUkContentApi < Sinatra::Application
       possible_tags = Tag.where(tag_id: params[:tag]).to_a
       custom_404 if possible_tags.count == 0
 
-      artefact = Artefact.live.where(tag_ids: params[:tag]).order_by(:created_at.desc).first
+      artefact = Artefact.live.where(tag_ids: { "$all" => [@role, params[:tag]] }).order_by(:created_at.desc).first
     end
     get_artefact(artefact.slug, params)
   end
@@ -555,6 +560,7 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def add_artefact_to_results!(results)
+
     results.each do |r|
       unless r['_id'].nil?
         slug = r['_id'].split("/").last
@@ -607,6 +613,9 @@ class GovUkContentApi < Sinatra::Application
   def sorted_artefacts_for_tag_ids(tag_ids, sort, filter = {})
     statsd.time("#{@statsd_scope}.#{tag_ids}") do
       tag_ids = tag_ids.split(",")
+
+      # Check if filter is set to 'all' for anything
+      filter = Hash[filter.map {|k, v| v == "all" ? [k.to_sym.nin, [[""], nil]] : [k,v] }]
 
       artefacts = Artefact.live.where(filter)
                                     .in(tag_ids: tag_ids)

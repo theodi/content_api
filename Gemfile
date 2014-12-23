@@ -5,15 +5,12 @@ source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 #ruby-gemset=quirkafleeg-content_api
 
 gem 'thin'
-gem 'foreman'
+gem 'foreman', '< 0.65.0'
 gem 'rake', '0.9.2.2'
+gem 'rack-protection', "< 1.5.1" # pinned due to slash-encoding change
 gem 'sinatra', '1.3.2'
 gem 'statsd-ruby', '1.0.0'
-gem 'omniauth-gds', '3.0.0' #rubygems doesn't seem to pull this in transitively
-
 gem 'dotenv'
-
-gem 'sinatra-cross_origin'
 
 gem 'govuk_content_models', '6.1.0'
 
@@ -27,7 +24,7 @@ end
 # (as seen in 680d3e9ab7)
 gem 'mongo', '>= 1.7.1'
 
-gem 'gds-sso', '9.2.3'
+gem 'gds-sso', '9.2.0'
 
 gem 'gds-api-adapters', :github => 'theodi/gds-api-adapters'
 
@@ -40,11 +37,12 @@ end
 gem 'plek', '1.4.0'
 gem 'router-client', '3.1.0', :require => false
 gem 'yajl-ruby'
-gem 'aws-ses'
+gem 'aws-ses', '0.5.0'
 gem 'kaminari', '0.14.1'
 gem 'link_header', '0.0.5'
 gem 'rack-cache', '1.2'
 gem 'redis-rack-cache', '1.2.1'
+gem 'airbrake'
 
 group :test do
   gem 'database_cleaner', '0.7.2'

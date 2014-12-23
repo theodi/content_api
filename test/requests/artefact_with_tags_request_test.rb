@@ -228,42 +228,57 @@ class ArtefactWithTagsRequestTest < GovUkContentApiTest
         assert_equal "Thing 1", parsed_response["results"][0]["title"]
       end
 
+      it "should only return those artefacts without a node if no node is specified" do
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', article: ['farmers'], state: 'live', node: ['westward-ho!', 'john-o-groats'])
+        FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', article: ['farmers'], state: 'live', node: [''])
+
+        get "/with_tag.json?article=farmers&node="
+
+        assert_equal 200, last_response.status
+
+        parsed_response = JSON.parse(last_response.body)
+
+        assert_equal 1, parsed_response["results"].count
+
+        assert_equal "Thing 2", parsed_response["results"][0]["title"]
+      end
+
       it "should filter by all artefacts with a node tag" do
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', article: ['farmers'], state: 'live', node: ['westward-ho!'])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', article: ['farmers'], state: 'live', node: ['john-o-groats'])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 3', article: ['farmers'], state: 'live')
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 3', article: ['farmers'], state: 'live', node: [''])
-
-
+        
+        
         get "/with_tag.json?article=farmers&node=all"
-
+        
         assert_equal 200, last_response.status
-
+        
         parsed_response = JSON.parse(last_response.body)
-
+        
         assert_equal 2, parsed_response["results"].count
-
+        
         assert_equal "Thing 1", parsed_response["results"][0]["title"]
         assert_equal "Thing 2", parsed_response["results"][1]["title"]
       end
-
+      
       it "should order by a field" do
         FactoryGirl.create(:my_non_publisher_artefact, name: 'd', article: ['farmers'], state: 'live')
         FactoryGirl.create(:my_non_publisher_artefact, name: 'c', article: ['farmers'], state: 'live')
         FactoryGirl.create(:my_non_publisher_artefact, name: 'a', article: ['farmers'], state: 'live')
         FactoryGirl.create(:my_non_publisher_artefact, name: 'b', article: ['farmers'], state: 'live')
-
-
+        
+        
         get "/with_tag.json?article=farmers&order_by=name"
-
+        
         assert_equal 200, last_response.status
-
+        
         parsed_response = JSON.parse(last_response.body)
-
+        
         assert_equal "a", parsed_response["results"].first["title"]
         assert_equal "d", parsed_response["results"].last["title"]
       end
-
+        
       it "should only return those artefacts with a particular organization_name" do
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 1', article: ['farmers'], state: 'live', organization_name: ["mom-corp", "planet-express"])
         FactoryGirl.create(:my_non_publisher_artefact, name: 'Thing 2', article: ['farmers'], state: 'live', organization_name: ["wayne-enterprises"])

@@ -36,7 +36,7 @@ if ! in_development || ENV["API_CACHE"]
   )
   if File.exists? cache_config_file_path
     template = ERB.new(File.read(cache_config_file_path)).result
-    cache_config = YAML.load_file(template).symbolize_keys
+    cache_config = YAML.load(template).symbolize_keys
     unless cache_config[:disable_cache] == true
       use Rack::Cache, cache_config
     end

@@ -26,6 +26,7 @@ class CourseInstanceRequest < GovUkContentApiTest
       @edition2 = FactoryGirl.create(:course_instance_edition,
         slug: "this-is-a-course-#{@date_str}",
         panopticon_id: @artefact.id,
+        state: "draft",
         course: "this-is-a-course",
         description: "new description",
         version_number: 2,

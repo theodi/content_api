@@ -439,11 +439,11 @@ class GovUkContentApi < Sinatra::Application
     expires DEFAULT_CACHE_TIME
 
     if params[:course] && params[:date]
-      instance = CourseInstanceEdition.where(:course => params[:course], :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
+      instance = CourseInstanceEdition.where(:course => params[:course], :state => "published", :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
 
       custom_404 if instance.count == 0
 
-      get_artefact(instance.first.slug, { edition: params[:edition] })
+      get_artefact(instance.last.slug, { edition: params[:edition] })
     else
       custom_404
     end

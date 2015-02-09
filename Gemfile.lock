@@ -222,12 +222,6 @@ GEM
     rake (0.9.2.2)
     rdoc (3.12.2)
       json (~> 1.4)
-    redis (3.2.0)
-    redis-rack-cache (1.2.1)
-      rack-cache (~> 1.2)
-      redis-store (~> 1.1.0)
-    redis-store (1.1.4)
-      redis (>= 2.2)
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
@@ -306,10 +300,8 @@ DEPENDENCIES
   odidown!
   plek (= 1.4.0)
   pry
-  rack-cache (= 1.2)
   rack-protection (< 1.5.1)
   rake (= 0.9.2.2)
-  redis-rack-cache (= 1.2.1)
   router-client (= 3.1.0)
   shotgun
   simplecov (= 0.6.4)

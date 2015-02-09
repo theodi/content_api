@@ -40,8 +40,6 @@ gem 'yajl-ruby'
 gem 'aws-ses', '0.5.0'
 gem 'kaminari', '0.14.1'
 gem 'link_header', '0.0.5'
-gem 'rack-cache', '1.2'
-gem 'redis-rack-cache', '1.2.1'
 gem 'airbrake'
 
 group :test do

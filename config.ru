@@ -5,13 +5,12 @@ $:.unshift(app_path) unless $:.include?(app_path)
 end
 
 require 'rubygems'
-
-require 'dotenv'
-Dotenv.load
-
 require "bundler"
 ENV['RACK_ENV'] ||= 'development'
 Bundler.require(:default, ENV['RACK_ENV'])
+
+require 'dotenv'
+Dotenv.load
 
 require "logger"
 

@@ -59,7 +59,7 @@ class URLHelper
   end
 
   def with_tag_web_url(tag)
-    public_web_url("/browse/#{tag.tag_id}")
+    public_web_url("/tags/#{tag.tag_id}")
   end
 
   def artefacts_url(page = nil)

@@ -17,7 +17,7 @@ class TagRequestTest < GovUkContentApiTest
       assert_equal "http://example.org/tags/sections/good-tag.json", response["id"]
       assert_equal nil, response["web_url"]
       assert_equal(
-        "#{public_web_url}/browse/good-tag",
+        "#{public_web_url}/tags/good-tag",
         response["content_with_tag"]["web_url"]
       )
     end
@@ -71,7 +71,7 @@ class TagRequestTest < GovUkContentApiTest
 
       assert last_response.ok?
       response = JSON.parse(last_response.body)
-      assert_equal "#{public_web_url}/browse/crime/batman", response["content_with_tag"]["web_url"]
+      assert_equal "#{public_web_url}/tags/crime/batman", response["content_with_tag"]["web_url"]
     end
 
     describe "has a parent tag" do
@@ -93,7 +93,7 @@ class TagRequestTest < GovUkContentApiTest
           },
           "content_with_tag" => {
             "id" => "http://example.org/with_tag.json?section=crime-and-prison",
-            "web_url" => "#{public_web_url}/browse/crime-and-prison",
+            "web_url" => "#{public_web_url}/tags/crime-and-prison",
             "slug" => "crime-and-prison"
           },
           "parent" => nil,

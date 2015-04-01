@@ -31,7 +31,7 @@ class TagListRequestTest < GovUkContentApiTest
       tag = FactoryGirl.create(:tag, tag_id: 'crime')
       get "/tags.json"
       expected_id = "http://example.org/tags/sections/crime.json"
-      expected_url = "#{public_web_url}/browse/crime"
+      expected_url = "#{public_web_url}/tags/crime"
 
       JSON.parse(last_response.body)['results'].map do |result|
         if result["slug"] == "crime"

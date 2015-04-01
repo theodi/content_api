@@ -183,7 +183,7 @@ class ArtefactRequestTest < GovUkContentApiTest
       assert_equal "section", tag_info["details"]["type"]
       # Temporary hack until the browse pages are rebuilt
       expected_section_slug = section[0]
-      assert_equal "#{public_web_url}/browse/#{expected_section_slug}", tag_info["content_with_tag"]["web_url"]
+      assert_equal "#{public_web_url}/tags/#{expected_section_slug}", tag_info["content_with_tag"]["web_url"]
     end
   end
 

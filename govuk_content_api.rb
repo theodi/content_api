@@ -128,7 +128,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/tags.json" do
-    expires DEFAULT_CACHE_TIME
 
     @statsd_scope = "request.tags"
     options = {}
@@ -188,7 +187,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/tag_types.json" do
-    expires LONG_CACHE_TIME
 
     presenter = ResultSetPresenter.new(
       FakePaginatedResultSet.new(known_tag_types),
@@ -200,7 +198,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/tags/:tag_type_or_id.json" do
-    expires DEFAULT_CACHE_TIME
 
     @statsd_scope = "request.tag"
 
@@ -260,7 +257,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/tags/:tag_type/:tag_id.json" do
-    expires DEFAULT_CACHE_TIME
 
     tag_type = known_tag_types.from_plural(params[:tag_type])
     custom_404 unless tag_type
@@ -282,7 +278,6 @@ class GovUkContentApi < Sinatra::Application
   #   /with_tag.json?section=crime&sort=curated
   #    - all artefacts in the Crime section, with any curated ones first
   get "/with_tag.json" do
-    expires DEFAULT_CACHE_TIME
 
     @statsd_scope = 'request.with_tag'
 
@@ -398,7 +393,6 @@ class GovUkContentApi < Sinatra::Application
 
   # Get the newest artefact by tag or type
   get "/latest.json" do
-    expires DEFAULT_CACHE_TIME
 
     if params[:type]
       # Check the type exists
@@ -418,7 +412,6 @@ class GovUkContentApi < Sinatra::Application
 
   # Get the next upcoming artefact (such as an event or course_instance) by type
   get "/upcoming.json" do
-    expires DEFAULT_CACHE_TIME
 
     if params[:order_by] && params[:type]
       type = "#{params[:type].camelize}Edition"
@@ -436,7 +429,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/course-instance.json" do
-    expires DEFAULT_CACHE_TIME
 
     if params[:course] && params[:date]
       instance = CourseInstanceEdition.where(:course => params[:course], :state => "published", :date => {:$gte => Date.parse(params[:date]), :$lt => (Date.parse(params[:date]) + 1.day) })
@@ -450,7 +442,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/section.json" do
-    expires DEFAULT_CACHE_TIME
 
     if params[:id]
       @section = Section.where(:tag_id => params[:id]).first
@@ -468,7 +459,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/related.json" do
-    expires DEFAULT_CACHE_TIME
 
     kv = params.first
     type = kv[0]
@@ -493,7 +483,6 @@ class GovUkContentApi < Sinatra::Application
   end
 
   get "/artefacts.json" do
-    expires DEFAULT_CACHE_TIME
 
     artefacts = statsd.time("request.artefacts") do
       a = Artefact.live.where(:tag_ids => @role)

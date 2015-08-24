@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-source 'https://BnrJb6FZyzspBboNJzYZ@gem.fury.io/govuk/'
 
 #ruby=ruby-1.9.3
 #ruby-gemset=quirkafleeg-content_api
@@ -35,7 +34,7 @@ else
 end
 
 gem 'plek', '1.4.0'
-gem 'router-client', '3.1.0', :require => false
+# gem 'router-client', '3.1.0', :require => false # No longer available
 gem 'yajl-ruby'
 gem 'aws-ses', '0.5.0'
 gem 'kaminari', '0.14.1'

@@ -39,7 +39,7 @@ gem 'yajl-ruby'
 gem 'aws-ses', '0.5.0'
 gem 'kaminari', '0.14.1'
 gem 'link_header', '0.0.5'
-gem 'airbrake'
+gem 'airbrake', '~> 4.3.0'
 
 group :test do
   gem 'database_cleaner', '0.7.2'

@@ -554,7 +554,7 @@ class GovUkContentApi < Sinatra::Application
       unless r['_id'].nil?
         slug = r['_id'].split("/").last
         @artefact = Artefact.find_by_slug_and_tag_ids(slug, @role)
-        if @artefact.owning_app == 'publisher'
+        if !@artefact.nil? && @artefact.owning_app == 'publisher'
           attach_publisher_edition(@artefact, nil)
         end
         r['artefact'] = @artefact

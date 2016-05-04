@@ -29,7 +29,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     PriorityQueue (0.1.2)
-    RedCloth (4.2.9)
+    RedCloth (4.3.0)
     actionmailer (3.2.22.2)
       actionpack (= 3.2.22.2)
       mail (~> 2.5.4)
@@ -122,7 +122,7 @@ GEM
       plek
       state_machine
     hashdiff (0.3.0)
-    hashie (3.4.3)
+    hashie (3.4.4)
     hike (1.2.3)
     hoe (3.15.0)
       rake (>= 0.8, < 12.0)
@@ -159,7 +159,7 @@ GEM
     mongoid_spacial (0.2.17)
       activesupport (~> 3.0)
       mongoid (>= 2.1.0, < 3.0.0)
-    multi_json (1.11.2)
+    multi_json (1.12.0)
     multi_test (0.1.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -267,7 +267,7 @@ GEM
     tzinfo (0.3.49)
     warden (1.2.6)
       rack (>= 1.0)
-    webmock (1.24.3)
+    webmock (1.24.6)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff

@@ -29,7 +29,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     PriorityQueue (0.1.2)
-    RedCloth (4.3.1)
+    RedCloth (4.3.2)
     actionmailer (3.2.22.2)
       actionpack (= 3.2.22.2)
       mail (~> 2.5.4)
@@ -159,7 +159,7 @@ GEM
     mongoid_spacial (0.2.17)
       activesupport (~> 3.0)
       mongoid (>= 2.1.0, < 3.0.0)
-    multi_json (1.12.0)
+    multi_json (1.12.1)
     multi_test (0.1.2)
     multi_xml (0.5.5)
     multipart-post (2.0.0)

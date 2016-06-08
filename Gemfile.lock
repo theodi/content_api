@@ -20,7 +20,7 @@ GIT
 
 GIT
   remote: git://github.com/theodi/odidown.git
-  revision: acc7ebf5ced83b4bd1bbe5bc6aee6d6f27d142b0
+  revision: 4917597d21cc727fa30d5efab499e133e93d2979
   specs:
     odidown (0.0.1)
       govspeak (~> 1.2.3)
@@ -146,7 +146,7 @@ GEM
     metaclass (0.0.4)
     method_source (0.8.2)
     mime-types (1.25.1)
-    mini_portile2 (2.0.0)
+    mini_portile2 (2.1.0)
     minitest (3.4.0)
     mocha (0.12.4)
       metaclass (~> 0.0.1)
@@ -170,8 +170,9 @@ GEM
       hoe (>= 2.3.1)
       rubigen (>= 1.5.2)
       syntax (>= 1.0.0)
-    nokogiri (1.6.7.2)
-      mini_portile2 (~> 2.0.0.rc2)
+    nokogiri (1.6.8)
+      mini_portile2 (~> 2.1.0)
+      pkg-config (~> 1.1.7)
     null_logger (0.0.1)
     oauth2 (1.1.0)
       faraday (>= 0.8, < 0.10)
@@ -188,6 +189,7 @@ GEM
     omniauth-oauth2 (1.3.1)
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
+    pkg-config (1.1.7)
     plek (1.4.0)
     polyglot (0.3.5)
     pry (0.10.3)
@@ -251,7 +253,7 @@ GEM
       tilt (~> 1.1, != 1.3.0)
     state_machine (1.2.0)
     statsd-ruby (1.0.0)
-    syntax (1.2.0)
+    syntax (1.2.1)
     thin (1.7.0)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)

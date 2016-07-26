@@ -8,6 +8,7 @@ class ArtefactAuthorPresenter
     {
       name: @author.title,
       slug: @author.slug,
+      state: @author.state,
       web_url: @url_helper.artefact_web_url(@author.artefact),
       tag_ids: @author.artefact.scoped_tag_ids
     }

@@ -511,6 +511,35 @@ class ArtefactRequestTest < GovUkContentApiTest
     assert_equal 200, last_response.status
     assert_equal 'Barry Scott', parsed_response["author"]["name"]
     assert_equal 'barry-scott', parsed_response["author"]["slug"]
+    assert_equal 'published', parsed_response["author"]["state"]
+
+    assert parsed_response["author"]["tag_ids"].include?('writers')
+  end
+
+  it "should include author details even if the author has been archived" do
+    barry = FactoryGirl.create(:my_artefact, state: 'live', slug: 'barry-scott', name: "Barry Scott", kind: "person", person: ['writers'])
+    FactoryGirl.create(:person_edition,
+      title: barry.name,
+      slug: barry.slug,
+      panopticon_id: barry.id,
+      state: 'published')
+
+    artefact = FactoryGirl.create(:my_artefact, state: 'live', author: 'barry-scott')
+    FactoryGirl.create(:guide_edition,
+      slug: artefact.slug,
+      panopticon_id: artefact.id,
+      state: 'published')
+
+    barry.state = 'archived'
+    barry.save
+
+    get "/#{artefact.slug}.json"
+    parsed_response = JSON.parse(last_response.body)
+    assert_equal 200, last_response.status
+    assert_equal 'Barry Scott', parsed_response["author"]["name"]
+    assert_equal 'barry-scott', parsed_response["author"]["slug"]
+    assert_equal 'archived', parsed_response["author"]["state"]
+
     assert parsed_response["author"]["tag_ids"].include?('writers')
   end
 

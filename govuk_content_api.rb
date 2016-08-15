@@ -522,6 +522,16 @@ class GovUkContentApi < Sinatra::Application
     get_artefact(id, params)
   end
 
+  get "/*/image" do |id|
+    @artefact = Artefact.find_by_slug_and_tag_ids(id, @role)
+    attach_publisher_edition(@artefact, params[:edition])
+    if @artefact.edition.is_a?(PersonEdition)
+      redirect_to_asset(@artefact, :image, params[:version])
+    else
+      custom_404
+    end
+  end
+
   protected
 
   def get_artefact(id, params)
@@ -722,6 +732,28 @@ class GovUkContentApi < Sinatra::Application
           logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
         end
       end
+    end
+  end
+
+  def redirect_to_asset(artefact, field, version = nil)
+    if asset_id = artefact.edition.send("#{field}_id")
+      begin
+        asset = asset_manager_api.asset(asset_id)
+        if asset
+          url = version.nil? ? asset['file_url'] : asset['file_versions'][version]
+          if url
+            redirect(url)
+          else
+            custom_404
+          end
+        else
+          custom_404
+        end
+      rescue GdsApi::BaseError => e
+        logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
+      end
+    else
+      custom_404
     end
   end
 

@@ -50,6 +50,7 @@ class GovUkContentApi < Sinatra::Application
 
   set :views, File.expand_path('views', File.dirname(__FILE__))
   set :show_exceptions, false
+  set :protection, :except => [:json_csrf]
 
   before do
     response.headers['Access-Control-Allow-Origin'] = "*"

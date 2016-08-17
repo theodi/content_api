@@ -46,7 +46,7 @@ module ContentApiArtefactExtensions
     @author_edition ||= begin
       if author
         artefact = Artefact.find_by_slug(author)
-        Edition.where(panopticon_id: artefact.id).first rescue nil
+        Edition.where(panopticon_id: artefact.id, state: 'published').last rescue nil
       else
         nil
       end

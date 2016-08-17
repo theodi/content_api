@@ -39,9 +39,12 @@ class AssetRedirectTest < GovUkContentApiTest
       assert_equal "https://assets.digital.cabinet-office.gov.uk/media/512c9019686c82191d000001/darth-on-a-cat-square.jpg", last_request.url
     end
 
-    it "404s if the version does not exist" do
+    it "redirects to the default if the version does not exist" do
       get "#{@artefact.slug}/image?version=bogus"
-      assert last_response.not_found?
+      assert last_response.redirect?
+      follow_redirect!
+
+      assert_equal "http://static.dev/assets/person-placeholder.png", last_request.url
     end
 
     it "404s if the edition isn't a person" do
@@ -52,13 +55,16 @@ class AssetRedirectTest < GovUkContentApiTest
       assert last_response.not_found?
     end
 
-    it "404s if there is no image" do
+    it "Redirects to the default if there is no image" do
       artefact = FactoryGirl.create(:my_artefact, :state => 'live')
       edition = FactoryGirl.create(:person_edition, panopticon_id: artefact.id, state: 'published', image_id: nil)
 
       get "#{artefact.slug}/image"
 
-      assert last_response.not_found?
+      assert last_response.redirect?
+      follow_redirect!
+
+      assert_equal "http://static.dev/assets/person-placeholder.png", last_request.url
     end
 
   end

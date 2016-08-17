@@ -737,24 +737,20 @@ class GovUkContentApi < Sinatra::Application
   end
 
   def redirect_to_asset(artefact, field, version = nil)
+    url = Plek.new.find('static') + '/assets/person-placeholder.png'
     if asset_id = artefact.edition.send("#{field}_id")
       begin
         asset = asset_manager_api.asset(asset_id)
         if asset
-          url = version.nil? ? asset['file_url'] : asset['file_versions'][version]
-          if url
-            redirect(url)
-          else
-            custom_404
-          end
-        else
-          custom_404
+          image_url = version.nil? ? asset['file_url'] : asset['file_versions'][version]
+          url = image_url if image_url
         end
+        redirect(url)
       rescue GdsApi::BaseError => e
         logger.warn "Requesting asset #{asset_id} returned error: #{e.inspect}"
       end
     else
-      custom_404
+      redirect(url)
     end
   end
 

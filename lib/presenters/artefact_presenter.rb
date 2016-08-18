@@ -1,4 +1,5 @@
 require "presenters/basic_artefact_presenter"
+require "presenters/related_artefact_presenter"
 require "presenters/tag_presenter"
 require "presenters/artefact_part_presenter"
 require "presenters/artefact_author_presenter"
@@ -102,7 +103,7 @@ class ArtefactPresenter
     presented["tags"] = present_with(scoped_tags, TagPresenter)
     presented["related"] = present_with(
       @artefact.live_related_artefacts,
-      BasicArtefactPresenter
+      RelatedArtefactPresenter
     )
 
     # MERGE ALL THE THINGS!

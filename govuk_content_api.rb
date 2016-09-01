@@ -442,6 +442,41 @@ class GovUkContentApi < Sinatra::Application
     end
   end
 
+  get "/lecture-list.json" do
+    artefacts = sorted_artefacts_for_tag_ids(
+      'lunchtime-lecture,event:lunchtime-lecture',
+      params[:sort],
+      params.slice('author', 'node', 'organization_name')
+    )
+
+    results = map_artefacts_and_add_editions(artefacts)
+
+    previous = results.reject { |x| x.edition.start_date > Date.today }
+    upcoming = results.select { |x| x.edition.start_date > Date.today }
+
+    @previous = FakePaginatedResultSet.new(previous)
+    @upcoming = FakePaginatedResultSet.new(upcoming)
+
+    previous = ResultSetPresenter.new(
+      @previous,
+      url_helper,
+      TaggedArtefactPresenter,
+      {}
+    )
+
+    upcoming = ResultSetPresenter.new(
+      @upcoming,
+      url_helper,
+      TaggedArtefactPresenter,
+      {}
+    )
+
+    {
+      previous: previous.present['results'],
+      upcoming: upcoming.present['results']
+    }.to_json
+  end
+
   get "/section.json" do
 
     if params[:id]

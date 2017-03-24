@@ -10,6 +10,7 @@ require 'config/gds_sso_middleware'
 require 'pagination'
 require 'tag_types'
 require 'ostruct'
+require 'multi_json'
 
 require "url_helper"
 require "presenters/result_set_presenter"
@@ -591,7 +592,8 @@ class GovUkContentApi < Sinatra::Application
       attach_publisher_edition(@artefact, params[:edition])
     end
 
-    ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter).present.to_json
+    MultiJson.use(:yajl)
+    MultiJson.dump(ArtefactPresenter.new(@artefact, url_helper, govspeak_formatter).present)
   end
 
   def add_artefact_to_results!(results)

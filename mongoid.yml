@@ -8,3 +8,8 @@ test:
   database: govuk_content_shared_test
   logger: false
   use_activesupport_time_zone: true
+production:
+  host: <%= ENV['MONGOID_HOST'] ||= "localhost" %>
+  database: govuk_content_production
+  logger: false
+  use_activesupport_time_zone: true

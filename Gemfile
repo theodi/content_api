@@ -57,3 +57,7 @@ end
 group :development do
   gem "shotgun"
 end
+
+group :production do
+  gem "rails_12factor"
+end

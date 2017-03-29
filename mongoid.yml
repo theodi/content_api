@@ -9,7 +9,6 @@ test:
   logger: false
   use_activesupport_time_zone: true
 production:
-  host: <%= ENV['MONGOID_HOST'] ||= "localhost" %>
-  database: govuk_content_production
+  uri: <%= ENV['MONGODB_URI'] %>
   logger: false
   use_activesupport_time_zone: true

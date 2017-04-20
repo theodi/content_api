@@ -88,13 +88,11 @@ GEM
     cucumber-core (1.5.0)
       gherkin (~> 4.0)
     cucumber-wire (0.0.1)
-    daemons (1.2.4)
     database_cleaner (0.7.2)
     diff-lcs (1.2.5)
     differ (0.1.2)
     dotenv (0.7.0)
     erubis (2.7.0)
-    eventmachine (1.2.0.1)
     factory_girl (3.6.1)
       activesupport (>= 3.0.0)
     faraday (0.9.2)
@@ -196,6 +194,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
+    puma (3.8.2)
     rack (1.4.7)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -259,10 +258,6 @@ GEM
     state_machine (1.2.0)
     statsd-ruby (1.0.0)
     syntax (1.2.1)
-    thin (1.7.0)
-      daemons (~> 1.0, >= 1.0.9)
-      eventmachine (~> 1.0, >= 1.0.4)
-      rack (>= 1, < 3)
     thor (0.19.1)
     tilt (1.4.1)
     timecop (0.5.9.2)
@@ -304,6 +299,7 @@ DEPENDENCIES
   odidown!
   plek (= 1.4.0)
   pry
+  puma
   rack-protection (< 1.5.1)
   rails_12factor
   rake (= 0.9.2.2)
@@ -312,7 +308,6 @@ DEPENDENCIES
   simplecov-rcov (= 0.2.3)
   sinatra (= 1.3.2)
   statsd-ruby (= 1.0.0)
-  thin
   timecop (= 0.5.9.2)
   turn
   webmock (~> 1.8)

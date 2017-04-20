@@ -25,11 +25,5 @@ end
 
 enable :dump_errors, :raise_errors
 
-unless in_development
-  log = File.new("log/production.log", "a")
-  STDOUT.reopen(log)
-  STDERR.reopen(log)
-end
-
 require 'govuk_content_api'
 run GovUkContentApi

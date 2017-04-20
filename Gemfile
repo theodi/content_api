@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
-#ruby=ruby-1.9.3
-#ruby-gemset=quirkafleeg-content_api
+ruby "1.9.3"
 
 gem 'thin'
 gem 'foreman', '< 0.65.0'
@@ -57,4 +56,8 @@ end
 
 group :development do
   gem "shotgun"
+end
+
+group :production do
+  gem "rails_12factor"
 end

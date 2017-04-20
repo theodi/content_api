@@ -3,24 +3,8 @@ sudo: false
 cache: bundler
 rvm:
 - 1.9.3
-after_success:
-- ! '[ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && curl -v -X DELETE -u $GITHUB_USER:$GITHUB_PASSWORD
-  "https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs/tags/CURRENT"'
-- ! '[ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ] && curl -v -X POST -d ''{"ref":"refs/tags/CURRENT","sha":"''$TRAVIS_COMMIT''"}''  --header
-  "Content-Type:application/json" -u $GITHUB_USER:$GITHUB_PASSWORD "https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs"'
-branches:
-  except:
-  - CURRENT
 services:
   - mongodb
-notifications:
-  irc:
-    channels:
-    - irc.freenode.net#theodi
-    template:
-    - ! '%{repository} %{branch} - %{message} %{build_url}'
-    on_success: change
-    on_failure: always
 env:
   global:
   - secure: XEKCdpq0Z1yfl3HelRRdgkz2huZfPqgl5NXXbWAWGVpAGo6z08nCU6nZRblJ45rN7fmYjfBoVEUMrqkEWrs44UqoI9Sd7ywoVqxI1UGV4rKgSNNs7RBtOSVAzrl6AaEvlf3lWc7RJ0lhxhR5MCsWAEonFp4X3nbX900fiQyijfk=

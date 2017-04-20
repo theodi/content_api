@@ -122,15 +122,11 @@ class ArtefactPresenter
 
     # TODO:there is duplication in representing this data, I don't know why
     # check in frontend which one is actually used so we can come back and clean this up
-    presented["details"]["organizations"] = organizations
-
-    presented["details"]["author"] = author
-    presented["author"] = author
-
-    presented["nodes"] = nodes
+    presented["details"]["organizations"] = presented["organizations"] = organizations
+    
+    presented["details"]["author"] = presented["author"] = author
+    
     presented["details"]["nodes"] = nodes
-
-    presented["organizations"] = organizations
 
     presented["related_external_links"] = @artefact.external_links.map do |l|
       {

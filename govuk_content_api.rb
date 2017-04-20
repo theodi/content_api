@@ -376,12 +376,15 @@ class GovUkContentApi < Sinatra::Application
 
     options = {
       govspeak_formatter: govspeak_formatter,
-      description: @description,
-      summary: true
+      description: @description
     }
 
     if params[:whole_body]
       options["whole_body"] = params[:whole_body]
+    end
+
+    if params[:summary] == "true"
+      options["summary"] = true
     end
 
     presenter = ResultSetPresenter.new(

@@ -9,7 +9,7 @@ class TaggedArtefactPresenter
   end
 
   def present
-    presented = ArtefactPresenter.new(@artefact, @url_helper, GovspeakFormatter.new(:html, nil)).present
+    presented = ArtefactPresenter.new(@artefact, @url_helper, GovspeakFormatter.new(:html, nil), @options).present
     if @options["whole_body"]
       presented["details"]["body"] = @artefact.whole_body
     end

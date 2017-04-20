@@ -384,7 +384,7 @@ class GovUkContentApi < Sinatra::Application
     end
 
     if params[:summary] == "true"
-      options["summary"] = true
+      options[:summary] = true
     end
 
     presenter = ResultSetPresenter.new(

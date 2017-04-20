@@ -126,7 +126,7 @@ class ArtefactPresenter
     
     presented["details"]["author"] = presented["author"] = author
     
-    presented["details"]["nodes"] = nodes
+    presented["details"]["nodes"] = presented["nodes"] = nodes
 
     presented["related_external_links"] = @artefact.external_links.map do |l|
       {

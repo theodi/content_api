@@ -383,6 +383,10 @@ class GovUkContentApi < Sinatra::Application
       options["whole_body"] = params[:whole_body]
     end
 
+    if params[:summary] == "true"
+      options["summary"] = true
+    end
+
     presenter = ResultSetPresenter.new(
       @result_set,
       url_helper,

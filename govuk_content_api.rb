@@ -345,7 +345,7 @@ class GovUkContentApi < Sinatra::Application
       @description = "All content with the #{type} type"
       artefacts = Artefact.live.where(:kind => type, :tag_ids => @role)
       if params[:sort] == "date"
-        artefacts.order_by(:created_at.desc)
+        artefacts = artefacts.order_by([[:created_at, :desc]])
       end
     end
 

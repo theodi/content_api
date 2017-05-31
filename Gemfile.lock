@@ -188,7 +188,7 @@ GEM
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
     pkg-config (1.1.7)
-    plek (1.4.0)
+    plek (2.0.0)
     polyglot (0.3.5)
     pry (0.10.4)
       coderay (~> 1.1.0)
@@ -297,7 +297,7 @@ DEPENDENCIES
   mongo (>= 1.7.1)
   odi_content_models!
   odidown!
-  plek (= 1.4.0)
+  plek (= 2.0.0)
   pry
   puma
   rack-protection (< 1.5.1)

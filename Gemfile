@@ -32,7 +32,7 @@ else
   gem 'odidown', github: 'theodi/odidown'
 end
 
-gem 'plek', '1.4.0'
+gem 'plek', '2.0.0'
 # gem 'router-client', '3.1.0', :require => false # No longer available
 gem 'yajl-ruby'
 gem 'aws-ses', '0.5.0'

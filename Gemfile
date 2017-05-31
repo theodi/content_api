@@ -35,7 +35,7 @@ end
 gem 'plek', '1.4.0'
 # gem 'router-client', '3.1.0', :require => false # No longer available
 gem 'yajl-ruby'
-gem 'aws-ses', '0.5.0'
+gem 'aws-ses', '0.6.0'
 gem 'kaminari', '0.14.1'
 gem 'link_header', '0.0.5'
 gem 'airbrake', '~> 4.3.0'

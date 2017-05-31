@@ -22,7 +22,7 @@ end
 # (as seen in 680d3e9ab7)
 gem 'mongo', '>= 1.7.1'
 
-gem 'gds-sso', '9.2.0'
+gem 'gds-sso', '9.4.0'
 
 gem 'gds-api-adapters', :github => 'theodi/gds-api-adapters'
 

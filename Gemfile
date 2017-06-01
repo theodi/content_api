@@ -41,7 +41,7 @@ gem 'link_header', '0.0.5'
 gem 'airbrake', '~> 4.3.0'
 
 group :test do
-  gem 'database_cleaner', '0.7.2'
+  gem 'database_cleaner', '1.6.1'
   gem 'factory_girl', '4.8.0'
   gem 'mocha', '0.12.4', require: false
   gem 'simplecov', '0.14.1'

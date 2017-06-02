@@ -262,7 +262,7 @@ GEM
     syntax (1.2.1)
     thor (0.19.1)
     tilt (1.4.1)
-    timecop (0.5.9.2)
+    timecop (0.8.1)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
@@ -310,7 +310,7 @@ DEPENDENCIES
   simplecov-rcov (= 0.2.3)
   sinatra (= 1.4.6)
   statsd-ruby (= 1.0.0)
-  timecop (= 0.5.9.2)
+  timecop (= 0.8.1)
   turn
   webmock (~> 1.8)
   yajl-ruby

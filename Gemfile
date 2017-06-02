@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby "1.9.3"
 
 gem 'puma'
-gem 'foreman', '< 0.65.0'
+gem 'foreman', '< 0.84.0'
 gem 'rake', '0.9.2.2'
 gem 'rack-protection', "< 1.5.1" # pinned due to slash-encoding change
 gem 'sinatra', '1.4.6'

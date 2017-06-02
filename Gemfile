@@ -37,7 +37,7 @@ gem 'plek', '2.0.0'
 gem 'yajl-ruby'
 gem 'aws-ses', '0.6.0'
 gem 'kaminari', '0.14.1'
-gem 'link_header', '0.0.5'
+gem 'link_header', '0.0.8'
 gem 'airbrake', '~> 4.3.0'
 
 group :test do

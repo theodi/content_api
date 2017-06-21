@@ -85,10 +85,12 @@ class ArtefactPresenter
     host
   ).map(&:to_sym)
 
-  def initialize(artefact, url_helper, govspeak_formatter)
+  def initialize(artefact, url_helper, govspeak_formatter, options = {})
     @artefact = artefact
     @url_helper = url_helper
     @govspeak_formatter = govspeak_formatter
+    @options = options
+    @summary = options[:summary]
   end
 
   def present_with(items, presenter_class)
@@ -101,10 +103,12 @@ class ArtefactPresenter
     presented = BasicArtefactPresenter.new(@artefact, @url_helper).present
     scoped_tags = @artefact.tags.reject {|t| t.tag_type == 'role'}
     presented["tags"] = present_with(scoped_tags, TagPresenter)
-    presented["related"] = present_with(
-      @artefact.live_related_artefacts,
-      RelatedArtefactPresenter
-    )
+    unless @summary
+      presented["related"] = present_with(
+        @artefact.live_related_artefacts,
+        RelatedArtefactPresenter
+      )
+    end
 
     # MERGE ALL THE THINGS!
     presented["details"] = [
@@ -120,19 +124,19 @@ class ArtefactPresenter
       artist,
     ].inject(&:merge)
 
-    # TODO:there is duplication in representing this data, I don't know why
-    # check in frontend which one is actually used so we can come back and clean this up
-    presented["details"]["organizations"] = presented["organizations"] = organizations
-    
-    presented["details"]["author"] = presented["author"] = author
-    
-    presented["details"]["nodes"] = presented["nodes"] = nodes
+    unless @summary
+      # TODO:there is duplication in representing this data, I don't know why
+      # check in frontend which one is actually used so we can come back and clean this up
+      presented["details"]["organizations"] = presented["organizations"] = organizations
+      presented["details"]["author"] = presented["author"] = author
+      presented["details"]["nodes"] = presented["nodes"] = nodes
 
-    presented["related_external_links"] = @artefact.external_links.map do |l|
-      {
-        "title" => l.title,
-        "url" => l.url
-      }
+      presented["related_external_links"] = @artefact.external_links.map do |l|
+        {
+          "title" => l.title,
+          "url" => l.url
+        }
+      end
     end
 
     presented

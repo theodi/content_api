@@ -49,7 +49,7 @@ group :test do
   gem 'minitest', '3.4.0'
   gem 'turn', require: false
   gem 'ci_reporter', '1.7.0'
-  gem 'webmock', '~> 1.8', require: false
+  gem 'webmock', '~> 2.3', require: false
   gem 'timecop', '0.9.0'
   gem 'pry'
 end

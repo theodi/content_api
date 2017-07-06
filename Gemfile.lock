@@ -71,7 +71,7 @@ GEM
     bson_ext (1.12.5)
       bson (~> 1.12.5)
     builder (3.0.4)
-    ci_reporter (1.7.0)
+    ci_reporter (2.0.0)
       builder (>= 2.1.2)
     coderay (1.1.1)
     crack (0.4.3)
@@ -259,7 +259,7 @@ PLATFORMS
 DEPENDENCIES
   airbrake (~> 4.3.0)
   aws-ses (= 0.6.0)
-  ci_reporter (= 1.7.0)
+  ci_reporter (= 2.0.0)
   database_cleaner (= 1.6.1)
   dotenv
   factory_girl (= 4.8.0)

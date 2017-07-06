@@ -38,7 +38,7 @@ gem 'yajl-ruby'
 gem 'aws-ses', '0.6.0'
 gem 'kaminari', '0.14.1'
 gem 'link_header', '0.0.8'
-gem 'airbrake', '~> 4.3.0'
+gem 'airbrake', '~> 5.6.1'
 
 group :test do
   gem 'database_cleaner', '1.6.1'

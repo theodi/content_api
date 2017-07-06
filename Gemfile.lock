@@ -117,7 +117,7 @@ GEM
     journey (1.0.4)
     json (1.8.6)
     jwt (1.5.6)
-    kaminari (0.14.1)
+    kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     kramdown (0.13.8)
@@ -267,7 +267,7 @@ DEPENDENCIES
   gds-api-adapters!
   gds-sso (= 9.4.0)
   govuk_content_models (= 6.1.0)
-  kaminari (= 0.14.1)
+  kaminari (= 0.17.0)
   link_header (= 0.0.8)
   minitest (= 3.4.0)
   mocha (= 0.12.4)

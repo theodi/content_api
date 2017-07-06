@@ -131,7 +131,7 @@ GEM
     method_source (0.8.2)
     mime-types (1.25.1)
     mini_portile2 (2.1.0)
-    minitest (3.4.0)
+    minitest (5.10.2)
     mocha (0.12.4)
       metaclass (~> 0.0.1)
     mongo (1.12.5)
@@ -269,7 +269,7 @@ DEPENDENCIES
   govuk_content_models (= 6.1.0)
   kaminari (= 0.14.1)
   link_header (= 0.0.8)
-  minitest (= 3.4.0)
+  minitest (= 5.10.2)
   mocha (= 0.12.4)
   mongo (>= 1.7.1)
   odi_content_models!

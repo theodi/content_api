@@ -7,7 +7,7 @@ gem 'foreman', '< 0.84.0'
 gem 'rake', '12.0.0'
 gem 'rack-protection', "< 1.5.1" # pinned due to slash-encoding change
 gem 'sinatra', '1.4.6'
-gem 'statsd-ruby', '1.0.0'
+gem 'statsd-ruby', '1.4.0'
 gem 'dotenv'
 
 gem 'govuk_content_models', '6.1.0'

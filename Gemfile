@@ -50,7 +50,7 @@ group :test do
   gem 'turn', require: false
   gem 'ci_reporter', '1.7.0'
   gem 'webmock', '~> 1.8', require: false
-  gem 'timecop', '0.9.0'
+  gem 'timecop', '0.9.1'
   gem 'pry'
 end
 

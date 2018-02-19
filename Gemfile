@@ -5,7 +5,7 @@ ruby "1.9.3"
 gem 'puma'
 gem 'foreman', '< 0.84.0'
 gem 'rake', '12.0.0'
-gem 'rack-protection', "< 1.5.1" # pinned due to slash-encoding change
+gem 'rack-protection', "< 1.5.5" # pinned due to slash-encoding change
 gem 'sinatra', '1.4.6'
 gem 'statsd-ruby', '1.0.0'
 gem 'dotenv'

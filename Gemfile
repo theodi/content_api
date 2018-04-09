@@ -43,7 +43,7 @@ gem 'airbrake', '~> 4.3.0'
 group :test do
   gem 'database_cleaner', '1.6.1'
   gem 'factory_girl', '4.8.0'
-  gem 'mocha', '0.12.4', require: false
+  gem 'mocha', '1.5.0', require: false
   gem 'simplecov', '0.14.1'
   gem 'simplecov-rcov', '0.2.3'
   gem 'minitest', '3.4.0'

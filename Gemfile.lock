@@ -132,7 +132,7 @@ GEM
     mime-types (1.25.1)
     mini_portile2 (2.1.0)
     minitest (3.4.0)
-    mocha (0.12.4)
+    mocha (1.5.0)
       metaclass (~> 0.0.1)
     mongo (1.12.5)
       bson (= 1.12.5)
@@ -270,7 +270,7 @@ DEPENDENCIES
   kaminari (= 0.14.1)
   link_header (= 0.0.8)
   minitest (= 3.4.0)
-  mocha (= 0.12.4)
+  mocha (= 1.5.0)
   mongo (>= 1.7.1)
   odi_content_models!
   odidown!

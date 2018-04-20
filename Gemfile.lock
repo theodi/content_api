@@ -79,7 +79,7 @@ GEM
     database_cleaner (1.6.1)
     differ (0.1.2)
     docile (1.1.5)
-    dotenv (2.2.1)
+    dotenv (2.3.0)
     erubis (2.7.0)
     factory_girl (4.8.0)
       activesupport (>= 3.0.0)
